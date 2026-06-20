@@ -13,7 +13,8 @@ import {
   Menu,
   Bell,
   Truck,
-  FileText
+  FileText,
+  LineChart
 } from "lucide-react";
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
@@ -22,10 +23,11 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
   const navItems = [
     { name: "Tableau de bord", href: "/dashboard", icon: LayoutDashboard },
+    { name: "Finance & Trésorerie", href: "/dashboard/finance", icon: LineChart },
     { name: "Catalogue & Stocks", href: "/dashboard/products", icon: Package },
     { name: "Achats (Commandes)", href: "/dashboard/purchases", icon: FileText },
     { name: "Fournisseurs", href: "/dashboard/suppliers", icon: Truck },
-    { name: "Ventes", href: "/dashboard/sales", icon: ShoppingCart },
+    { name: "Ventes & Factures", href: "/dashboard/sales", icon: ShoppingCart },
     { name: "Utilisateurs", href: "/dashboard/users", icon: Users },
     { name: "Paramètres", href: "/dashboard/settings", icon: Settings },
   ];
