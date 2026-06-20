@@ -26,11 +26,13 @@ model User {
   passwordHash   String
   fullName       String
   isActive       Boolean         @default(true)
-  roleId         String
-  role           Role            @relation(fields: [roleId], references: [id])
-  stockMovements StockMovement[]
-  createdAt      DateTime        @default(now())
-  updatedAt      DateTime        @updatedAt
+  roleId             String
+  role               Role            @relation(fields: [roleId], references: [id])
+  stockMovements     StockMovement[]
+  transfersDispatched StockTransfer[] @relation("DispatchedBy")
+  transfersReceived   StockTransfer[] @relation("ReceivedBy")
+  createdAt          DateTime        @default(now())
+  updatedAt          DateTime        @updatedAt
 }
 
 // ==========================================
@@ -61,6 +63,7 @@ model Product {
   units          Unit[]
   stockLevels    StockLevel[]
   stockMovements StockMovement[]
+  stockTransfers StockTransfer[]
   invoiceLines   InvoiceLine[]
   createdAt      DateTime        @default(now())
   updatedAt      DateTime        @updatedAt
@@ -81,14 +84,16 @@ model Unit {
 // LOGISTIQUE ET STOCKS
 // ==========================================
 model Depot {
-  id          String          @id @default(uuid())
-  name        String
-  location    String?
-  type        String // CENTRAL, RETAIL, WHOLESALE
-  stockLevels StockLevel[]
-  movements   StockMovement[]
-  createdAt   DateTime        @default(now())
-  updatedAt   DateTime        @updatedAt
+  id               String          @id @default(uuid())
+  name             String
+  location         String?
+  type             String // CENTRAL, RETAIL, WHOLESALE
+  stockLevels      StockLevel[]
+  movements        StockMovement[]
+  transfersFrom    StockTransfer[] @relation("TransferFrom")
+  transfersTo      StockTransfer[] @relation("TransferTo")
+  createdAt        DateTime        @default(now())
+  updatedAt        DateTime        @updatedAt
 }
 
 model StockLevel {
@@ -108,7 +113,7 @@ model StockLevel {
 model StockMovement {
   id              String   @id @default(uuid())
   date            DateTime @default(now())
-  type            String // IN, OUT, TRANSFER
+  type            String // IN, OUT, TRANSFER_OUT, TRANSFER_IN
   reference       String? // Motif ou ID doc source
   quantityChanged Float // Positif ou négatif
   userId          String
@@ -118,6 +123,25 @@ model StockMovement {
   depotId         String
   depot           Depot    @relation(fields: [depotId], references: [id])
   createdAt       DateTime @default(now())
+}
+
+model StockTransfer {
+  id              String    @id @default(uuid())
+  reference       String    @unique
+  status          String    @default("IN_TRANSIT") // IN_TRANSIT, COMPLETED, CANCELLED
+  quantity        Float
+  productId       String
+  product         Product   @relation(fields: [productId], references: [id])
+  fromDepotId     String
+  fromDepot       Depot     @relation("TransferFrom", fields: [fromDepotId], references: [id])
+  toDepotId       String
+  toDepot         Depot     @relation("TransferTo", fields: [toDepotId], references: [id])
+  dispatchedAt    DateTime  @default(now())
+  receivedAt      DateTime?
+  dispatchedById  String
+  dispatchedBy    User      @relation("DispatchedBy", fields: [dispatchedById], references: [id])
+  receivedById    String?
+  receivedBy      User?     @relation("ReceivedBy", fields: [receivedById], references: [id])
 }
 
 // ==========================================
