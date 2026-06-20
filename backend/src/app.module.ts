@@ -13,9 +13,11 @@ import { StockMovementsModule } from './stock-movements/stock-movements.module';
 import { StockTransfersModule } from './stock-transfers/stock-transfers.module';
 import { SuppliersModule } from './suppliers/suppliers.module';
 import { PurchaseOrdersModule } from './purchase-orders/purchase-orders.module';
+import { CustomersModule } from './customers/customers.module';
+import { SalesModule } from './sales/sales.module';
 
 @Module({
-  imports: [PrismaModule, AuthModule, CategoriesModule, ProductsModule, UsersModule, RolesModule, DepotsModule, StockLevelsModule, StockMovementsModule, StockTransfersModule, SuppliersModule, PurchaseOrdersModule],
+  imports: [PrismaModule, AuthModule, CategoriesModule, ProductsModule, UsersModule, RolesModule, DepotsModule, StockLevelsModule, StockMovementsModule, StockTransfersModule, SuppliersModule, PurchaseOrdersModule, CustomersModule, SalesModule],
   controllers: [AppController],
   providers: [AppService],
 })
