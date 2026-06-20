@@ -20,12 +20,14 @@ const depots_module_1 = require("./depots/depots.module");
 const stock_levels_module_1 = require("./stock-levels/stock-levels.module");
 const stock_movements_module_1 = require("./stock-movements/stock-movements.module");
 const stock_transfers_module_1 = require("./stock-transfers/stock-transfers.module");
+const suppliers_module_1 = require("./suppliers/suppliers.module");
+const purchase_orders_module_1 = require("./purchase-orders/purchase-orders.module");
 let AppModule = class AppModule {
 };
 exports.AppModule = AppModule;
 exports.AppModule = AppModule = __decorate([
     (0, common_1.Module)({
-        imports: [prisma_module_1.PrismaModule, auth_module_1.AuthModule, categories_module_1.CategoriesModule, products_module_1.ProductsModule, users_module_1.UsersModule, roles_module_1.RolesModule, depots_module_1.DepotsModule, stock_levels_module_1.StockLevelsModule, stock_movements_module_1.StockMovementsModule, stock_transfers_module_1.StockTransfersModule],
+        imports: [prisma_module_1.PrismaModule, auth_module_1.AuthModule, categories_module_1.CategoriesModule, products_module_1.ProductsModule, users_module_1.UsersModule, roles_module_1.RolesModule, depots_module_1.DepotsModule, stock_levels_module_1.StockLevelsModule, stock_movements_module_1.StockMovementsModule, stock_transfers_module_1.StockTransfersModule, suppliers_module_1.SuppliersModule, purchase_orders_module_1.PurchaseOrdersModule],
         controllers: [app_controller_1.AppController],
         providers: [app_service_1.AppService],
     })
