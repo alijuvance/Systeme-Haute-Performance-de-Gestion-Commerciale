@@ -1,0 +1,162 @@
+// Modèle de données Prisma pour l'ERP/CRM
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// ==========================================
+// SECURITE & UTILISATEURS
+// ==========================================
+model Role {
+  id          String   @id @default(uuid())
+  name        String   @unique // ex: ADMIN, MANAGER, CASHIER, STOREKEEPER
+  permissions String?
+  users       User[]
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model User {
+  id             String          @id @default(uuid())
+  email          String          @unique
+  passwordHash   String
+  fullName       String
+  isActive       Boolean         @default(true)
+  roleId         String
+  role           Role            @relation(fields: [roleId], references: [id])
+  stockMovements StockMovement[]
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt
+}
+
+// ==========================================
+// REFERENTIEL PRODUITS
+// ==========================================
+model Category {
+  id            String     @id @default(uuid())
+  name          String     @unique
+  parentId      String?
+  parent        Category?  @relation("CategoryHierarchy", fields: [parentId], references: [id])
+  subcategories Category[] @relation("CategoryHierarchy")
+  products      Product[]
+  createdAt     DateTime   @default(now())
+  updatedAt     DateTime   @updatedAt
+}
+
+model Product {
+  id             String          @id @default(uuid())
+  sku            String          @unique // Ref interne
+  barcode        String?         @unique // Code-barre
+  name           String
+  description    String?
+  defaultPrice   Float // Prix de vente par défaut
+  costPrice      Float // PAMP (Prix moyen pondéré)
+  isActive       Boolean         @default(true)
+  categoryId     String
+  category       Category        @relation(fields: [categoryId], references: [id])
+  units          Unit[]
+  stockLevels    StockLevel[]
+  stockMovements StockMovement[]
+  invoiceLines   InvoiceLine[]
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt
+}
+
+model Unit {
+  id             String   @id @default(uuid())
+  name           String // Ex: Pièce, Carton
+  conversionRate Float // Ratio par rapport à l'unité de base
+  isBaseUnit     Boolean  @default(false)
+  productId      String
+  product        Product  @relation(fields: [productId], references: [id])
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+}
+
+// ==========================================
+// LOGISTIQUE ET STOCKS
+// ==========================================
+model Depot {
+  id          String          @id @default(uuid())
+  name        String
+  location    String?
+  type        String // CENTRAL, RETAIL, WHOLESALE
+  stockLevels StockLevel[]
+  movements   StockMovement[]
+  createdAt   DateTime        @default(now())
+  updatedAt   DateTime        @updatedAt
+}
+
+model StockLevel {
+  id               String   @id @default(uuid())
+  quantity         Float    @default(0)
+  minAlertQuantity Float    @default(0)
+  productId        String
+  product          Product  @relation(fields: [productId], references: [id])
+  depotId          String
+  depot            Depot    @relation(fields: [depotId], references: [id])
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  @@unique([productId, depotId]) // Un seul enregistrement de niveau par produit et par dépôt
+}
+
+model StockMovement {
+  id              String   @id @default(uuid())
+  date            DateTime @default(now())
+  type            String // IN, OUT, TRANSFER
+  reference       String? // Motif ou ID doc source
+  quantityChanged Float // Positif ou négatif
+  userId          String
+  user            User     @relation(fields: [userId], references: [id])
+  productId       String
+  product         Product  @relation(fields: [productId], references: [id])
+  depotId         String
+  depot           Depot    @relation(fields: [depotId], references: [id])
+  createdAt       DateTime @default(now())
+}
+
+// ==========================================
+// VENTES ET CLIENTS (B2B & POS)
+// ==========================================
+model Customer {
+  id          String    @id @default(uuid())
+  companyName String?
+  fullName    String?
+  taxId       String? // Matricule fiscal
+  creditLimit Float     @default(0)
+  currentDebt Float     @default(0)
+  invoices    Invoice[]
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+}
+
+model Invoice {
+  id            String        @id @default(uuid())
+  invoiceNumber String        @unique
+  date          DateTime      @default(now())
+  dueDate       DateTime?
+  status        String // DRAFT, VALIDATED, PAID
+  totalAmount   Float
+  taxAmount     Float
+  customerId    String? // Optionnel pour les tickets de caisse POS
+  customer      Customer?     @relation(fields: [customerId], references: [id])
+  lines         InvoiceLine[]
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+}
+
+model InvoiceLine {
+  id        String  @id @default(uuid())
+  quantity  Float
+  unitPrice Float
+  discount  Float   @default(0)
+  invoiceId String
+  invoice   Invoice @relation(fields: [invoiceId], references: [id])
+  productId String
+  product   Product @relation(fields: [productId], references: [id])
+}
