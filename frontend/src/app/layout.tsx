@@ -12,6 +12,8 @@ export const metadata: Metadata = {
   description: "Système de Gestion Commerciale B2B/B2C",
 };
 
+import { Providers } from "@/contexts/Providers";
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -23,7 +25,7 @@ export default function RootLayout({
       className={`${inter.variable} h-full antialiased dark`}
     >
       <body className="min-h-full flex flex-col font-sans bg-[#020617] text-white">
-        {children}
+        <Providers>{children}</Providers>
       </body>
     </html>
   );

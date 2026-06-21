@@ -5,28 +5,32 @@
 @custom-variant dark (&:is(.dark *));
 
 :root {
-  --primary: #3b82f6;
-  --primary-hover: #2563eb;
-  --background: #f8fafc;
-  --foreground: #0f172a;
-  --card: #ffffff;
-  --card-foreground: #0f172a;
+  /* Minimalist Professional Theme */
+  --primary: #0f172a;        /* Slate 900 for primary actions - very sober */
+  --primary-hover: #1e293b;  
+  --background: #f8fafc;     /* Slate 50 - off white for main background */
+  --foreground: #020617;     /* Slate 950 */
+  --card: #ffffff;           /* Pure white for content areas */
+  --card-foreground: #020617;
   --popover: #ffffff;
-  --popover-foreground: #0f172a;
-  --primary-foreground: #f8fafc;
-  --secondary: #e2e8f0;
+  --popover-foreground: #020617;
+  --primary-foreground: #ffffff;
+  --secondary: #e2e8f0;      /* Slate 200 */
   --secondary-foreground: #0f172a;
-  --muted: #f1f5f9;
-  --muted-foreground: #64748b;
+  --muted: #f1f5f9;          /* Slate 100 */
+  --muted-foreground: #64748b; /* Slate 500 */
   --accent: #f1f5f9;
   --accent-foreground: #0f172a;
-  --destructive: #ef4444;
-  --border: #e2e8f0;
+  --destructive: #ef4444;    /* Red 500 */
+  --border: #e2e8f0;         /* Sharp thin borders */
   --input: #e2e8f0;
-  --ring: #3b82f6;
-  --radius: 1rem;
+  --ring: #94a3b8;           /* Slate 400 for focus rings */
+  
+  /* CRITICAL: No rounded corners for that sharp, enterprise look */
+  --radius: 0px; 
 }
 
+/* Optional Dark Mode - kept extremely sober if user toggles it */
 .dark {
   --background: #020617;
   --foreground: #f8fafc;
@@ -34,7 +38,7 @@
   --card-foreground: #f8fafc;
   --popover: #0f172a;
   --popover-foreground: #f8fafc;
-  --primary: #60a5fa;
+  --primary: #f8fafc;
   --primary-foreground: #0f172a;
   --secondary: #1e293b;
   --secondary-foreground: #f8fafc;
@@ -42,10 +46,10 @@
   --muted-foreground: #94a3b8;
   --accent: #1e293b;
   --accent-foreground: #f8fafc;
-  --destructive: #f87171;
-  --border: rgba(255, 255, 255, 0.1);
-  --input: rgba(255, 255, 255, 0.1);
-  --ring: #60a5fa;
+  --destructive: #7f1d1d;
+  --border: #1e293b;
+  --input: #1e293b;
+  --ring: #475569;
 }
 
 @theme inline {
@@ -69,64 +73,58 @@
   --color-popover: var(--popover);
   --color-card-foreground: var(--card-foreground);
   --color-card: var(--card);
-  --radius-sm: calc(var(--radius) * 0.6);
-  --radius-md: calc(var(--radius) * 0.8);
-  --radius-lg: var(--radius);
-  --radius-xl: calc(var(--radius) * 1.4);
+  
+  /* Enforce 0px radius across the entire tailwind ecosystem */
+  --radius-sm: 0px;
+  --radius-md: 0px;
+  --radius-lg: 0px;
+  --radius-xl: 0px;
+  --radius-2xl: 0px;
+  --radius-3xl: 0px;
+  --radius-full: 0px; /* Only keep full for actual circles like avatars if needed, but override global */
 }
 
 body {
   font-family: var(--font-sans);
   -webkit-font-smoothing: antialiased;
-  transition: background-color 0.4s ease, color 0.4s ease;
-  /* Subtle mesh gradient background for premium feel */
-  background: radial-gradient(circle at top left, rgba(59, 130, 246, 0.15), transparent 40%),
-              radial-gradient(circle at bottom right, rgba(139, 92, 246, 0.15), transparent 40%),
-              var(--background);
-  background-attachment: fixed;
+  background-color: var(--background);
+  color: var(--foreground);
 }
 
-/* Utilitaires Premium (Glassmorphism & Animations) */
-.glass {
-  background: rgba(255, 255, 255, 0.6);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border: 1px solid rgba(255, 255, 255, 0.4);
-  box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.05);
-}
-
-.dark .glass {
-  background: rgba(15, 23, 42, 0.4);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border: 1px solid rgba(255, 255, 255, 0.05);
-  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
-}
-
-.glass-panel {
-  background: linear-gradient(135deg, rgba(255,255,255,0.1), rgba(255,255,255,0));
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-}
-
-.dark .glass-panel {
-  background: linear-gradient(135deg, rgba(30,41,59,0.5), rgba(15,23,42,0.8));
-  border-top: 1px solid rgba(255, 255, 255, 0.1);
-  border-left: 1px solid rgba(255, 255, 255, 0.05);
-}
-
-.hover-glow:hover {
-  box-shadow: 0 0 25px rgba(96, 165, 250, 0.5);
-  transform: translateY(-2px);
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
+/* Base styles enforcing sharp borders */
 @layer base {
   * {
     @apply border-border outline-ring/50;
+    border-radius: 0px !important; /* Force 0px everywhere */
   }
+  
+  /* Exception for true circles like avatars or status dots */
+  .rounded-full {
+    border-radius: 9999px !important;
+  }
+  
   html {
     @apply font-sans;
   }
+}
+
+/* Custom Scrollbar for professional look */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: transparent; 
+}
+::-webkit-scrollbar-thumb {
+  background: #cbd5e1; 
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8; 
+}
+.dark ::-webkit-scrollbar-thumb {
+  background: #334155; 
+}
+.dark ::-webkit-scrollbar-thumb:hover {
+  background: #475569; 
 }

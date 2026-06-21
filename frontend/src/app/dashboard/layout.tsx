@@ -19,24 +19,18 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       case "/dashboard/sales": return "Ventes & Factures";
       case "/dashboard/users": return "Utilisateurs";
       case "/dashboard/settings": return "Paramètres";
-      default: return "ERP Pro";
+      default: return "ERP System";
     }
   };
 
   return (
-    <div className="min-h-screen bg-transparent flex">
-      
-      {/* Extracted Sidebar */}
+    <div className="min-h-screen bg-slate-50 flex text-slate-900">
       <Sidebar sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} />
 
-      {/* Main Content */}
-      <div className={`flex-1 flex flex-col min-h-screen transition-all duration-300 ${sidebarOpen ? "ml-72" : "ml-20"}`}>
-        
-        {/* Extracted Header */}
+      <div className={`flex-1 flex flex-col min-h-screen transition-all duration-300 ${sidebarOpen ? "ml-64" : "ml-16"}`}>
         <Header title={getTitle()} />
 
-        {/* Content */}
-        <main className="p-8 flex-1 animate-in fade-in zoom-in-95 duration-500">
+        <main className="p-6 flex-1">
           {children}
         </main>
       </div>

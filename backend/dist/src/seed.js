@@ -35,7 +35,7 @@ var __importStar = (this && this.__importStar) || (function () {
 Object.defineProperty(exports, "__esModule", { value: true });
 const core_1 = require("@nestjs/core");
 const app_module_1 = require("./app.module");
-const prisma_service_1 = require("./prisma/prisma.service");
+const prisma_service_1 = require("./core/prisma/prisma.service");
 const bcrypt = __importStar(require("bcrypt"));
 async function bootstrap() {
     const app = await core_1.NestFactory.createApplicationContext(app_module_1.AppModule);
