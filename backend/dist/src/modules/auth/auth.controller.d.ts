@@ -16,12 +16,12 @@ export declare class AuthController {
         };
     }>;
     register(createUserDto: CreateUserDto): Promise<Omit<{
-        email: string;
-        fullName: string;
-        roleId: string;
         id: string;
+        email: string;
         passwordHash: string;
+        fullName: string;
         isActive: boolean;
+        roleId: string;
         createdAt: Date;
         updatedAt: Date;
     }, "passwordHash">>;

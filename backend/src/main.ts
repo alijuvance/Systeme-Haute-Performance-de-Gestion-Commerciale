@@ -1,12 +1,22 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { ValidationPipe } from '@nestjs/common';
+import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   
   app.setGlobalPrefix('api');
   
+  const config = new DocumentBuilder()
+    .setTitle('ERP API')
+    .setDescription('The ERP/CRM API description')
+    .setVersion('1.0')
+    .addBearerAuth()
+    .build();
+  const document = SwaggerModule.createDocument(app, config);
+  SwaggerModule.setup('api/docs', app, document);
+
   // Activation de la validation globale des DTOs (très important pour la sécurité)
   app.useGlobalPipes(new ValidationPipe({
     whitelist: true, // Retire les propriétés non définies dans le DTO
@@ -15,11 +25,10 @@ async function bootstrap() {
   }));
   
   // Configuration des CORS pour autoriser le frontend Next.js à communiquer avec l'API
-  app.enableCors({
-    origin: 'http://localhost:3000', // Port par défaut de Next.js
-    credentials: true,
-  });
+  app.enableCors();
 
-  await app.listen(3001); // Le backend tournera sur le port 3001
+  const port = process.env.PORT || 3001;
+  await app.listen(port);
+  console.log(`Application is running on: http://localhost:${port}`);
 }
 bootstrap();

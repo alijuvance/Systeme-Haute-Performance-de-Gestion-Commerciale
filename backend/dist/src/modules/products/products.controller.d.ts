@@ -51,9 +51,9 @@ export declare class ProductsController {
             id: string;
             createdAt: Date;
             updatedAt: Date;
+            productId: string;
             conversionRate: number;
             isBaseUnit: boolean;
-            productId: string;
         }[];
     } & {
         name: string;

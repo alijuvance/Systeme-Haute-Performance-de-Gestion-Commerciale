@@ -21,16 +21,16 @@ export declare class StockLevelsService {
             id: string;
             createdAt: Date;
             updatedAt: Date;
-            location: string | null;
             type: string;
+            location: string | null;
         };
     } & {
         id: string;
         createdAt: Date;
         updatedAt: Date;
-        productId: string;
         quantity: number;
         minAlertQuantity: number;
+        productId: string;
         depotId: string;
     })[]>;
 }

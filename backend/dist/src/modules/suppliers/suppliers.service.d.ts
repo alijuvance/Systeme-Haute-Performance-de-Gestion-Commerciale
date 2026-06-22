@@ -4,9 +4,9 @@ export declare class SuppliersService {
     private prisma;
     constructor(prisma: PrismaService);
     create(dto: CreateSupplierDto): import("@prisma/client").Prisma.Prisma__SupplierClient<{
-        email: string | null;
         name: string;
         id: string;
+        email: string | null;
         createdAt: Date;
         updatedAt: Date;
         contactName: string | null;
@@ -15,9 +15,9 @@ export declare class SuppliersService {
         taxId: string | null;
     }, never, import("@prisma/client/runtime/client").DefaultArgs, import("@prisma/client").Prisma.PrismaClientOptions>;
     findAll(): import("@prisma/client").Prisma.PrismaPromise<{
-        email: string | null;
         name: string;
         id: string;
+        email: string | null;
         createdAt: Date;
         updatedAt: Date;
         contactName: string | null;

@@ -65,7 +65,7 @@ export default function LoginPage() {
                 type="email"
                 required
                 className="w-full pl-10 pr-4 py-2 border border-slate-300 bg-white text-sm focus:outline-none focus:ring-1 focus:ring-slate-400 text-slate-900 placeholder-slate-400"
-                placeholder="admin@entreprise.com"
+                placeholder="admin@erp.com"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
               />
@@ -83,7 +83,7 @@ export default function LoginPage() {
                 type="password"
                 required
                 className="w-full pl-10 pr-4 py-2 border border-slate-300 bg-white text-sm focus:outline-none focus:ring-1 focus:ring-slate-400 text-slate-900 placeholder-slate-400"
-                placeholder="••••••••"
+                placeholder="admin123"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
               />

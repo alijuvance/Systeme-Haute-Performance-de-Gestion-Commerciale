@@ -7,27 +7,27 @@ export declare class StockTransfersService {
     constructor(prisma: PrismaService, stockMovementsService: StockMovementsService);
     dispatchTransfer(dto: DispatchTransferDto, userId: string): Promise<{
         id: string;
-        productId: string;
         quantity: number;
+        productId: string;
         reference: string;
-        fromDepotId: string;
-        toDepotId: string;
         status: string;
         dispatchedAt: Date;
         receivedAt: Date | null;
+        fromDepotId: string;
+        toDepotId: string;
         dispatchedById: string;
         receivedById: string | null;
     }>;
     receiveTransfer(transferId: string, userId: string): Promise<{
         id: string;
-        productId: string;
         quantity: number;
+        productId: string;
         reference: string;
-        fromDepotId: string;
-        toDepotId: string;
         status: string;
         dispatchedAt: Date;
         receivedAt: Date | null;
+        fromDepotId: string;
+        toDepotId: string;
         dispatchedById: string;
         receivedById: string | null;
     }>;
@@ -50,16 +50,16 @@ export declare class StockTransfersService {
             id: string;
             createdAt: Date;
             updatedAt: Date;
-            location: string | null;
             type: string;
+            location: string | null;
         };
         toDepot: {
             name: string;
             id: string;
             createdAt: Date;
             updatedAt: Date;
-            location: string | null;
             type: string;
+            location: string | null;
         };
         dispatchedBy: {
             fullName: string;
@@ -69,14 +69,14 @@ export declare class StockTransfersService {
         } | null;
     } & {
         id: string;
-        productId: string;
         quantity: number;
+        productId: string;
         reference: string;
-        fromDepotId: string;
-        toDepotId: string;
         status: string;
         dispatchedAt: Date;
         receivedAt: Date | null;
+        fromDepotId: string;
+        toDepotId: string;
         dispatchedById: string;
         receivedById: string | null;
     })[]>;
