@@ -1,5 +1,4 @@
 import React from 'react';
-import { Card } from '@/components/ui/card';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { LineChart } from 'lucide-react';
 import { formatCurrency } from '@/utils/formatters';
@@ -11,44 +10,39 @@ interface DashboardChartsProps {
 
 export const DashboardCharts: React.FC<DashboardChartsProps> = ({ chartData, isLoading }) => {
   if (isLoading) {
-    return <Card className="p-8 pb-10 h-96 flex items-center justify-center animate-pulse text-gray-500">Chargement du graphique...</Card>;
+    return <div className="bg-white border border-slate-200 p-6 h-96 flex items-center justify-center text-slate-400 animate-pulse">Chargement du graphique...</div>;
   }
 
   return (
-    <Card className="p-8 pb-10">
-      <h2 className="text-xl font-bold text-gray-800 dark:text-white mb-8 flex items-center">
-        <div className="w-2 h-8 bg-blue-500 rounded-full mr-3"></div>
-        Évolution des Ventes
-      </h2>
-      <div className="h-96 w-full">
+    <div className="bg-white border border-slate-200 p-6">
+      <h2 className="text-base font-bold text-slate-900 mb-6">Évolution des Ventes</h2>
+      <div className="h-80 w-full">
         {chartData.length > 0 ? (
           <ResponsiveContainer width="100%" height="100%">
             <AreaChart data={chartData} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
               <defs>
                 <linearGradient id="colorSales" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.6}/>
-                  <stop offset="95%" stopColor="#3b82f6" stopOpacity={0}/>
+                  <stop offset="5%" stopColor="#0f172a" stopOpacity={0.15}/>
+                  <stop offset="95%" stopColor="#0f172a" stopOpacity={0}/>
                 </linearGradient>
               </defs>
-              <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="rgba(255,255,255,0.1)" />
-              <XAxis dataKey="date" axisLine={false} tickLine={false} tick={{ fill: '#94a3b8', fontSize: 12 }} dy={15} />
-              <YAxis axisLine={false} tickLine={false} tick={{ fill: '#94a3b8', fontSize: 12 }} width={80} tickFormatter={(value) => new Intl.NumberFormat('fr-MG', { notation: "compact", compactDisplay: "short" }).format(value)} />
-              <Tooltip 
+              <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e2e8f0" />
+              <XAxis dataKey="date" axisLine={false} tickLine={false} tick={{ fill: '#64748b', fontSize: 12 }} dy={10} />
+              <YAxis axisLine={false} tickLine={false} tick={{ fill: '#64748b', fontSize: 12 }} width={80} tickFormatter={(v) => new Intl.NumberFormat('fr-MG', { notation: "compact", compactDisplay: "short" }).format(v)} />
+              <Tooltip
                 formatter={(value: any) => [formatCurrency(value), "Ventes"]}
-                contentStyle={{ borderRadius: '16px', border: '1px solid rgba(255,255,255,0.1)', boxShadow: '0 10px 40px -10px rgba(0,0,0,0.3)', backgroundColor: 'rgba(15, 23, 42, 0.8)', backdropFilter: 'blur(10px)', color: 'white' }}
+                contentStyle={{ border: '1px solid #e2e8f0', boxShadow: '0 4px 12px rgba(0,0,0,0.08)', backgroundColor: '#ffffff', color: '#0f172a', fontSize: '13px' }}
               />
-              <Area type="monotone" dataKey="amount" stroke="#3b82f6" strokeWidth={4} fillOpacity={1} fill="url(#colorSales)" />
+              <Area type="monotone" dataKey="amount" stroke="#0f172a" strokeWidth={2} fillOpacity={1} fill="url(#colorSales)" />
             </AreaChart>
           </ResponsiveContainer>
         ) : (
-          <div className="flex flex-col items-center justify-center h-full text-gray-400">
-            <div className="w-16 h-16 rounded-full bg-gray-100 dark:bg-white/5 flex items-center justify-center mb-4">
-              <LineChart className="w-8 h-8 opacity-50" />
-            </div>
-            <p className="font-medium">Aucune donnée de vente pour le graphique</p>
+          <div className="flex flex-col items-center justify-center h-full text-slate-400">
+            <LineChart className="w-10 h-10 mb-3 opacity-30" />
+            <p className="text-sm">Aucune donnée de vente disponible</p>
           </div>
         )}
       </div>
-    </Card>
+    </div>
   );
 };

@@ -17,7 +17,6 @@ export default function LoginPage() {
     setError("");
 
     try {
-      // Simulation pour l'UI, on connectera axios plus tard
       setTimeout(() => {
         router.push("/dashboard");
       }, 1000);
@@ -28,36 +27,33 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen w-full flex items-center justify-center bg-[url('https://images.unsplash.com/photo-1557683316-973673baf926?q=80&w=2000&auto=format&fit=crop')] bg-cover bg-center">
-      {/* Overlay sombre/coloré */}
-      <div className="absolute inset-0 bg-black/40 backdrop-blur-[2px]"></div>
-
-      <div className="relative z-10 w-full max-w-md p-8 m-4 rounded-3xl glass text-foreground dark:text-white">
+    <div className="min-h-screen w-full flex items-center justify-center bg-slate-50">
+      <div className="w-full max-w-sm p-8 bg-white border border-slate-200">
         <div className="mb-8 text-center">
-          <div className="w-16 h-16 bg-primary rounded-2xl mx-auto flex items-center justify-center mb-4 shadow-lg shadow-primary/30">
-            <Lock className="w-8 h-8 text-white" />
+          <div className="w-12 h-12 bg-slate-900 mx-auto flex items-center justify-center mb-4">
+            <Lock className="w-6 h-6 text-white" />
           </div>
-          <h1 className="text-3xl font-bold tracking-tight mb-2">Bon retour</h1>
-          <p className="text-foreground/70 dark:text-gray-300">
-            Connectez-vous à votre espace ERP
+          <h1 className="text-xl font-bold text-slate-900 mb-1">Connexion</h1>
+          <p className="text-sm text-slate-500">
+            Accédez à votre espace de gestion
           </p>
         </div>
 
         {error && (
-          <div className="mb-6 p-4 rounded-xl bg-red-500/10 border border-red-500/20 text-red-600 dark:text-red-400 text-sm text-center">
+          <div className="mb-6 p-3 bg-red-50 border border-red-200 text-red-700 text-sm text-center">
             {error}
           </div>
         )}
 
-        <form onSubmit={handleLogin} className="space-y-6">
-          <div className="space-y-2">
-            <label className="text-sm font-medium ml-1">Email</label>
+        <form onSubmit={handleLogin} className="space-y-4">
+          <div>
+            <label className="block text-sm font-semibold text-slate-700 mb-1">Email</label>
             <div className="relative">
-              <Mail className="absolute left-4 top-3.5 w-5 h-5 text-gray-400" />
+              <Mail className="absolute left-3 top-2.5 w-4 h-4 text-slate-400" />
               <input
                 type="email"
                 required
-                className="w-full pl-12 pr-4 py-3 rounded-xl bg-white/50 dark:bg-black/20 border border-gray-200 dark:border-white/10 focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all text-black dark:text-white"
+                className="w-full pl-10 pr-4 py-2 border border-slate-300 bg-white text-sm focus:outline-none focus:ring-1 focus:ring-slate-400 text-slate-900 placeholder-slate-400"
                 placeholder="admin@entreprise.com"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
@@ -65,17 +61,17 @@ export default function LoginPage() {
             </div>
           </div>
 
-          <div className="space-y-2">
-            <div className="flex justify-between items-center ml-1">
-              <label className="text-sm font-medium">Mot de passe</label>
-              <a href="#" className="text-xs text-primary hover:underline">Mot de passe oublié ?</a>
+          <div>
+            <div className="flex justify-between items-center mb-1">
+              <label className="text-sm font-semibold text-slate-700">Mot de passe</label>
+              <a href="#" className="text-xs text-slate-500 hover:text-slate-900 transition-colors">Mot de passe oublié ?</a>
             </div>
             <div className="relative">
-              <Lock className="absolute left-4 top-3.5 w-5 h-5 text-gray-400" />
+              <Lock className="absolute left-3 top-2.5 w-4 h-4 text-slate-400" />
               <input
                 type="password"
                 required
-                className="w-full pl-12 pr-4 py-3 rounded-xl bg-white/50 dark:bg-black/20 border border-gray-200 dark:border-white/10 focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all text-black dark:text-white"
+                className="w-full pl-10 pr-4 py-2 border border-slate-300 bg-white text-sm focus:outline-none focus:ring-1 focus:ring-slate-400 text-slate-900 placeholder-slate-400"
                 placeholder="••••••••"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
@@ -86,14 +82,14 @@ export default function LoginPage() {
           <button
             type="submit"
             disabled={loading}
-            className="w-full py-3.5 rounded-xl bg-primary hover:bg-primary-hover text-white font-medium flex items-center justify-center gap-2 transition-all hover:scale-[1.02] active:scale-95 shadow-lg shadow-primary/30 disabled:opacity-70 disabled:hover:scale-100"
+            className="w-full py-2.5 bg-slate-900 hover:bg-slate-800 text-white text-sm font-medium flex items-center justify-center gap-2 transition-colors disabled:opacity-60"
           >
             {loading ? (
-              <Loader2 className="w-5 h-5 animate-spin" />
+              <Loader2 className="w-4 h-4 animate-spin" />
             ) : (
               <>
                 Se connecter
-                <ArrowRight className="w-5 h-5" />
+                <ArrowRight className="w-4 h-4" />
               </>
             )}
           </button>

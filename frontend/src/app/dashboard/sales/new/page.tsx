@@ -1,14 +1,13 @@
 'use client';
 
 import { SaleForm } from '@/features/sales/components/SaleForm';
+import { PageHeader } from '@/components/shared/PageHeader';
 
 export default function NewSalePage() {
   return (
-    <div className="p-6 max-w-4xl mx-auto">
-      <h1 className="text-2xl font-bold text-gray-800 dark:text-white mb-6">
-        Nouvelle Facture B2B
-      </h1>
+    <>
+      <PageHeader title="Nouvelle Facture B2B" description="Créez une facture pour un client professionnel." />
       <SaleForm />
-    </div>
+    </>
   );
 }

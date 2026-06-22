@@ -6,7 +6,7 @@ export const customerSchema = z.object({
   email: z.string().email('Adresse email invalide.').optional().or(z.literal('')),
   phone: z.string().min(8, 'Le numéro de téléphone est trop court.'),
   address: z.string().optional(),
-  type: z.enum(['B2B', 'B2C']).default('B2B'),
+  type: z.enum(['B2B', 'B2C']),
 });
 
 export type CustomerFormData = z.infer<typeof customerSchema>;
