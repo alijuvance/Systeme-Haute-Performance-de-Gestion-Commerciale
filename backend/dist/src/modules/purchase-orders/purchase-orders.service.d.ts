@@ -8,9 +8,9 @@ export declare class PurchaseOrdersService {
     constructor(prisma: PrismaService, stockMovementsService: StockMovementsService);
     create(dto: CreatePurchaseOrderDto): Promise<{
         supplier: {
+            email: string | null;
             name: string;
             id: string;
-            email: string | null;
             createdAt: Date;
             updatedAt: Date;
             contactName: string | null;
@@ -20,8 +20,8 @@ export declare class PurchaseOrdersService {
         };
         lines: {
             id: string;
-            quantity: number;
             productId: string;
+            quantity: number;
             unitPrice: number;
             purchaseOrderId: string;
         }[];
@@ -31,11 +31,11 @@ export declare class PurchaseOrdersService {
         updatedAt: Date;
         date: Date;
         status: string;
+        supplierId: string;
+        receivingDepotId: string | null;
         orderNumber: string;
         expectedDate: Date | null;
         totalAmount: number;
-        supplierId: string;
-        receivingDepotId: string | null;
     }>;
     receive(id: string, dto: ReceivePurchaseOrderDto, userId: string): Promise<{
         id: string;
@@ -43,17 +43,17 @@ export declare class PurchaseOrdersService {
         updatedAt: Date;
         date: Date;
         status: string;
+        supplierId: string;
+        receivingDepotId: string | null;
         orderNumber: string;
         expectedDate: Date | null;
         totalAmount: number;
-        supplierId: string;
-        receivingDepotId: string | null;
     }>;
     findAll(): import("@prisma/client").Prisma.PrismaPromise<({
         supplier: {
+            email: string | null;
             name: string;
             id: string;
-            email: string | null;
             createdAt: Date;
             updatedAt: Date;
             contactName: string | null;
@@ -66,8 +66,8 @@ export declare class PurchaseOrdersService {
             id: string;
             createdAt: Date;
             updatedAt: Date;
-            type: string;
             location: string | null;
+            type: string;
         } | null;
     } & {
         id: string;
@@ -75,10 +75,10 @@ export declare class PurchaseOrdersService {
         updatedAt: Date;
         date: Date;
         status: string;
+        supplierId: string;
+        receivingDepotId: string | null;
         orderNumber: string;
         expectedDate: Date | null;
         totalAmount: number;
-        supplierId: string;
-        receivingDepotId: string | null;
     })[]>;
 }

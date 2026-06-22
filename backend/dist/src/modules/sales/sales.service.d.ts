@@ -9,8 +9,8 @@ export declare class SalesService {
     constructor(prisma: PrismaService, stockMovementsService: StockMovementsService, customersService: CustomersService);
     createSale(dto: CreateSaleDto, userId: string): Promise<{
         customer: {
-            id: string;
             fullName: string | null;
+            id: string;
             createdAt: Date;
             updatedAt: Date;
             type: string;
@@ -23,8 +23,8 @@ export declare class SalesService {
         };
         lines: {
             id: string;
-            quantity: number;
             productId: string;
+            quantity: number;
             unitPrice: number;
             discount: number;
             invoiceId: string;
@@ -34,15 +34,15 @@ export declare class SalesService {
         createdAt: Date;
         updatedAt: Date;
         depotId: string;
-        date: Date;
         type: string;
+        date: Date;
         status: string;
         totalAmount: number;
+        customerId: string;
+        amountPaid: number;
         invoiceNumber: string;
         dueDate: Date | null;
         taxAmount: number;
-        amountPaid: number;
-        customerId: string;
     }>;
     findAll(): import("@prisma/client").Prisma.PrismaPromise<({
         depot: {
@@ -50,12 +50,12 @@ export declare class SalesService {
             id: string;
             createdAt: Date;
             updatedAt: Date;
-            type: string;
             location: string | null;
+            type: string;
         };
         customer: {
-            id: string;
             fullName: string | null;
+            id: string;
             createdAt: Date;
             updatedAt: Date;
             type: string;
@@ -71,14 +71,14 @@ export declare class SalesService {
         createdAt: Date;
         updatedAt: Date;
         depotId: string;
-        date: Date;
         type: string;
+        date: Date;
         status: string;
         totalAmount: number;
+        customerId: string;
+        amountPaid: number;
         invoiceNumber: string;
         dueDate: Date | null;
         taxAmount: number;
-        amountPaid: number;
-        customerId: string;
     })[]>;
 }

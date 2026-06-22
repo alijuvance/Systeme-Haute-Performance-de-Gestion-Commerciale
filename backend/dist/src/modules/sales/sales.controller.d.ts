@@ -5,8 +5,8 @@ export declare class SalesController {
     constructor(salesService: SalesService);
     create(createSaleDto: CreateSaleDto, req: any): Promise<{
         customer: {
-            id: string;
             fullName: string | null;
+            id: string;
             createdAt: Date;
             updatedAt: Date;
             type: string;
@@ -19,8 +19,8 @@ export declare class SalesController {
         };
         lines: {
             id: string;
-            quantity: number;
             productId: string;
+            quantity: number;
             unitPrice: number;
             discount: number;
             invoiceId: string;
@@ -30,15 +30,15 @@ export declare class SalesController {
         createdAt: Date;
         updatedAt: Date;
         depotId: string;
-        date: Date;
         type: string;
+        date: Date;
         status: string;
         totalAmount: number;
+        customerId: string;
+        amountPaid: number;
         invoiceNumber: string;
         dueDate: Date | null;
         taxAmount: number;
-        amountPaid: number;
-        customerId: string;
     }>;
     findAll(): import("@prisma/client").Prisma.PrismaPromise<({
         depot: {
@@ -46,12 +46,12 @@ export declare class SalesController {
             id: string;
             createdAt: Date;
             updatedAt: Date;
-            type: string;
             location: string | null;
+            type: string;
         };
         customer: {
-            id: string;
             fullName: string | null;
+            id: string;
             createdAt: Date;
             updatedAt: Date;
             type: string;
@@ -67,14 +67,14 @@ export declare class SalesController {
         createdAt: Date;
         updatedAt: Date;
         depotId: string;
-        date: Date;
         type: string;
+        date: Date;
         status: string;
         totalAmount: number;
+        customerId: string;
+        amountPaid: number;
         invoiceNumber: string;
         dueDate: Date | null;
         taxAmount: number;
-        amountPaid: number;
-        customerId: string;
     })[]>;
 }

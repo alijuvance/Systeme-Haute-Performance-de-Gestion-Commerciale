@@ -6,9 +6,9 @@ export declare class PurchaseOrdersController {
     constructor(purchaseOrdersService: PurchaseOrdersService);
     create(createPurchaseOrderDto: CreatePurchaseOrderDto): Promise<{
         supplier: {
+            email: string | null;
             name: string;
             id: string;
-            email: string | null;
             createdAt: Date;
             updatedAt: Date;
             contactName: string | null;
@@ -18,8 +18,8 @@ export declare class PurchaseOrdersController {
         };
         lines: {
             id: string;
-            quantity: number;
             productId: string;
+            quantity: number;
             unitPrice: number;
             purchaseOrderId: string;
         }[];
@@ -29,17 +29,17 @@ export declare class PurchaseOrdersController {
         updatedAt: Date;
         date: Date;
         status: string;
+        supplierId: string;
+        receivingDepotId: string | null;
         orderNumber: string;
         expectedDate: Date | null;
         totalAmount: number;
-        supplierId: string;
-        receivingDepotId: string | null;
     }>;
     findAll(): import("@prisma/client").Prisma.PrismaPromise<({
         supplier: {
+            email: string | null;
             name: string;
             id: string;
-            email: string | null;
             createdAt: Date;
             updatedAt: Date;
             contactName: string | null;
@@ -52,8 +52,8 @@ export declare class PurchaseOrdersController {
             id: string;
             createdAt: Date;
             updatedAt: Date;
-            type: string;
             location: string | null;
+            type: string;
         } | null;
     } & {
         id: string;
@@ -61,11 +61,11 @@ export declare class PurchaseOrdersController {
         updatedAt: Date;
         date: Date;
         status: string;
+        supplierId: string;
+        receivingDepotId: string | null;
         orderNumber: string;
         expectedDate: Date | null;
         totalAmount: number;
-        supplierId: string;
-        receivingDepotId: string | null;
     })[]>;
     receive(id: string, receiveDto: ReceivePurchaseOrderDto, req: any): Promise<{
         id: string;
@@ -73,10 +73,10 @@ export declare class PurchaseOrdersController {
         updatedAt: Date;
         date: Date;
         status: string;
+        supplierId: string;
+        receivingDepotId: string | null;
         orderNumber: string;
         expectedDate: Date | null;
         totalAmount: number;
-        supplierId: string;
-        receivingDepotId: string | null;
     }>;
 }

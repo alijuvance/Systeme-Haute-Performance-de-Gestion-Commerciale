@@ -4,8 +4,8 @@ export declare class CustomersController {
     private readonly customersService;
     constructor(customersService: CustomersService);
     create(createCustomerDto: CreateCustomerDto): Promise<{
-        id: string;
         fullName: string | null;
+        id: string;
         createdAt: Date;
         updatedAt: Date;
         type: string;
@@ -17,8 +17,8 @@ export declare class CustomersController {
         currentDebt: number;
     }>;
     findAll(): import("@prisma/client").Prisma.PrismaPromise<{
-        id: string;
         fullName: string | null;
+        id: string;
         createdAt: Date;
         updatedAt: Date;
         type: string;

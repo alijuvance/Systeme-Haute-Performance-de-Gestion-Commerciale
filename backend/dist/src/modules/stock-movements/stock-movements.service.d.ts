@@ -8,20 +8,20 @@ export declare class StockMovementsService {
         createdAt: Date;
         productId: string;
         depotId: string;
-        date: Date;
         type: string;
         reference: string | null;
         quantityChanged: number;
+        date: Date;
         userId: string;
     }>;
     findAll(): Promise<({
         user: {
-            id: string;
             email: string;
-            passwordHash: string;
             fullName: string;
-            isActive: boolean;
             roleId: string;
+            id: string;
+            passwordHash: string;
+            isActive: boolean;
             createdAt: Date;
             updatedAt: Date;
         };
@@ -43,18 +43,18 @@ export declare class StockMovementsService {
             id: string;
             createdAt: Date;
             updatedAt: Date;
-            type: string;
             location: string | null;
+            type: string;
         };
     } & {
         id: string;
         createdAt: Date;
         productId: string;
         depotId: string;
-        date: Date;
         type: string;
         reference: string | null;
         quantityChanged: number;
+        date: Date;
         userId: string;
     })[]>;
 }

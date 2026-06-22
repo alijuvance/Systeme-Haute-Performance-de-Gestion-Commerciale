@@ -9,6 +9,6 @@ export default defineConfig({
     path: "prisma/migrations",
   },
   datasource: {
-    url: "postgresql://erp_user:erp_password@127.0.0.1:5433/erp_db?schema=public",
+    url: "postgresql://erp_user:erp_password@127.0.0.1:5432/erp_db?schema=public",
   },
 });

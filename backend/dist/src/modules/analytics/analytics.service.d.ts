@@ -14,8 +14,8 @@ export declare class AnalyticsService {
     }[]>;
     getDebts(): Promise<({
         customer: {
-            id: string;
             fullName: string | null;
+            id: string;
             createdAt: Date;
             updatedAt: Date;
             type: string;
@@ -31,14 +31,14 @@ export declare class AnalyticsService {
         createdAt: Date;
         updatedAt: Date;
         depotId: string;
-        date: Date;
         type: string;
+        date: Date;
         status: string;
         totalAmount: number;
+        customerId: string;
+        amountPaid: number;
         invoiceNumber: string;
         dueDate: Date | null;
         taxAmount: number;
-        amountPaid: number;
-        customerId: string;
     })[]>;
 }
