@@ -1,25 +1,39 @@
-import { useState, useEffect } from 'react';
-import { getSuppliers } from '../api/getSuppliers';
+import { useState, useEffect, useCallback } from 'react';
+import { Supplier } from '../schemas/supplierSchema';
+import { getSuppliers, deleteSupplier } from '../api/supplierApi';
 
 export const useSuppliers = () => {
-  const [data, setData] = useState<any[]>([]);
+  const [suppliers, setSuppliers] = useState<Supplier[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        setIsLoading(true);
-        const result = await getSuppliers();
-        setData(result);
-      } catch (err: any) {
-        setError(err.message || 'Une erreur est survenue lors du chargement.');
-      } finally {
-        setIsLoading(false);
-      }
-    };
-    fetchData();
+  const fetchSuppliers = useCallback(async () => {
+    setIsLoading(true);
+    setError(null);
+    try {
+      const data = await getSuppliers();
+      setSuppliers(data);
+    } catch (err: any) {
+      setError(err.message || 'Erreur lors du chargement des fournisseurs');
+    } finally {
+      setIsLoading(false);
+    }
   }, []);
 
-  return { data, isLoading, error };
+  useEffect(() => {
+    fetchSuppliers();
+  }, [fetchSuppliers]);
+
+  const removeSupplier = async (id: string) => {
+    try {
+      await deleteSupplier(id);
+      setSuppliers(prev => prev.filter(s => s.id !== id));
+      return true;
+    } catch (err: any) {
+      setError(err.message || 'Impossible de supprimer le fournisseur');
+      return false;
+    }
+  };
+
+  return { suppliers, isLoading, error, fetchSuppliers, removeSupplier };
 };

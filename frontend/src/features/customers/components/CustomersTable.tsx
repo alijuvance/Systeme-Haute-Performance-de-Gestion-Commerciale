@@ -1,37 +1,94 @@
-import React from 'react';
+'use client';
+import React, { useState } from 'react';
+import { useCustomers } from '../hooks/useCustomers';
+import { Customer } from '../schemas/customerSchema';
+import { DataTable, ColumnDef } from '@/components/shared/DataTable';
+import { PageHeader } from '@/components/shared/PageHeader';
+import { Button } from '@/components/shared/Button';
+import { Plus, Edit2, Trash2 } from 'lucide-react';
+import { CustomerFormModal } from './CustomerFormModal';
 
-interface CustomersTableProps {
-  data: any[];
-  isLoading: boolean;
-  error: string | null;
-}
+export function CustomersTable() {
+  const { customers, isLoading, error, fetchCustomers, removeCustomer } = useCustomers();
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [editingCustomer, setEditingCustomer] = useState<Customer | undefined>(undefined);
 
-export const CustomersTable: React.FC<CustomersTableProps> = ({ data, isLoading, error }) => {
-  if (error) return <div className="text-red-500 p-4">{error}</div>;
-  if (isLoading) return <div className="p-4 animate-pulse">Chargement des clients...</div>;
+  const handleOpenCreate = () => {
+    setEditingCustomer(undefined);
+    setIsModalOpen(true);
+  };
+
+  const handleOpenEdit = (customer: Customer) => {
+    setEditingCustomer(customer);
+    setIsModalOpen(true);
+  };
+
+  const handleDelete = async (id: string) => {
+    if (confirm('Voulez-vous vraiment supprimer ce client ?')) {
+      await removeCustomer(id);
+    }
+  };
+
+  const columns: ColumnDef<Customer>[] = [
+    { key: 'name', header: 'Nom complet', cell: (c) => <span className="font-medium text-slate-900">{c.fullName}</span> },
+    { key: 'company', header: 'Raison sociale', cell: (c) => c.companyName || '—' },
+    { key: 'phone', header: 'Téléphone', cell: (c) => c.phone },
+    { key: 'email', header: 'Email', cell: (c) => c.email || '—' },
+    { 
+      key: 'type', 
+      header: 'Type', 
+      cell: (c) => (
+        <span className={`inline-block px-2 py-0.5 text-xs font-semibold border ${c.type === 'B2B' ? 'text-blue-700 bg-blue-50 border-blue-200' : 'text-emerald-700 bg-emerald-50 border-emerald-200'}`}>
+          {c.type}
+        </span>
+      ) 
+    },
+    { 
+      key: 'actions', 
+      header: '', 
+      align: 'right',
+      cell: (c) => (
+        <div className="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+          <button onClick={() => handleOpenEdit(c)} className="p-1.5 text-slate-400 hover:text-blue-600 hover:bg-blue-50 transition-colors">
+            <Edit2 className="w-4 h-4" />
+          </button>
+          <button onClick={() => handleDelete(c.id)} className="p-1.5 text-slate-400 hover:text-red-600 hover:bg-red-50 transition-colors">
+            <Trash2 className="w-4 h-4" />
+          </button>
+        </div>
+      )
+    }
+  ];
+
+  if (error) {
+    return <div className="p-4 bg-red-50 text-red-600 border border-red-200">{error}</div>;
+  }
 
   return (
-    <div className="bg-white dark:bg-gray-800 rounded-lg shadow overflow-x-auto">
-      <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
-        <thead className="bg-gray-50 dark:bg-gray-900">
-          <tr>
-            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">ID</th>
-            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Nom / Réf</th>
-            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Statut</th>
-          </tr>
-        </thead>
-        <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
-          {data.length === 0 ? <tr><td colSpan={3} className="text-center p-4 text-gray-500">Aucune donnée trouvée.</td></tr> :
-            data.map((item: any) => (
-              <tr key={item.id} className="hover:bg-gray-50 dark:hover:bg-gray-700/50">
-                <td className="px-6 py-4">{item.id || '#'}</td>
-                <td className="px-6 py-4">{item.name || item.reference || 'N/A'}</td>
-                <td className="px-6 py-4">{item.status || 'Actif'}</td>
-              </tr>
-            ))
-          }
-        </tbody>
-      </table>
-    </div>
+    <>
+      <PageHeader 
+        title="Clients B2B" 
+        description="Gérez votre portefeuille de clients professionnels."
+        actions={
+          <Button onClick={handleOpenCreate} icon={<Plus className="w-4 h-4" />}>
+            Nouveau Client
+          </Button>
+        }
+      />
+      
+      <DataTable 
+        data={customers} 
+        columns={columns} 
+        keyExtractor={(c) => c.id} 
+        isLoading={isLoading}
+      />
+
+      <CustomerFormModal 
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        onSuccess={fetchCustomers}
+        initialData={editingCustomer}
+      />
+    </>
   );
-};
+}
