@@ -16,6 +16,9 @@ export class ProductsService {
       if (error.code === 'P2002') {
         throw new ConflictException('Un produit avec ce SKU ou Code-barre existe déjà');
       }
+      if (error.code === 'P2003') {
+        throw new ConflictException('La catégorie sélectionnée n\'existe pas');
+      }
       throw error;
     }
   }

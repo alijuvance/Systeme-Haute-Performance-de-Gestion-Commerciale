@@ -3,6 +3,8 @@ import { useProductForm } from '../hooks/useProductForm';
 import { Product } from '../schemas/productSchema';
 import { Modal } from '@/components/shared/Modal';
 import { Button } from '@/components/shared/Button';
+import api from '@/api/axios';
+import { useState, useEffect } from 'react';
 
 interface ProductFormModalProps {
   isOpen: boolean;
@@ -18,6 +20,14 @@ export function ProductFormModal({ isOpen, onClose, onSuccess, initialData }: Pr
   }, initialData);
 
   const { register, formState: { errors, isSubmitting } } = form;
+
+  const [categories, setCategories] = useState<any[]>([]);
+
+  useEffect(() => {
+    api.get('/api/categories').then((res) => {
+      setCategories(res.data);
+    }).catch(console.error);
+  }, []);
 
   return (
     <Modal isOpen={isOpen} onClose={onClose} title={initialData ? "Modifier le produit" : "Nouveau produit"}>
@@ -47,11 +57,16 @@ export function ProductFormModal({ isOpen, onClose, onSuccess, initialData }: Pr
         </div>
 
         <div>
-          <label className="block text-sm font-semibold text-slate-700 mb-1">Catégorie ID <span className="text-red-500">*</span></label>
-          <input
+          <label className="block text-sm font-semibold text-slate-700 mb-1">Catégorie <span className="text-red-500">*</span></label>
+          <select
             {...register('categoryId')}
             className={`w-full border p-2 text-sm bg-white focus:outline-none focus:ring-1 focus:ring-slate-400 ${errors.categoryId ? 'border-red-400' : 'border-slate-300'}`}
-          />
+          >
+            <option value="">Sélectionnez une catégorie...</option>
+            {categories.map((c) => (
+              <option key={c.id} value={c.id}>{c.name}</option>
+            ))}
+          </select>
           {errors.categoryId && <p className="text-xs text-red-500 mt-1">{errors.categoryId.message}</p>}
         </div>
 
