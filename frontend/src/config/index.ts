@@ -1,6 +1,6 @@
 export const CONFIG = {
   API_URL: process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000',
-  APP_NAME: 'ERP High Performance',
+  APP_NAME: 'Fanjava',
   APP_VERSION: '1.0.0',
   DEFAULT_CURRENCY: 'MGA',
   DEFAULT_LOCALE: 'fr-MG',
