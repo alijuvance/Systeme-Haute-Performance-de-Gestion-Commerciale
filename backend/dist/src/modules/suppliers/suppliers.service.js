@@ -23,21 +23,6 @@ let SuppliersService = class SuppliersService {
     findAll() {
         return this.prisma.supplier.findMany({ orderBy: { name: 'asc' } });
     }
-    async findOne(id) {
-        const supplier = await this.prisma.supplier.findUnique({ where: { id } });
-        if (!supplier) {
-            throw new common_1.NotFoundException(`Fournisseur avec l'ID ${id} non trouvé`);
-        }
-        return supplier;
-    }
-    async update(id, dto) {
-        await this.findOne(id);
-        return this.prisma.supplier.update({ where: { id }, data: dto });
-    }
-    async remove(id) {
-        await this.findOne(id);
-        return this.prisma.supplier.delete({ where: { id } });
-    }
 };
 exports.SuppliersService = SuppliersService;
 exports.SuppliersService = SuppliersService = __decorate([

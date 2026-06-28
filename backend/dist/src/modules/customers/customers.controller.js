@@ -28,15 +28,6 @@ let CustomersController = class CustomersController {
     findAll() {
         return this.customersService.findAll();
     }
-    findOne(id) {
-        return this.customersService.findOne(id);
-    }
-    update(id, updateDto) {
-        return this.customersService.update(id, updateDto);
-    }
-    remove(id) {
-        return this.customersService.remove(id);
-    }
 };
 exports.CustomersController = CustomersController;
 __decorate([
@@ -52,28 +43,6 @@ __decorate([
     __metadata("design:paramtypes", []),
     __metadata("design:returntype", void 0)
 ], CustomersController.prototype, "findAll", null);
-__decorate([
-    (0, common_1.Get)(':id'),
-    __param(0, (0, common_1.Param)('id')),
-    __metadata("design:type", Function),
-    __metadata("design:paramtypes", [String]),
-    __metadata("design:returntype", void 0)
-], CustomersController.prototype, "findOne", null);
-__decorate([
-    (0, common_1.Patch)(':id'),
-    __param(0, (0, common_1.Param)('id')),
-    __param(1, (0, common_1.Body)()),
-    __metadata("design:type", Function),
-    __metadata("design:paramtypes", [String, Object]),
-    __metadata("design:returntype", void 0)
-], CustomersController.prototype, "update", null);
-__decorate([
-    (0, common_1.Delete)(':id'),
-    __param(0, (0, common_1.Param)('id')),
-    __metadata("design:type", Function),
-    __metadata("design:paramtypes", [String]),
-    __metadata("design:returntype", void 0)
-], CustomersController.prototype, "remove", null);
 exports.CustomersController = CustomersController = __decorate([
     (0, common_1.Controller)('customers'),
     (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard),

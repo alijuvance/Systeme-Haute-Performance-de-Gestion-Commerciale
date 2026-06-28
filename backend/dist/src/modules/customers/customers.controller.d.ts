@@ -3,9 +3,32 @@ import { CreateCustomerDto } from './dto/create-customer.dto';
 export declare class CustomersController {
     private readonly customersService;
     constructor(customersService: CustomersService);
-    create(createCustomerDto: CreateCustomerDto): Promise<any>;
-    findAll(): any;
-    findOne(id: string): Promise<any>;
-    update(id: string, updateDto: Partial<CreateCustomerDto>): Promise<any>;
-    remove(id: string): Promise<any>;
+    create(createCustomerDto: CreateCustomerDto): Promise<{
+        email: string | null;
+        fullName: string | null;
+        id: string;
+        createdAt: Date;
+        updatedAt: Date;
+        type: string;
+        phone: string | null;
+        address: string | null;
+        taxId: string | null;
+        companyName: string | null;
+        creditLimit: number;
+        currentDebt: number;
+    }>;
+    findAll(): import("@prisma/client").Prisma.PrismaPromise<{
+        email: string | null;
+        fullName: string | null;
+        id: string;
+        createdAt: Date;
+        updatedAt: Date;
+        type: string;
+        phone: string | null;
+        address: string | null;
+        taxId: string | null;
+        companyName: string | null;
+        creditLimit: number;
+        currentDebt: number;
+    }[]>;
 }

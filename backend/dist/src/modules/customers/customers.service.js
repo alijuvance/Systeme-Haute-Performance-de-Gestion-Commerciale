@@ -23,21 +23,6 @@ let CustomersService = class CustomersService {
     findAll() {
         return this.prisma.customer.findMany({ orderBy: { createdAt: 'desc' } });
     }
-    async findOne(id) {
-        const customer = await this.prisma.customer.findUnique({ where: { id } });
-        if (!customer) {
-            throw new common_1.NotFoundException(`Client avec l'ID ${id} non trouvé`);
-        }
-        return customer;
-    }
-    async update(id, dto) {
-        await this.findOne(id);
-        return this.prisma.customer.update({ where: { id }, data: dto });
-    }
-    async remove(id) {
-        await this.findOne(id);
-        return this.prisma.customer.delete({ where: { id } });
-    }
     async getOrCreateGenericPosCustomer() {
         let customer = await this.prisma.customer.findFirst({
             where: { fullName: 'Client Passant', type: 'B2C' }

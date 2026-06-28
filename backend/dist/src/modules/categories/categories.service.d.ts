@@ -4,9 +4,62 @@ import { UpdateCategoryDto } from './dto/update-category.dto';
 export declare class CategoriesService {
     private prisma;
     constructor(prisma: PrismaService);
-    create(createCategoryDto: CreateCategoryDto): Promise<any>;
-    findAll(): Promise<any>;
-    findOne(id: string): Promise<any>;
-    update(id: string, updateCategoryDto: UpdateCategoryDto): Promise<any>;
-    remove(id: string): Promise<any>;
+    create(createCategoryDto: CreateCategoryDto): Promise<{
+        name: string;
+        id: string;
+        createdAt: Date;
+        updatedAt: Date;
+        parentId: string | null;
+    }>;
+    findAll(): Promise<({
+        subcategories: {
+            name: string;
+            id: string;
+            createdAt: Date;
+            updatedAt: Date;
+            parentId: string | null;
+        }[];
+    } & {
+        name: string;
+        id: string;
+        createdAt: Date;
+        updatedAt: Date;
+        parentId: string | null;
+    })[]>;
+    findOne(id: string): Promise<{
+        parent: {
+            name: string;
+            id: string;
+            createdAt: Date;
+            updatedAt: Date;
+            parentId: string | null;
+        } | null;
+        subcategories: {
+            name: string;
+            id: string;
+            createdAt: Date;
+            updatedAt: Date;
+            parentId: string | null;
+        }[];
+    } & {
+        name: string;
+        id: string;
+        createdAt: Date;
+        updatedAt: Date;
+        parentId: string | null;
+    }>;
+    update(id: string, updateCategoryDto: UpdateCategoryDto): Promise<{
+        name: string;
+        id: string;
+        createdAt: Date;
+        updatedAt: Date;
+        parentId: string | null;
+    }>;
+    remove(id: string): Promise<{
+        name: string;
+        id: string;
+        createdAt: Date;
+        updatedAt: Date;
+        parentId: string | null;
+    }>;
 }

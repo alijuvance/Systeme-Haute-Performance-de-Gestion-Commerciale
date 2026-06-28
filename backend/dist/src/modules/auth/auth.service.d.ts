@@ -8,10 +8,10 @@ export declare class AuthService {
     login(loginDto: LoginDto): Promise<{
         access_token: string;
         user: {
-            id: any;
-            email: any;
-            fullName: any;
-            role: any;
+            id: string;
+            email: string;
+            fullName: string;
+            role: string;
         };
     }>;
 }

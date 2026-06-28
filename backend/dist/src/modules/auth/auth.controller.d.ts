@@ -9,12 +9,21 @@ export declare class AuthController {
     login(loginDto: LoginDto): Promise<{
         access_token: string;
         user: {
-            id: any;
-            email: any;
-            fullName: any;
-            role: any;
+            id: string;
+            email: string;
+            fullName: string;
+            role: string;
         };
     }>;
-    register(createUserDto: CreateUserDto): Promise<Omit<User, "passwordHash">>;
+    register(createUserDto: CreateUserDto): Promise<Omit<{
+        email: string;
+        fullName: string;
+        roleId: string;
+        id: string;
+        passwordHash: string;
+        isActive: boolean;
+        createdAt: Date;
+        updatedAt: Date;
+    }, "passwordHash">>;
     getProfile(req: any): any;
 }

@@ -28,15 +28,6 @@ let SuppliersController = class SuppliersController {
     findAll() {
         return this.suppliersService.findAll();
     }
-    findOne(id) {
-        return this.suppliersService.findOne(id);
-    }
-    update(id, updateDto) {
-        return this.suppliersService.update(id, updateDto);
-    }
-    remove(id) {
-        return this.suppliersService.remove(id);
-    }
 };
 exports.SuppliersController = SuppliersController;
 __decorate([
@@ -52,28 +43,6 @@ __decorate([
     __metadata("design:paramtypes", []),
     __metadata("design:returntype", void 0)
 ], SuppliersController.prototype, "findAll", null);
-__decorate([
-    (0, common_1.Get)(':id'),
-    __param(0, (0, common_1.Param)('id')),
-    __metadata("design:type", Function),
-    __metadata("design:paramtypes", [String]),
-    __metadata("design:returntype", void 0)
-], SuppliersController.prototype, "findOne", null);
-__decorate([
-    (0, common_1.Patch)(':id'),
-    __param(0, (0, common_1.Param)('id')),
-    __param(1, (0, common_1.Body)()),
-    __metadata("design:type", Function),
-    __metadata("design:paramtypes", [String, Object]),
-    __metadata("design:returntype", void 0)
-], SuppliersController.prototype, "update", null);
-__decorate([
-    (0, common_1.Delete)(':id'),
-    __param(0, (0, common_1.Param)('id')),
-    __metadata("design:type", Function),
-    __metadata("design:paramtypes", [String]),
-    __metadata("design:returntype", void 0)
-], SuppliersController.prototype, "remove", null);
 exports.SuppliersController = SuppliersController = __decorate([
     (0, common_1.Controller)('suppliers'),
     (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard),
