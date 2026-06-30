@@ -52,5 +52,5 @@ export const SalesTable: React.FC<SalesTableProps> = ({ sales, isLoading, error 
     }
   ];
 
-  return <DataTable data={sales} columns={columns} keyExtractor={(s) => s.id} isLoading={isLoading} />;
+  return <DataTable data={sales} columns={columns} keyExtractor={(s) => s.id} isLoading={isLoading} emptyMessage="Aucune vente trouvée avec ces filtres." />;
 };
