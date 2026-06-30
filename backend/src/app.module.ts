@@ -16,9 +16,10 @@ import { PurchaseOrdersModule } from './modules/purchase-orders/purchase-orders.
 import { CustomersModule } from './modules/customers/customers.module';
 import { SalesModule } from './modules/sales/sales.module';
 import { AnalyticsModule } from './modules/analytics/analytics.module';
+import { NotificationsModule } from './modules/notifications/notifications.module';
 
 @Module({
-  imports: [PrismaModule, AuthModule, CategoriesModule, ProductsModule, UsersModule, RolesModule, DepotsModule, StockLevelsModule, StockMovementsModule, StockTransfersModule, SuppliersModule, PurchaseOrdersModule, CustomersModule, SalesModule, AnalyticsModule],
+  imports: [PrismaModule, AuthModule, CategoriesModule, ProductsModule, UsersModule, RolesModule, DepotsModule, StockLevelsModule, StockMovementsModule, StockTransfersModule, SuppliersModule, PurchaseOrdersModule, CustomersModule, SalesModule, AnalyticsModule, NotificationsModule],
   controllers: [AppController],
   providers: [AppService],
 })
