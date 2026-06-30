@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useForm, useFieldArray } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useRouter } from 'next/navigation';
@@ -9,7 +9,7 @@ import { getFormReferenceData } from '../api/getFormReferenceData';
 export const useSaleForm = () => {
   const router = useRouter();
 
-  // --- Reference data (dropdowns) ---
+  // --- Reference data ---
   const [customers, setCustomers] = useState<any[]>([]);
   const [products, setProducts] = useState<any[]>([]);
   const [depots, setDepots] = useState<any[]>([]);
@@ -40,12 +40,12 @@ export const useSaleForm = () => {
       customerId: '',
       depotId: '',
       amountPaid: 0,
-      lines: [{ productId: '', quantity: 1, unitPrice: 0 }],
+      lines: [],
     },
     mode: 'onChange',
   });
 
-  const { fields, append, remove } = useFieldArray({
+  const { fields, append, remove, update } = useFieldArray({
     control: form.control,
     name: 'lines',
   });
@@ -57,25 +57,50 @@ export const useSaleForm = () => {
     0
   );
 
-  // --- Auto-fill unit price when product changes ---
-  const handleProductChange = (index: number, productId: string) => {
-    form.setValue(`lines.${index}.productId`, productId, { shouldValidate: true });
-    const product = products.find((p: any) => p.id === productId);
-    if (product) {
-      form.setValue(`lines.${index}.unitPrice`, product.defaultPrice || 0);
+  // --- Add product from search results (or increment if already exists) ---
+  const addProductToInvoice = useCallback((productId: string) => {
+    const existingIndex = watchedLines.findIndex(l => l.productId === productId);
+    if (existingIndex >= 0) {
+      // Product already in invoice → increment quantity
+      const currentQty = watchedLines[existingIndex].quantity || 1;
+      form.setValue(`lines.${existingIndex}.quantity`, currentQty + 1, { shouldValidate: true });
+    } else {
+      // New product → add line
+      const product = products.find((p: any) => p.id === productId);
+      if (product) {
+        append({
+          productId: product.id,
+          quantity: 1,
+          unitPrice: product.defaultPrice || 0,
+        });
+      }
     }
-  };
+  }, [watchedLines, products, append, form]);
 
-  // --- Add / remove lines ---
-  const addLine = () => {
-    append({ productId: '', quantity: 1, unitPrice: 0 });
-  };
+  // --- Increment quantity ---
+  const incrementLine = useCallback((index: number) => {
+    const currentQty = watchedLines[index]?.quantity || 1;
+    form.setValue(`lines.${index}.quantity`, currentQty + 1, { shouldValidate: true });
+  }, [watchedLines, form]);
 
-  const removeLine = (index: number) => {
-    if (fields.length > 1) {
-      remove(index);
+  // --- Decrement quantity ---
+  const decrementLine = useCallback((index: number) => {
+    const currentQty = watchedLines[index]?.quantity || 1;
+    if (currentQty > 1) {
+      form.setValue(`lines.${index}.quantity`, currentQty - 1, { shouldValidate: true });
     }
-  };
+  }, [watchedLines, form]);
+
+  // --- Set quantity directly ---
+  const setLineQuantity = useCallback((index: number, quantity: number) => {
+    const safeQty = Math.max(1, Math.round(quantity));
+    form.setValue(`lines.${index}.quantity`, safeQty, { shouldValidate: true });
+  }, [form]);
+
+  // --- Remove line ---
+  const removeLine = useCallback((index: number) => {
+    remove(index);
+  }, [remove]);
 
   // --- Submission ---
   const [submitError, setSubmitError] = useState<string | null>(null);
@@ -106,9 +131,11 @@ export const useSaleForm = () => {
     categories,
     isLoadingRef,
     // Actions
-    addLine,
+    addProductToInvoice,
+    incrementLine,
+    decrementLine,
+    setLineQuantity,
     removeLine,
-    handleProductChange,
     // Computed
     totalAmount,
     // Errors
