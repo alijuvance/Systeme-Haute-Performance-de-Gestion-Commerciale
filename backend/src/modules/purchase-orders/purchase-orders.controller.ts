@@ -23,4 +23,14 @@ export class PurchaseOrdersController {
   receive(@Param('id') id: string, @Body() receiveDto: ReceivePurchaseOrderDto, @Request() req: any) {
     return this.purchaseOrdersService.receive(id, receiveDto, req.user.userId);
   }
+
+  @Get('kpis')
+  getPurchaseKPIs() {
+    return this.purchaseOrdersService.getPurchaseKPIs();
+  }
+
+  @Put(':id/pay')
+  recordPayment(@Param('id') id: string, @Body('amount') amount: number) {
+    return this.purchaseOrdersService.recordPayment(id, amount);
+  }
 }

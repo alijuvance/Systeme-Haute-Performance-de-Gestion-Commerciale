@@ -71,4 +71,59 @@ export class PurchaseOrdersService {
       orderBy: { date: 'desc' }
     });
   }
+
+  async getPurchaseKPIs() {
+    const startOfMonth = new Date();
+    startOfMonth.setDate(1);
+    startOfMonth.setHours(0, 0, 0, 0);
+
+    // Dépenses du mois (toutes commandes)
+    const monthOrders = await this.prisma.purchaseOrder.findMany({
+      where: { date: { gte: startOfMonth }, status: { not: 'CANCELLED' } }
+    });
+    const monthSpent = monthOrders.reduce((sum, o) => sum + o.totalAmount, 0);
+
+    // À réceptionner (non reçues, non annulées)
+    const pendingReceiptCount = await this.prisma.purchaseOrder.count({
+      where: { status: { in: ['DRAFT', 'SENT'] } }
+    });
+
+    // À payer (Reste à payer > 0, non annulées)
+    const unpaidOrders = await this.prisma.purchaseOrder.findMany({
+      where: { status: { not: 'CANCELLED' } }
+    });
+    let totalUnpaidAmount = 0;
+    unpaidOrders.forEach(o => {
+      totalUnpaidAmount += (o.totalAmount - o.amountPaid);
+    });
+
+    // Total des commandes actives
+    const activeOrdersCount = await this.prisma.purchaseOrder.count({
+      where: { status: { not: 'CANCELLED' } }
+    });
+
+    return {
+      monthSpent,
+      pendingReceiptCount,
+      totalUnpaidAmount,
+      activeOrdersCount
+    };
+  }
+
+  async recordPayment(id: string, amount: number) {
+    const order = await this.prisma.purchaseOrder.findUnique({ where: { id } });
+    if (!order) throw new NotFoundException('Commande introuvable');
+    if (order.status === 'CANCELLED') throw new ConflictException('Commande annulée');
+
+    const newAmountPaid = order.amountPaid + amount;
+    if (newAmountPaid > order.totalAmount) {
+      throw new ConflictException('Le montant payé ne peut pas dépasser le total de la commande.');
+    }
+
+    return this.prisma.purchaseOrder.update({
+      where: { id },
+      data: { amountPaid: newAmountPaid },
+      include: { supplier: true, receivingDepot: true }
+    });
+  }
 }
