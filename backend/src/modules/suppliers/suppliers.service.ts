@@ -13,4 +13,17 @@ export class SuppliersService {
   findAll() {
     return this.prisma.supplier.findMany({ orderBy: { name: 'asc' } });
   }
+
+  async update(id: string, data: any) {
+    return this.prisma.supplier.update({
+      where: { id },
+      data,
+    });
+  }
+
+  async remove(id: string) {
+    return this.prisma.supplier.delete({
+      where: { id },
+    });
+  }
 }
