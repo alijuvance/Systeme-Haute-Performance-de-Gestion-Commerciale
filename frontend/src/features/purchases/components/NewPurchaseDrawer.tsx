@@ -118,7 +118,7 @@ export function NewPurchaseDrawer({ isOpen, onClose, onSuccess }: NewPurchaseDra
       setIsSubmitting(true);
       await api.post('/api/purchase-orders', { supplierId, lines });
       setShowSuccess(true);
-      toast.success('Commande d\\'achat créée avec succès');
+      toast.success("Commande d'achat créée avec succès");
       // Wait a moment to show success, then close
       setTimeout(() => {
         onSuccess();
