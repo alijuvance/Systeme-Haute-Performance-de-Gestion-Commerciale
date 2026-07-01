@@ -1,15 +1,23 @@
 'use client';
 import { useState } from 'react';
-import Link from 'next/link';
 import { LayoutDashboard, ShoppingCart, Loader2, Plus } from 'lucide-react';
 import { PurchasesTable } from '@/features/purchases/components/PurchasesTable';
 import { PurchasesOverview } from '@/features/purchases/components/PurchasesOverview';
+import { NewPurchaseDrawer } from '@/features/purchases/components/NewPurchaseDrawer';
 import { usePurchaseAnalytics } from '@/features/purchases/hooks/usePurchaseAnalytics';
 import { Button } from '@/components/shared/Button';
 
 export default function PurchasePage() {
   const [activeTab, setActiveTab] = useState<'overview' | 'orders'>('overview');
-  const { kpis, isLoading } = usePurchaseAnalytics();
+  const { kpis, isLoading, refreshKPIs } = usePurchaseAnalytics();
+  const [drawerOpen, setDrawerOpen] = useState(false);
+
+  const handleOrderCreated = () => {
+    refreshKPIs();
+    // The PurchasesTable will also need a refresh — 
+    // we switch to the orders tab so the user sees the new entry
+    setActiveTab('orders');
+  };
 
   return (
     <div className="flex flex-col h-full space-y-6">
@@ -29,7 +37,7 @@ export default function PurchasePage() {
               className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all ${activeTab === 'overview' ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-500 hover:text-slate-700'}`}
             >
               <LayoutDashboard className="w-4 h-4" />
-              <span className="hidden sm:inline">Vue d'ensemble</span>
+              <span className="hidden sm:inline">Vue d&apos;ensemble</span>
             </button>
             <button
               onClick={() => setActiveTab('orders')}
@@ -40,11 +48,9 @@ export default function PurchasePage() {
             </button>
           </div>
 
-          <Link href="/dashboard/purchases/new" className="hidden sm:flex">
-            <Button icon={<Plus className="w-4 h-4"/>}>
-              Nouvelle Commande
-            </Button>
-          </Link>
+          <Button icon={<Plus className="w-4 h-4"/>} onClick={() => setDrawerOpen(true)}>
+            Nouvelle Commande
+          </Button>
         </div>
       </div>
 
@@ -53,7 +59,7 @@ export default function PurchasePage() {
         {isLoading && activeTab === 'overview' ? (
           <div className="flex flex-col items-center justify-center h-64 text-slate-400">
             <Loader2 className="w-8 h-8 animate-spin mb-4" />
-            <p>Chargement des statistiques d'achats...</p>
+            <p>Chargement des statistiques d&apos;achats...</p>
           </div>
         ) : (
           <>
@@ -67,6 +73,13 @@ export default function PurchasePage() {
           </>
         )}
       </div>
+
+      {/* Drawer de création */}
+      <NewPurchaseDrawer
+        isOpen={drawerOpen}
+        onClose={() => setDrawerOpen(false)}
+        onSuccess={handleOrderCreated}
+      />
 
     </div>
   );
