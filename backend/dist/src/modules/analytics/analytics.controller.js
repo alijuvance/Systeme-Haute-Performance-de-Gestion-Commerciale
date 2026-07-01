@@ -27,6 +27,15 @@ let AnalyticsController = class AnalyticsController {
     getDebts() {
         return this.analyticsService.getDebts();
     }
+    getFinanceKPIs() {
+        return this.analyticsService.getFinanceKPIs();
+    }
+    getCashflowChart() {
+        return this.analyticsService.getCashflowChart();
+    }
+    getPayables() {
+        return this.analyticsService.getPayables();
+    }
 };
 exports.AnalyticsController = AnalyticsController;
 __decorate([
@@ -47,6 +56,24 @@ __decorate([
     __metadata("design:paramtypes", []),
     __metadata("design:returntype", void 0)
 ], AnalyticsController.prototype, "getDebts", null);
+__decorate([
+    (0, common_1.Get)('finance-kpis'),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", []),
+    __metadata("design:returntype", void 0)
+], AnalyticsController.prototype, "getFinanceKPIs", null);
+__decorate([
+    (0, common_1.Get)('cashflow'),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", []),
+    __metadata("design:returntype", void 0)
+], AnalyticsController.prototype, "getCashflowChart", null);
+__decorate([
+    (0, common_1.Get)('payables'),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", []),
+    __metadata("design:returntype", void 0)
+], AnalyticsController.prototype, "getPayables", null);
 exports.AnalyticsController = AnalyticsController = __decorate([
     (0, common_1.Controller)('analytics'),
     (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard),

@@ -36,6 +36,7 @@ export declare class PurchaseOrdersService {
         orderNumber: string;
         expectedDate: Date | null;
         totalAmount: number;
+        amountPaid: number;
     }>;
     receive(id: string, dto: ReceivePurchaseOrderDto, userId: string): Promise<{
         id: string;
@@ -48,6 +49,7 @@ export declare class PurchaseOrdersService {
         orderNumber: string;
         expectedDate: Date | null;
         totalAmount: number;
+        amountPaid: number;
     }>;
     findAll(): import("@prisma/client").Prisma.PrismaPromise<({
         supplier: {
@@ -80,5 +82,6 @@ export declare class PurchaseOrdersService {
         orderNumber: string;
         expectedDate: Date | null;
         totalAmount: number;
+        amountPaid: number;
     })[]>;
 }

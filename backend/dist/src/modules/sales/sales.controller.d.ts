@@ -35,8 +35,8 @@ export declare class SalesController {
         date: Date;
         status: string;
         totalAmount: number;
-        customerId: string;
         amountPaid: number;
+        customerId: string;
         invoiceNumber: string;
         dueDate: Date | null;
         taxAmount: number;
@@ -95,8 +95,8 @@ export declare class SalesController {
         date: Date;
         status: string;
         totalAmount: number;
-        customerId: string;
         amountPaid: number;
+        customerId: string;
         invoiceNumber: string;
         dueDate: Date | null;
         taxAmount: number;
