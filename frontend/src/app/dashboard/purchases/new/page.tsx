@@ -1,24 +1,29 @@
 'use client';
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import api from '@/api/axios';
 
 export default function NewPurchaseOrderPage() {
   const [suppliers, setSuppliers] = useState([]);
   const [products, setProducts] = useState([]);
   const router = useRouter();
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const [supplierId, setSupplierId] = useState('');
   const [lines, setLines] = useState([{ productId: '', quantity: 1, unitPrice: 0 }]);
 
   useEffect(() => {
     const fetchData = async () => {
-      const headers = { Authorization: `Bearer ${localStorage.getItem('token')}` };
-      const [suppRes, prodRes] = await Promise.all([
-        fetch('/api/suppliers', { headers }),
-        fetch('/api/products', { headers })
-      ]);
-      if (suppRes.ok) setSuppliers(await suppRes.json());
-      if (prodRes.ok) setProducts(await prodRes.json());
+      try {
+        const [suppRes, prodRes] = await Promise.all([
+          api.get('/api/suppliers'),
+          api.get('/api/products')
+        ]);
+        setSuppliers(suppRes.data || []);
+        setProducts(prodRes.data || []);
+      } catch (e) {
+        console.error('Erreur chargement refs:', e);
+      }
     };
     fetchData();
   }, []);
@@ -39,17 +44,13 @@ export default function NewPurchaseOrderPage() {
       return alert("Veuillez remplir correctement la commande.");
     }
 
-    const res = await fetch('/api/purchase-orders', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${localStorage.getItem('token')}`
-      },
-      body: JSON.stringify({ supplierId, lines })
-    });
-
-    if (res.ok) {
+    try {
+      setIsSubmitting(true);
+      await api.post('/api/purchase-orders', { supplierId, lines });
       router.push('/dashboard/purchases');
+    } catch (err: any) {
+      alert(err.response?.data?.message || err.message || 'Une erreur est survenue');
+      setIsSubmitting(false);
     }
   };
 
@@ -125,8 +126,10 @@ export default function NewPurchaseOrderPage() {
         </div>
 
         <div className="flex justify-end space-x-4">
-          <button type="button" onClick={() => router.push('/dashboard/purchases')} className="px-6 py-2 border rounded text-gray-700 bg-white">Annuler</button>
-          <button type="submit" className="px-6 py-2 bg-blue-600 text-white rounded font-medium">Valider la Commande</button>
+          <button type="button" onClick={() => router.push('/dashboard/purchases')} className="px-6 py-2 border rounded text-gray-700 bg-white" disabled={isSubmitting}>Annuler</button>
+          <button type="submit" disabled={isSubmitting} className="px-6 py-2 bg-blue-600 text-white rounded font-medium disabled:opacity-50">
+            {isSubmitting ? 'Validation...' : 'Valider la Commande'}
+          </button>
         </div>
       </form>
     </div>

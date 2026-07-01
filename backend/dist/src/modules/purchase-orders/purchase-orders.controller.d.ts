@@ -82,4 +82,43 @@ export declare class PurchaseOrdersController {
         totalAmount: number;
         amountPaid: number;
     }>;
+    getPurchaseKPIs(): Promise<{
+        monthSpent: number;
+        pendingReceiptCount: number;
+        totalUnpaidAmount: number;
+        activeOrdersCount: number;
+    }>;
+    recordPayment(id: string, amount: number): Promise<{
+        supplier: {
+            email: string | null;
+            name: string;
+            id: string;
+            createdAt: Date;
+            updatedAt: Date;
+            contactName: string | null;
+            phone: string | null;
+            address: string | null;
+            taxId: string | null;
+        };
+        receivingDepot: {
+            name: string;
+            id: string;
+            createdAt: Date;
+            updatedAt: Date;
+            location: string | null;
+            type: string;
+        } | null;
+    } & {
+        id: string;
+        createdAt: Date;
+        updatedAt: Date;
+        date: Date;
+        status: string;
+        supplierId: string;
+        receivingDepotId: string | null;
+        orderNumber: string;
+        expectedDate: Date | null;
+        totalAmount: number;
+        amountPaid: number;
+    }>;
 }

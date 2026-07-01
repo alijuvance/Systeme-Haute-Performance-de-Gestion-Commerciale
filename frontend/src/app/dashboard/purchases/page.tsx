@@ -1,5 +1,6 @@
 'use client';
 import { useState } from 'react';
+import Link from 'next/link';
 import { LayoutDashboard, ShoppingCart, Loader2, Plus } from 'lucide-react';
 import { PurchasesTable } from '@/features/purchases/components/PurchasesTable';
 import { PurchasesOverview } from '@/features/purchases/components/PurchasesOverview';
@@ -39,9 +40,11 @@ export default function PurchasePage() {
             </button>
           </div>
 
-          <Button icon={<Plus className="w-4 h-4"/>} className="hidden sm:flex">
-            Nouvelle Commande
-          </Button>
+          <Link href="/dashboard/purchases/new" className="hidden sm:flex">
+            <Button icon={<Plus className="w-4 h-4"/>}>
+              Nouvelle Commande
+            </Button>
+          </Link>
         </div>
       </div>
 

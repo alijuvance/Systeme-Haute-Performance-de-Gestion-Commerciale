@@ -74,6 +74,50 @@ let PurchaseOrdersService = class PurchaseOrdersService {
             orderBy: { date: 'desc' }
         });
     }
+    async getPurchaseKPIs() {
+        const startOfMonth = new Date();
+        startOfMonth.setDate(1);
+        startOfMonth.setHours(0, 0, 0, 0);
+        const monthOrders = await this.prisma.purchaseOrder.findMany({
+            where: { date: { gte: startOfMonth }, status: { not: 'CANCELLED' } }
+        });
+        const monthSpent = monthOrders.reduce((sum, o) => sum + o.totalAmount, 0);
+        const pendingReceiptCount = await this.prisma.purchaseOrder.count({
+            where: { status: { in: ['DRAFT', 'SENT'] } }
+        });
+        const unpaidOrders = await this.prisma.purchaseOrder.findMany({
+            where: { status: { not: 'CANCELLED' } }
+        });
+        let totalUnpaidAmount = 0;
+        unpaidOrders.forEach(o => {
+            totalUnpaidAmount += (o.totalAmount - o.amountPaid);
+        });
+        const activeOrdersCount = await this.prisma.purchaseOrder.count({
+            where: { status: { not: 'CANCELLED' } }
+        });
+        return {
+            monthSpent,
+            pendingReceiptCount,
+            totalUnpaidAmount,
+            activeOrdersCount
+        };
+    }
+    async recordPayment(id, amount) {
+        const order = await this.prisma.purchaseOrder.findUnique({ where: { id } });
+        if (!order)
+            throw new common_1.NotFoundException('Commande introuvable');
+        if (order.status === 'CANCELLED')
+            throw new common_1.ConflictException('Commande annulée');
+        const newAmountPaid = order.amountPaid + amount;
+        if (newAmountPaid > order.totalAmount) {
+            throw new common_1.ConflictException('Le montant payé ne peut pas dépasser le total de la commande.');
+        }
+        return this.prisma.purchaseOrder.update({
+            where: { id },
+            data: { amountPaid: newAmountPaid },
+            include: { supplier: true, receivingDepot: true }
+        });
+    }
 };
 exports.PurchaseOrdersService = PurchaseOrdersService;
 exports.PurchaseOrdersService = PurchaseOrdersService = __decorate([

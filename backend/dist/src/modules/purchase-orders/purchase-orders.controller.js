@@ -32,6 +32,12 @@ let PurchaseOrdersController = class PurchaseOrdersController {
     receive(id, receiveDto, req) {
         return this.purchaseOrdersService.receive(id, receiveDto, req.user.userId);
     }
+    getPurchaseKPIs() {
+        return this.purchaseOrdersService.getPurchaseKPIs();
+    }
+    recordPayment(id, amount) {
+        return this.purchaseOrdersService.recordPayment(id, amount);
+    }
 };
 exports.PurchaseOrdersController = PurchaseOrdersController;
 __decorate([
@@ -56,6 +62,20 @@ __decorate([
     __metadata("design:paramtypes", [String, receive_purchase_order_dto_1.ReceivePurchaseOrderDto, Object]),
     __metadata("design:returntype", void 0)
 ], PurchaseOrdersController.prototype, "receive", null);
+__decorate([
+    (0, common_1.Get)('kpis'),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", []),
+    __metadata("design:returntype", void 0)
+], PurchaseOrdersController.prototype, "getPurchaseKPIs", null);
+__decorate([
+    (0, common_1.Put)(':id/pay'),
+    __param(0, (0, common_1.Param)('id')),
+    __param(1, (0, common_1.Body)('amount')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String, Number]),
+    __metadata("design:returntype", void 0)
+], PurchaseOrdersController.prototype, "recordPayment", null);
 exports.PurchaseOrdersController = PurchaseOrdersController = __decorate([
     (0, common_1.Controller)('purchase-orders'),
     (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard),
