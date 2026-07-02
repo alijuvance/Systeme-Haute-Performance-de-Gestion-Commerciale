@@ -4,6 +4,7 @@ import React, { createContext, useContext, useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import api from '@/api/axios';
 import { User } from '@/types';
+import Cookies from 'js-cookie';
 
 interface AuthContextType {
   user: User | null;
@@ -22,23 +23,23 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   useEffect(() => {
     const checkAuth = async () => {
-      const token = localStorage.getItem('token');
+      const token = Cookies.get('token');
       if (!token) {
         setIsLoading(false);
         return;
       }
 
       try {
-        // Optionnel : un appel /api/auth/me pour valider le token et récupérer l'utilisateur
-        // Pour l'instant on lit depuis localStorage si l'user y est stocké
-        const storedUser = localStorage.getItem('user');
+        const storedUser = Cookies.get('user');
         if (storedUser) {
           setUser(JSON.parse(storedUser));
+        } else {
+          // If token exists but no user data, we could fetch it here
         }
       } catch (error) {
         console.error('Erreur d\'authentification:', error);
-        localStorage.removeItem('token');
-        localStorage.removeItem('user');
+        Cookies.remove('token');
+        Cookies.remove('user');
       } finally {
         setIsLoading(false);
       }
@@ -48,15 +49,16 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   }, []);
 
   const login = (token: string, userData: User) => {
-    localStorage.setItem('token', token);
-    localStorage.setItem('user', JSON.stringify(userData));
+    // Expires in 7 days
+    Cookies.set('token', token, { expires: 7, secure: process.env.NODE_ENV === 'production', sameSite: 'strict' });
+    Cookies.set('user', JSON.stringify(userData), { expires: 7, secure: process.env.NODE_ENV === 'production', sameSite: 'strict' });
     setUser(userData);
     router.push('/dashboard');
   };
 
   const logout = () => {
-    localStorage.removeItem('token');
-    localStorage.removeItem('user');
+    Cookies.remove('token');
+    Cookies.remove('user');
     setUser(null);
     router.push('/login');
   };
