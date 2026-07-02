@@ -23,6 +23,17 @@ let SuppliersService = class SuppliersService {
     findAll() {
         return this.prisma.supplier.findMany({ orderBy: { name: 'asc' } });
     }
+    async update(id, data) {
+        return this.prisma.supplier.update({
+            where: { id },
+            data,
+        });
+    }
+    async remove(id) {
+        return this.prisma.supplier.delete({
+            where: { id },
+        });
+    }
 };
 exports.SuppliersService = SuppliersService;
 exports.SuppliersService = SuppliersService = __decorate([

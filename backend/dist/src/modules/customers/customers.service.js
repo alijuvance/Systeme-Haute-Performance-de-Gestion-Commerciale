@@ -23,6 +23,17 @@ let CustomersService = class CustomersService {
     findAll() {
         return this.prisma.customer.findMany({ orderBy: { createdAt: 'desc' } });
     }
+    async update(id, data) {
+        return this.prisma.customer.update({
+            where: { id },
+            data,
+        });
+    }
+    async remove(id) {
+        return this.prisma.customer.delete({
+            where: { id },
+        });
+    }
     async getOrCreateGenericPosCustomer() {
         let customer = await this.prisma.customer.findFirst({
             where: { fullName: 'Client Passant', type: 'B2C' }

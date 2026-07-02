@@ -31,4 +31,32 @@ export declare class CustomersController {
         creditLimit: number;
         currentDebt: number;
     }[]>;
+    update(id: string, updateCustomerDto: any): Promise<{
+        email: string | null;
+        fullName: string | null;
+        id: string;
+        createdAt: Date;
+        updatedAt: Date;
+        type: string;
+        phone: string | null;
+        address: string | null;
+        taxId: string | null;
+        companyName: string | null;
+        creditLimit: number;
+        currentDebt: number;
+    }>;
+    remove(id: string): Promise<{
+        email: string | null;
+        fullName: string | null;
+        id: string;
+        createdAt: Date;
+        updatedAt: Date;
+        type: string;
+        phone: string | null;
+        address: string | null;
+        taxId: string | null;
+        companyName: string | null;
+        creditLimit: number;
+        currentDebt: number;
+    }>;
 }

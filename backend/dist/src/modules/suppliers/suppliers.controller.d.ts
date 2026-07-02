@@ -25,4 +25,26 @@ export declare class SuppliersController {
         address: string | null;
         taxId: string | null;
     }[]>;
+    update(id: string, updateSupplierDto: any): Promise<{
+        email: string | null;
+        name: string;
+        id: string;
+        createdAt: Date;
+        updatedAt: Date;
+        contactName: string | null;
+        phone: string | null;
+        address: string | null;
+        taxId: string | null;
+    }>;
+    remove(id: string): Promise<{
+        email: string | null;
+        name: string;
+        id: string;
+        createdAt: Date;
+        updatedAt: Date;
+        contactName: string | null;
+        phone: string | null;
+        address: string | null;
+        taxId: string | null;
+    }>;
 }
