@@ -4,6 +4,7 @@ export interface User {
   firstName?: string;
   lastName?: string;
   roleId: string;
+  role?: Role | any;
 }
 
 export interface Role {
