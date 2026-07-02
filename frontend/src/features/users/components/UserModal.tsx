@@ -91,9 +91,9 @@ export const UserModal = ({ isOpen, onClose, onSuccess, user }: UserModalProps) 
       }
       onSuccess();
       onClose();
-    } catch (error) {
+    } catch (error: any) {
       console.error(error);
-      alert("Une erreur est survenue.");
+      alert(error.response?.data?.message || "Une erreur est survenue.");
     } finally {
       setIsLoading(false);
     }
