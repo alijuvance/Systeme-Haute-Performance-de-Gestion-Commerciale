@@ -25,8 +25,15 @@ async function main() {
     });
   }
 
-  const email = 'alijuvance@gmail.com';
-  const password = '91140000';
+  const email = process.env.DEFAULT_ADMIN_EMAIL;
+  const password = process.env.DEFAULT_ADMIN_PASSWORD;
+
+  if (!email || !password) {
+    console.warn('⚠️  DEFAULT_ADMIN_EMAIL or DEFAULT_ADMIN_PASSWORD is not set in .env');
+    console.warn('⚠️  Skipping default admin user seeding.');
+    return;
+  }
+
   const passwordHash = await bcrypt.hash(password, 10);
 
   const user = await prisma.user.upsert({
