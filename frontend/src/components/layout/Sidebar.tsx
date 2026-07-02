@@ -1,6 +1,7 @@
 'use client';
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useAuth } from "@/contexts/AuthContext";
 import { 
   LayoutDashboard, 
   Package, 
@@ -12,7 +13,8 @@ import {
   Truck,
   FileText,
   LineChart,
-  Warehouse
+  Warehouse,
+  Shield
 } from "lucide-react";
 
 interface SidebarProps {
@@ -23,17 +25,23 @@ interface SidebarProps {
 export function Sidebar({ sidebarOpen, setSidebarOpen }: SidebarProps) {
   const pathname = usePathname();
 
-  const navItems = [
+  const { user } = useAuth();
+  const role = user?.role?.name || user?.role || 'MANAGER'; // Par défaut, sécurité
+
+  const allNavItems = [
     { name: "Tableau de bord", href: "/dashboard", icon: LayoutDashboard },
-    { name: "Ventes & Factures", href: "/dashboard/sales", icon: ShoppingCart },
-    { name: "Catalogue (Produits)", href: "/dashboard/products", icon: Package },
-    { name: "Gestion des Stocks", href: "/dashboard/stocks", icon: Warehouse },
-    { name: "Clients B2B", href: "/dashboard/customers", icon: Users },
-    { name: "Fournisseurs", href: "/dashboard/suppliers", icon: Truck },
-    { name: "Achats", href: "/dashboard/purchases", icon: FileText },
-    { name: "Finance", href: "/dashboard/finance", icon: LineChart },
-    { name: "Paramètres", href: "/dashboard/settings", icon: Settings },
+    { name: "Ventes & Factures", href: "/dashboard/sales", icon: ShoppingCart, roles: ['ADMIN', 'MANAGER'] },
+    { name: "Catalogue (Produits)", href: "/dashboard/products", icon: Package, roles: ['ADMIN', 'MANAGER'] },
+    { name: "Gestion des Stocks", href: "/dashboard/stocks", icon: Warehouse, roles: ['ADMIN'] },
+    { name: "Clients B2B", href: "/dashboard/customers", icon: Users, roles: ['ADMIN', 'MANAGER'] },
+    { name: "Fournisseurs", href: "/dashboard/suppliers", icon: Truck, roles: ['ADMIN'] },
+    { name: "Achats", href: "/dashboard/purchases", icon: FileText, roles: ['ADMIN'] },
+    { name: "Finance", href: "/dashboard/finance", icon: LineChart, roles: ['ADMIN'] },
+    { name: "Utilisateurs", href: "/dashboard/users", icon: Shield, roles: ['ADMIN'] },
+    { name: "Paramètres", href: "/dashboard/settings", icon: Settings, roles: ['ADMIN'] },
   ];
+
+  const navItems = allNavItems.filter(item => !item.roles || item.roles.includes(role));
 
   return (
     <aside className={`${sidebarOpen ? "w-64" : "w-16"} transition-all duration-300 bg-white border-r border-slate-200 flex flex-col fixed h-full z-20`}>

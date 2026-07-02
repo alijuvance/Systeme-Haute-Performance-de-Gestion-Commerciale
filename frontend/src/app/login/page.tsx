@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import { Lock, Mail, ArrowRight, Loader2 } from "lucide-react";
 import api from "@/api/axios";
 
@@ -75,7 +76,7 @@ export default function LoginPage() {
           <div>
             <div className="flex justify-between items-center mb-1">
               <label className="text-sm font-semibold text-slate-700">Mot de passe</label>
-              <a href="#" className="text-xs text-slate-500 hover:text-slate-900 transition-colors">Mot de passe oublié ?</a>
+              <Link href="/login/forgot-password" className="text-xs text-slate-500 hover:text-slate-900 transition-colors">Mot de passe oublié ?</Link>
             </div>
             <div className="relative">
               <Lock className="absolute left-3 top-2.5 w-4 h-4 text-slate-400" />
