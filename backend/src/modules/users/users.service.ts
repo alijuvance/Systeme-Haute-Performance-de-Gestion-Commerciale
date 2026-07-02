@@ -25,7 +25,7 @@ export class UsersService {
         fullName: createUserDto.fullName,
         roleId: createUserDto.roleId,
         avatar: createUserDto.avatar,
-        depotId: createUserDto.depotId,
+        depotId: createUserDto.depotId || null,
       },
     });
 
@@ -70,6 +70,9 @@ export class UsersService {
     delete data.password;
     if (passwordHash) {
       data.passwordHash = passwordHash;
+    }
+    if (data.depotId === '') {
+      data.depotId = null;
     }
 
     const user = await this.prisma.user.update({

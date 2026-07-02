@@ -76,9 +76,12 @@ export const UserModal = ({ isOpen, onClose, onSuccess, user }: UserModalProps) 
   const onSubmit = async (data: UserFormData) => {
     try {
       setIsLoading(true);
-      const payload = { ...data };
+      const payload: any = { ...data };
       if (!payload.password) {
         delete payload.password;
+      }
+      if (!payload.depotId) {
+        payload.depotId = null;
       }
       
       if (user) {
