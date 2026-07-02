@@ -27,6 +27,8 @@ model User {
   passwordHash   String
   fullName       String
   isActive       Boolean         @default(true)
+  resetOtp       String?
+  resetOtpExpiresAt DateTime?
   roleId             String
   role               Role            @relation(fields: [roleId], references: [id])
   stockMovements     StockMovement[]
