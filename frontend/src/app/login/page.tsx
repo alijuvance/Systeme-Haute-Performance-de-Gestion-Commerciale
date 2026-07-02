@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { Lock, Mail, ArrowRight, Loader2 } from "lucide-react";
 import api from "@/api/axios";
+import { useAuth } from "@/contexts/AuthContext";
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
@@ -12,6 +13,7 @@ export default function LoginPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const router = useRouter();
+  const { login } = useAuth();
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -20,10 +22,9 @@ export default function LoginPage() {
 
     try {
       const response = await api.post("/api/auth/login", { email, password });
-      const { access_token } = response.data;
+      const { access_token, user } = response.data;
       if (access_token) {
-        localStorage.setItem("token", access_token);
-        router.push("/dashboard");
+        login(access_token, user);
       } else {
         setError("Token non reçu.");
         setLoading(false);
