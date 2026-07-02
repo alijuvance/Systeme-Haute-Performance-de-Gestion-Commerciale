@@ -152,7 +152,7 @@ export const AvatarUpload = ({ currentAvatar, onUploadSuccess }: AvatarUploadPro
               <Button 
                 onClick={handleUpload} 
                 isLoading={isUploading}
-                leftIcon={<Check className="w-4 h-4" />}
+                icon={<Check className="w-4 h-4" />}
               >
                 Confirmer
               </Button>

@@ -14,11 +14,11 @@ export declare class AnalyticsService {
     }[]>;
     getDebts(): Promise<({
         customer: {
-            email: string | null;
-            fullName: string | null;
             id: string;
             createdAt: Date;
             updatedAt: Date;
+            email: string | null;
+            fullName: string | null;
             type: string;
             phone: string | null;
             address: string | null;
@@ -28,10 +28,10 @@ export declare class AnalyticsService {
             currentDebt: number;
         };
     } & {
-        depotId: string;
         id: string;
         createdAt: Date;
         updatedAt: Date;
+        depotId: string;
         type: string;
         date: Date;
         status: string;
@@ -55,11 +55,11 @@ export declare class AnalyticsService {
     }[]>;
     getPayables(): Promise<({
         supplier: {
-            email: string | null;
-            name: string;
             id: string;
+            name: string;
             createdAt: Date;
             updatedAt: Date;
+            email: string | null;
             contactName: string | null;
             phone: string | null;
             address: string | null;

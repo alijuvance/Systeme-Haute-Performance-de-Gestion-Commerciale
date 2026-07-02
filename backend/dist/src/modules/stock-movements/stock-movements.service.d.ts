@@ -4,9 +4,9 @@ export declare class StockMovementsService {
     private prisma;
     constructor(prisma: PrismaService);
     registerMovement(dto: CreateStockMovementDto, userId: string): Promise<{
-        depotId: string;
         id: string;
         createdAt: Date;
+        depotId: string;
         type: string;
         productId: string;
         date: Date;
@@ -15,27 +15,35 @@ export declare class StockMovementsService {
         userId: string;
     }>;
     findAll(): Promise<({
-        user: {
-            email: string;
-            fullName: string;
-            roleId: string;
-            avatar: string | null;
-            depotId: string | null;
-            isActive: boolean;
+        depot: {
             id: string;
+            name: string;
+            createdAt: Date;
+            updatedAt: Date;
+            location: string | null;
+            type: string;
+        };
+        user: {
+            id: string;
+            createdAt: Date;
+            updatedAt: Date;
+            email: string;
             passwordHash: string;
+            fullName: string;
+            isActive: boolean;
             resetOtp: string | null;
             resetOtpExpiresAt: Date | null;
+            roleId: string;
+            avatar: string | null;
             lastLogin: Date | null;
-            createdAt: Date;
-            updatedAt: Date;
+            depotId: string | null;
         };
         product: {
-            isActive: boolean;
-            name: string;
             id: string;
+            name: string;
             createdAt: Date;
             updatedAt: Date;
+            isActive: boolean;
             sku: string;
             barcode: string | null;
             description: string | null;
@@ -43,18 +51,10 @@ export declare class StockMovementsService {
             costPrice: number;
             categoryId: string;
         };
-        depot: {
-            name: string;
-            id: string;
-            createdAt: Date;
-            updatedAt: Date;
-            location: string | null;
-            type: string;
-        };
     } & {
-        depotId: string;
         id: string;
         createdAt: Date;
+        depotId: string;
         type: string;
         productId: string;
         date: Date;

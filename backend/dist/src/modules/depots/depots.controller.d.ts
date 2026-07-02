@@ -3,8 +3,8 @@ export declare class DepotsController {
     private readonly depotsService;
     constructor(depotsService: DepotsService);
     findAll(): Promise<{
-        name: string;
         id: string;
+        name: string;
         createdAt: Date;
         updatedAt: Date;
         location: string | null;
@@ -15,8 +15,8 @@ export declare class DepotsController {
         location?: string;
         type: string;
     }): Promise<{
-        name: string;
         id: string;
+        name: string;
         createdAt: Date;
         updatedAt: Date;
         location: string | null;

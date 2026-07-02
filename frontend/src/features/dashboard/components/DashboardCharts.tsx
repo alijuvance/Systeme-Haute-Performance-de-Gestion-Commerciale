@@ -16,7 +16,7 @@ export const DashboardCharts: React.FC<DashboardChartsProps> = ({ chartData, isL
   return (
     <div className="bg-white border border-slate-200 p-6">
       <h2 className="text-base font-bold text-slate-900 mb-6">Évolution des Ventes</h2>
-      <div className="h-80 w-full">
+      <div className="h-80 w-full" style={{ minHeight: '300px' }}>
         {chartData.length > 0 ? (
           <ResponsiveContainer width="100%" height="100%">
             <AreaChart data={chartData} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>

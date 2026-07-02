@@ -5,59 +5,59 @@ export declare class CategoriesService {
     private prisma;
     constructor(prisma: PrismaService);
     create(createCategoryDto: CreateCategoryDto): Promise<{
-        name: string;
         id: string;
+        name: string;
         createdAt: Date;
         updatedAt: Date;
         parentId: string | null;
     }>;
     findAll(): Promise<({
         subcategories: {
-            name: string;
             id: string;
+            name: string;
             createdAt: Date;
             updatedAt: Date;
             parentId: string | null;
         }[];
     } & {
-        name: string;
         id: string;
+        name: string;
         createdAt: Date;
         updatedAt: Date;
         parentId: string | null;
     })[]>;
     findOne(id: string): Promise<{
         parent: {
-            name: string;
             id: string;
+            name: string;
             createdAt: Date;
             updatedAt: Date;
             parentId: string | null;
         } | null;
         subcategories: {
-            name: string;
             id: string;
+            name: string;
             createdAt: Date;
             updatedAt: Date;
             parentId: string | null;
         }[];
     } & {
-        name: string;
         id: string;
+        name: string;
         createdAt: Date;
         updatedAt: Date;
         parentId: string | null;
     }>;
     update(id: string, updateCategoryDto: UpdateCategoryDto): Promise<{
-        name: string;
         id: string;
+        name: string;
         createdAt: Date;
         updatedAt: Date;
         parentId: string | null;
     }>;
     remove(id: string): Promise<{
-        name: string;
         id: string;
+        name: string;
         createdAt: Date;
         updatedAt: Date;
         parentId: string | null;

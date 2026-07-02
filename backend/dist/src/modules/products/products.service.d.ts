@@ -5,11 +5,11 @@ export declare class ProductsService {
     private prisma;
     constructor(prisma: PrismaService);
     create(createProductDto: CreateProductDto): Promise<{
-        isActive: boolean;
-        name: string;
         id: string;
+        name: string;
         createdAt: Date;
         updatedAt: Date;
+        isActive: boolean;
         sku: string;
         barcode: string | null;
         description: string | null;
@@ -19,18 +19,18 @@ export declare class ProductsService {
     }>;
     findAll(): Promise<({
         category: {
-            name: string;
             id: string;
+            name: string;
             createdAt: Date;
             updatedAt: Date;
             parentId: string | null;
         };
     } & {
-        isActive: boolean;
-        name: string;
         id: string;
+        name: string;
         createdAt: Date;
         updatedAt: Date;
+        isActive: boolean;
         sku: string;
         barcode: string | null;
         description: string | null;
@@ -40,15 +40,15 @@ export declare class ProductsService {
     })[]>;
     findOne(id: string): Promise<{
         category: {
-            name: string;
             id: string;
+            name: string;
             createdAt: Date;
             updatedAt: Date;
             parentId: string | null;
         };
         units: {
-            name: string;
             id: string;
+            name: string;
             createdAt: Date;
             updatedAt: Date;
             conversionRate: number;
@@ -56,11 +56,11 @@ export declare class ProductsService {
             productId: string;
         }[];
     } & {
-        isActive: boolean;
-        name: string;
         id: string;
+        name: string;
         createdAt: Date;
         updatedAt: Date;
+        isActive: boolean;
         sku: string;
         barcode: string | null;
         description: string | null;
@@ -69,11 +69,11 @@ export declare class ProductsService {
         categoryId: string;
     }>;
     update(id: string, updateProductDto: UpdateProductDto): Promise<{
-        isActive: boolean;
-        name: string;
         id: string;
+        name: string;
         createdAt: Date;
         updatedAt: Date;
+        isActive: boolean;
         sku: string;
         barcode: string | null;
         description: string | null;
@@ -82,11 +82,11 @@ export declare class ProductsService {
         categoryId: string;
     }>;
     remove(id: string): Promise<{
-        isActive: boolean;
-        name: string;
         id: string;
+        name: string;
         createdAt: Date;
         updatedAt: Date;
+        isActive: boolean;
         sku: string;
         barcode: string | null;
         description: string | null;

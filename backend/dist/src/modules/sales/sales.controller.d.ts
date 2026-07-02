@@ -5,11 +5,11 @@ export declare class SalesController {
     constructor(salesService: SalesService);
     create(createSaleDto: CreateSaleDto, req: any): Promise<{
         customer: {
-            email: string | null;
-            fullName: string | null;
             id: string;
             createdAt: Date;
             updatedAt: Date;
+            email: string | null;
+            fullName: string | null;
             type: string;
             phone: string | null;
             address: string | null;
@@ -27,10 +27,10 @@ export declare class SalesController {
             invoiceId: string;
         }[];
     } & {
-        depotId: string;
         id: string;
         createdAt: Date;
         updatedAt: Date;
+        depotId: string;
         type: string;
         date: Date;
         status: string;
@@ -43,19 +43,19 @@ export declare class SalesController {
     }>;
     findAll(): import("@prisma/client").Prisma.PrismaPromise<({
         depot: {
-            name: string;
             id: string;
+            name: string;
             createdAt: Date;
             updatedAt: Date;
             location: string | null;
             type: string;
         };
         customer: {
-            email: string | null;
-            fullName: string | null;
             id: string;
             createdAt: Date;
             updatedAt: Date;
+            email: string | null;
+            fullName: string | null;
             type: string;
             phone: string | null;
             address: string | null;
@@ -66,11 +66,11 @@ export declare class SalesController {
         };
         lines: ({
             product: {
-                isActive: boolean;
-                name: string;
                 id: string;
+                name: string;
                 createdAt: Date;
                 updatedAt: Date;
+                isActive: boolean;
                 sku: string;
                 barcode: string | null;
                 description: string | null;
@@ -87,10 +87,10 @@ export declare class SalesController {
             invoiceId: string;
         })[];
     } & {
-        depotId: string;
         id: string;
         createdAt: Date;
         updatedAt: Date;
+        depotId: string;
         type: string;
         date: Date;
         status: string;

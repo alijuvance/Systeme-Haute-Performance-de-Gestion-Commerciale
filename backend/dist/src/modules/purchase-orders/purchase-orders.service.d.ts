@@ -8,11 +8,11 @@ export declare class PurchaseOrdersService {
     constructor(prisma: PrismaService, stockMovementsService: StockMovementsService);
     create(dto: CreatePurchaseOrderDto): Promise<{
         supplier: {
-            email: string | null;
-            name: string;
             id: string;
+            name: string;
             createdAt: Date;
             updatedAt: Date;
+            email: string | null;
             contactName: string | null;
             phone: string | null;
             address: string | null;
@@ -53,19 +53,19 @@ export declare class PurchaseOrdersService {
     }>;
     findAll(): import("@prisma/client").Prisma.PrismaPromise<({
         supplier: {
-            email: string | null;
-            name: string;
             id: string;
+            name: string;
             createdAt: Date;
             updatedAt: Date;
+            email: string | null;
             contactName: string | null;
             phone: string | null;
             address: string | null;
             taxId: string | null;
         };
         receivingDepot: {
-            name: string;
             id: string;
+            name: string;
             createdAt: Date;
             updatedAt: Date;
             location: string | null;
@@ -92,19 +92,19 @@ export declare class PurchaseOrdersService {
     }>;
     recordPayment(id: string, amount: number): Promise<{
         supplier: {
-            email: string | null;
-            name: string;
             id: string;
+            name: string;
             createdAt: Date;
             updatedAt: Date;
+            email: string | null;
             contactName: string | null;
             phone: string | null;
             address: string | null;
             taxId: string | null;
         };
         receivingDepot: {
-            name: string;
             id: string;
+            name: string;
             createdAt: Date;
             updatedAt: Date;
             location: string | null;

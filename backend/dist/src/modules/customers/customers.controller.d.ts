@@ -4,11 +4,11 @@ export declare class CustomersController {
     private readonly customersService;
     constructor(customersService: CustomersService);
     create(createCustomerDto: CreateCustomerDto): Promise<{
-        email: string | null;
-        fullName: string | null;
         id: string;
         createdAt: Date;
         updatedAt: Date;
+        email: string | null;
+        fullName: string | null;
         type: string;
         phone: string | null;
         address: string | null;
@@ -18,11 +18,11 @@ export declare class CustomersController {
         currentDebt: number;
     }>;
     findAll(): import("@prisma/client").Prisma.PrismaPromise<{
-        email: string | null;
-        fullName: string | null;
         id: string;
         createdAt: Date;
         updatedAt: Date;
+        email: string | null;
+        fullName: string | null;
         type: string;
         phone: string | null;
         address: string | null;
@@ -32,11 +32,11 @@ export declare class CustomersController {
         currentDebt: number;
     }[]>;
     update(id: string, updateCustomerDto: any): Promise<{
-        email: string | null;
-        fullName: string | null;
         id: string;
         createdAt: Date;
         updatedAt: Date;
+        email: string | null;
+        fullName: string | null;
         type: string;
         phone: string | null;
         address: string | null;
@@ -46,11 +46,11 @@ export declare class CustomersController {
         currentDebt: number;
     }>;
     remove(id: string): Promise<{
-        email: string | null;
-        fullName: string | null;
         id: string;
         createdAt: Date;
         updatedAt: Date;
+        email: string | null;
+        fullName: string | null;
         type: string;
         phone: string | null;
         address: string | null;

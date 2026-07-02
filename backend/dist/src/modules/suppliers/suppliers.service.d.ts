@@ -4,44 +4,44 @@ export declare class SuppliersService {
     private prisma;
     constructor(prisma: PrismaService);
     create(dto: CreateSupplierDto): import("@prisma/client").Prisma.Prisma__SupplierClient<{
-        email: string | null;
-        name: string;
         id: string;
+        name: string;
         createdAt: Date;
         updatedAt: Date;
+        email: string | null;
         contactName: string | null;
         phone: string | null;
         address: string | null;
         taxId: string | null;
     }, never, import("@prisma/client/runtime/client").DefaultArgs, import("@prisma/client").Prisma.PrismaClientOptions>;
     findAll(): import("@prisma/client").Prisma.PrismaPromise<{
-        email: string | null;
-        name: string;
         id: string;
+        name: string;
         createdAt: Date;
         updatedAt: Date;
+        email: string | null;
         contactName: string | null;
         phone: string | null;
         address: string | null;
         taxId: string | null;
     }[]>;
     update(id: string, data: any): Promise<{
-        email: string | null;
-        name: string;
         id: string;
+        name: string;
         createdAt: Date;
         updatedAt: Date;
+        email: string | null;
         contactName: string | null;
         phone: string | null;
         address: string | null;
         taxId: string | null;
     }>;
     remove(id: string): Promise<{
-        email: string | null;
-        name: string;
         id: string;
+        name: string;
         createdAt: Date;
         updatedAt: Date;
+        email: string | null;
         contactName: string | null;
         phone: string | null;
         address: string | null;

@@ -18,19 +18,19 @@ export declare class AuthController {
         };
     }>;
     register(createUserDto: CreateUserDto): Promise<Omit<{
-        email: string;
-        fullName: string;
-        roleId: string;
-        avatar: string | null;
-        depotId: string | null;
-        isActive: boolean;
         id: string;
-        passwordHash: string;
-        resetOtp: string | null;
-        resetOtpExpiresAt: Date | null;
-        lastLogin: Date | null;
         createdAt: Date;
         updatedAt: Date;
+        email: string;
+        passwordHash: string;
+        fullName: string;
+        isActive: boolean;
+        resetOtp: string | null;
+        resetOtpExpiresAt: Date | null;
+        roleId: string;
+        avatar: string | null;
+        lastLogin: Date | null;
+        depotId: string | null;
     }, "passwordHash">>;
     forgotPassword(forgotPasswordDto: ForgotPasswordDto): Promise<{
         message: string;

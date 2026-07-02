@@ -33,11 +33,11 @@ export declare class StockTransfersService {
     }>;
     findAll(): Promise<({
         product: {
-            isActive: boolean;
-            name: string;
             id: string;
+            name: string;
             createdAt: Date;
             updatedAt: Date;
+            isActive: boolean;
             sku: string;
             barcode: string | null;
             description: string | null;
@@ -46,16 +46,16 @@ export declare class StockTransfersService {
             categoryId: string;
         };
         fromDepot: {
-            name: string;
             id: string;
+            name: string;
             createdAt: Date;
             updatedAt: Date;
             location: string | null;
             type: string;
         };
         toDepot: {
-            name: string;
             id: string;
+            name: string;
             createdAt: Date;
             updatedAt: Date;
             location: string | null;

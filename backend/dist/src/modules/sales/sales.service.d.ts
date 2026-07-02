@@ -9,11 +9,11 @@ export declare class SalesService {
     constructor(prisma: PrismaService, stockMovementsService: StockMovementsService, customersService: CustomersService);
     createSale(dto: CreateSaleDto, userId: string): Promise<{
         customer: {
-            email: string | null;
-            fullName: string | null;
             id: string;
             createdAt: Date;
             updatedAt: Date;
+            email: string | null;
+            fullName: string | null;
             type: string;
             phone: string | null;
             address: string | null;
@@ -31,10 +31,10 @@ export declare class SalesService {
             invoiceId: string;
         }[];
     } & {
-        depotId: string;
         id: string;
         createdAt: Date;
         updatedAt: Date;
+        depotId: string;
         type: string;
         date: Date;
         status: string;
@@ -47,19 +47,19 @@ export declare class SalesService {
     }>;
     findAll(): import("@prisma/client").Prisma.PrismaPromise<({
         depot: {
-            name: string;
             id: string;
+            name: string;
             createdAt: Date;
             updatedAt: Date;
             location: string | null;
             type: string;
         };
         customer: {
-            email: string | null;
-            fullName: string | null;
             id: string;
             createdAt: Date;
             updatedAt: Date;
+            email: string | null;
+            fullName: string | null;
             type: string;
             phone: string | null;
             address: string | null;
@@ -70,11 +70,11 @@ export declare class SalesService {
         };
         lines: ({
             product: {
-                isActive: boolean;
-                name: string;
                 id: string;
+                name: string;
                 createdAt: Date;
                 updatedAt: Date;
+                isActive: boolean;
                 sku: string;
                 barcode: string | null;
                 description: string | null;
@@ -91,10 +91,10 @@ export declare class SalesService {
             invoiceId: string;
         })[];
     } & {
-        depotId: string;
         id: string;
         createdAt: Date;
         updatedAt: Date;
+        depotId: string;
         type: string;
         date: Date;
         status: string;

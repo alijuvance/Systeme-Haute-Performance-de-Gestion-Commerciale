@@ -5,20 +5,28 @@ export declare class StockLevelsService {
     findAll(depotId?: string): Promise<{
         firstAddedAt: Date;
         lastAddedAt: Date;
+        depot: {
+            id: string;
+            name: string;
+            createdAt: Date;
+            updatedAt: Date;
+            location: string | null;
+            type: string;
+        };
         product: {
             category: {
-                name: string;
                 id: string;
+                name: string;
                 createdAt: Date;
                 updatedAt: Date;
                 parentId: string | null;
             };
         } & {
-            isActive: boolean;
-            name: string;
             id: string;
+            name: string;
             createdAt: Date;
             updatedAt: Date;
+            isActive: boolean;
             sku: string;
             barcode: string | null;
             description: string | null;
@@ -26,18 +34,10 @@ export declare class StockLevelsService {
             costPrice: number;
             categoryId: string;
         };
-        depot: {
-            name: string;
-            id: string;
-            createdAt: Date;
-            updatedAt: Date;
-            location: string | null;
-            type: string;
-        };
-        depotId: string;
         id: string;
         createdAt: Date;
         updatedAt: Date;
+        depotId: string;
         productId: string;
         quantity: number;
         minAlertQuantity: number;
