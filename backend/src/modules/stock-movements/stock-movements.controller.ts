@@ -1,10 +1,13 @@
+import { RolesGuard } from '../auth/guards/roles.guard';
+import { Roles } from '../../common/decorators/roles.decorator';
 import { Controller, Post, Get, Body, UseGuards, Request } from '@nestjs/common';
 import { StockMovementsService } from './stock-movements.service';
 import { CreateStockMovementDto } from './dto/create-stock-movement.dto';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 
 @Controller('stock-movements')
-@UseGuards(JwtAuthGuard)
+@UseGuards(JwtAuthGuard, RolesGuard)
+@Roles(...['ADMIN'])
 export class StockMovementsController {
   constructor(private readonly stockMovementsService: StockMovementsService) {}
 
