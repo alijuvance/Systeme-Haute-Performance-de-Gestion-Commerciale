@@ -14,9 +14,9 @@ export declare class StockLevelsController {
                 parentId: string | null;
             };
         } & {
+            isActive: boolean;
             name: string;
             id: string;
-            isActive: boolean;
             createdAt: Date;
             updatedAt: Date;
             sku: string;
@@ -34,11 +34,11 @@ export declare class StockLevelsController {
             location: string | null;
             type: string;
         };
+        depotId: string;
         id: string;
         createdAt: Date;
         updatedAt: Date;
         productId: string;
-        depotId: string;
         quantity: number;
         minAlertQuantity: number;
     }[]>;

@@ -1,9 +1,141 @@
 import { PrismaService } from '../../core/prisma/prisma.service';
 import { CreateUserDto } from './dto/create-user.dto';
+import { UpdateUserDto } from './dto/update-user.dto';
 import { User } from '@prisma/client';
 export declare class UsersService {
     private prisma;
     constructor(prisma: PrismaService);
     findByEmail(email: string): Promise<User | null>;
     create(createUserDto: CreateUserDto): Promise<Omit<User, 'passwordHash'>>;
+    findAll(): Promise<{
+        role: {
+            name: string;
+            id: string;
+            createdAt: Date;
+            updatedAt: Date;
+            permissions: string | null;
+        };
+        depot: {
+            name: string;
+            id: string;
+            createdAt: Date;
+            updatedAt: Date;
+            location: string | null;
+            type: string;
+        } | null;
+        email: string;
+        fullName: string;
+        roleId: string;
+        avatar: string | null;
+        depotId: string | null;
+        isActive: boolean;
+        id: string;
+        resetOtp: string | null;
+        resetOtpExpiresAt: Date | null;
+        lastLogin: Date | null;
+        createdAt: Date;
+        updatedAt: Date;
+    }[]>;
+    findOne(id: string): Promise<{
+        role: {
+            name: string;
+            id: string;
+            createdAt: Date;
+            updatedAt: Date;
+            permissions: string | null;
+        };
+        depot: {
+            name: string;
+            id: string;
+            createdAt: Date;
+            updatedAt: Date;
+            location: string | null;
+            type: string;
+        } | null;
+        email: string;
+        fullName: string;
+        roleId: string;
+        avatar: string | null;
+        depotId: string | null;
+        isActive: boolean;
+        id: string;
+        resetOtp: string | null;
+        resetOtpExpiresAt: Date | null;
+        lastLogin: Date | null;
+        createdAt: Date;
+        updatedAt: Date;
+    } | null>;
+    update(id: string, updateUserDto: UpdateUserDto): Promise<{
+        email: string;
+        fullName: string;
+        roleId: string;
+        avatar: string | null;
+        depotId: string | null;
+        isActive: boolean;
+        id: string;
+        resetOtp: string | null;
+        resetOtpExpiresAt: Date | null;
+        lastLogin: Date | null;
+        createdAt: Date;
+        updatedAt: Date;
+    }>;
+    toggleStatus(id: string): Promise<{
+        email: string;
+        fullName: string;
+        roleId: string;
+        avatar: string | null;
+        depotId: string | null;
+        isActive: boolean;
+        id: string;
+        resetOtp: string | null;
+        resetOtpExpiresAt: Date | null;
+        lastLogin: Date | null;
+        createdAt: Date;
+        updatedAt: Date;
+    }>;
+    updateLastLogin(id: string): Promise<{
+        email: string;
+        fullName: string;
+        roleId: string;
+        avatar: string | null;
+        depotId: string | null;
+        isActive: boolean;
+        id: string;
+        passwordHash: string;
+        resetOtp: string | null;
+        resetOtpExpiresAt: Date | null;
+        lastLogin: Date | null;
+        createdAt: Date;
+        updatedAt: Date;
+    }>;
+    updateOtp(userId: string, otp: string | null, expiresAt: Date | null): Promise<{
+        email: string;
+        fullName: string;
+        roleId: string;
+        avatar: string | null;
+        depotId: string | null;
+        isActive: boolean;
+        id: string;
+        passwordHash: string;
+        resetOtp: string | null;
+        resetOtpExpiresAt: Date | null;
+        lastLogin: Date | null;
+        createdAt: Date;
+        updatedAt: Date;
+    }>;
+    updatePasswordAndClearOtp(userId: string, passwordHash: string): Promise<{
+        email: string;
+        fullName: string;
+        roleId: string;
+        avatar: string | null;
+        depotId: string | null;
+        isActive: boolean;
+        id: string;
+        passwordHash: string;
+        resetOtp: string | null;
+        resetOtpExpiresAt: Date | null;
+        lastLogin: Date | null;
+        createdAt: Date;
+        updatedAt: Date;
+    }>;
 }

@@ -33,9 +33,9 @@ export declare class StockTransfersService {
     }>;
     findAll(): Promise<({
         product: {
+            isActive: boolean;
             name: string;
             id: string;
-            isActive: boolean;
             createdAt: Date;
             updatedAt: Date;
             sku: string;

@@ -31,11 +31,11 @@ export declare class SalesService {
             invoiceId: string;
         }[];
     } & {
+        depotId: string;
         id: string;
         createdAt: Date;
         updatedAt: Date;
         type: string;
-        depotId: string;
         date: Date;
         status: string;
         totalAmount: number;
@@ -70,9 +70,9 @@ export declare class SalesService {
         };
         lines: ({
             product: {
+                isActive: boolean;
                 name: string;
                 id: string;
-                isActive: boolean;
                 createdAt: Date;
                 updatedAt: Date;
                 sku: string;
@@ -91,11 +91,11 @@ export declare class SalesService {
             invoiceId: string;
         })[];
     } & {
+        depotId: string;
         id: string;
         createdAt: Date;
         updatedAt: Date;
         type: string;
-        depotId: string;
         date: Date;
         status: string;
         totalAmount: number;

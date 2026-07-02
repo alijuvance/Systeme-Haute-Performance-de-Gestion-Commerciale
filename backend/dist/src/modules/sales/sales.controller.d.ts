@@ -27,11 +27,11 @@ export declare class SalesController {
             invoiceId: string;
         }[];
     } & {
+        depotId: string;
         id: string;
         createdAt: Date;
         updatedAt: Date;
         type: string;
-        depotId: string;
         date: Date;
         status: string;
         totalAmount: number;
@@ -66,9 +66,9 @@ export declare class SalesController {
         };
         lines: ({
             product: {
+                isActive: boolean;
                 name: string;
                 id: string;
-                isActive: boolean;
                 createdAt: Date;
                 updatedAt: Date;
                 sku: string;
@@ -87,11 +87,11 @@ export declare class SalesController {
             invoiceId: string;
         })[];
     } & {
+        depotId: string;
         id: string;
         createdAt: Date;
         updatedAt: Date;
         type: string;
-        depotId: string;
         date: Date;
         status: string;
         totalAmount: number;

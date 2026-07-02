@@ -7,11 +7,16 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.StockTransfersController = void 0;
+const roles_guard_1 = require("../auth/guards/roles.guard");
+const roles_decorator_1 = require("../../common/decorators/roles.decorator");
 const common_1 = require("@nestjs/common");
+const jwt_auth_guard_1 = require("../auth/guards/jwt-auth.guard");
 let StockTransfersController = class StockTransfersController {
 };
 exports.StockTransfersController = StockTransfersController;
 exports.StockTransfersController = StockTransfersController = __decorate([
+    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard, roles_guard_1.RolesGuard),
+    (0, roles_decorator_1.Roles)(...['ADMIN']),
     (0, common_1.Controller)('stock-transfers')
 ], StockTransfersController);
 //# sourceMappingURL=stock-transfers.controller.js.map

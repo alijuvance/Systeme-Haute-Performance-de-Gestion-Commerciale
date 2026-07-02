@@ -5,9 +5,9 @@ export declare class ProductsController {
     private readonly productsService;
     constructor(productsService: ProductsService);
     create(createProductDto: CreateProductDto): Promise<{
+        isActive: boolean;
         name: string;
         id: string;
-        isActive: boolean;
         createdAt: Date;
         updatedAt: Date;
         sku: string;
@@ -26,9 +26,9 @@ export declare class ProductsController {
             parentId: string | null;
         };
     } & {
+        isActive: boolean;
         name: string;
         id: string;
-        isActive: boolean;
         createdAt: Date;
         updatedAt: Date;
         sku: string;
@@ -56,9 +56,9 @@ export declare class ProductsController {
             productId: string;
         }[];
     } & {
+        isActive: boolean;
         name: string;
         id: string;
-        isActive: boolean;
         createdAt: Date;
         updatedAt: Date;
         sku: string;
@@ -69,9 +69,9 @@ export declare class ProductsController {
         categoryId: string;
     }>;
     update(id: string, updateProductDto: UpdateProductDto): Promise<{
+        isActive: boolean;
         name: string;
         id: string;
-        isActive: boolean;
         createdAt: Date;
         updatedAt: Date;
         sku: string;
@@ -82,9 +82,9 @@ export declare class ProductsController {
         categoryId: string;
     }>;
     remove(id: string): Promise<{
+        isActive: boolean;
         name: string;
         id: string;
-        isActive: boolean;
         createdAt: Date;
         updatedAt: Date;
         sku: string;

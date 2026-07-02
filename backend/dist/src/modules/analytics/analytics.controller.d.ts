@@ -28,11 +28,11 @@ export declare class AnalyticsController {
             currentDebt: number;
         };
     } & {
+        depotId: string;
         id: string;
         createdAt: Date;
         updatedAt: Date;
         type: string;
-        depotId: string;
         date: Date;
         status: string;
         totalAmount: number;

@@ -13,6 +13,8 @@ var __param = (this && this.__param) || function (paramIndex, decorator) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.DepotsController = void 0;
+const roles_guard_1 = require("../auth/guards/roles.guard");
+const roles_decorator_1 = require("../../common/decorators/roles.decorator");
 const common_1 = require("@nestjs/common");
 const depots_service_1 = require("./depots.service");
 const jwt_auth_guard_1 = require("../auth/guards/jwt-auth.guard");
@@ -44,7 +46,8 @@ __decorate([
 ], DepotsController.prototype, "create", null);
 exports.DepotsController = DepotsController = __decorate([
     (0, common_1.Controller)('depots'),
-    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard),
+    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard, roles_guard_1.RolesGuard),
+    (0, roles_decorator_1.Roles)(...['ADMIN']),
     __metadata("design:paramtypes", [depots_service_1.DepotsService])
 ], DepotsController);
 //# sourceMappingURL=depots.controller.js.map

@@ -3,4 +3,6 @@ export declare class CreateUserDto {
     password: string;
     fullName: string;
     roleId: string;
+    avatar?: string;
+    depotId?: string;
 }

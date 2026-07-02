@@ -63,10 +63,88 @@ let UsersService = class UsersService {
                 passwordHash,
                 fullName: createUserDto.fullName,
                 roleId: createUserDto.roleId,
+                avatar: createUserDto.avatar,
+                depotId: createUserDto.depotId,
             },
         });
         const { passwordHash: _, ...result } = user;
         return result;
+    }
+    async findAll() {
+        const users = await this.prisma.user.findMany({
+            include: {
+                role: true,
+                depot: true,
+            },
+            orderBy: { createdAt: 'desc' },
+        });
+        return users.map(user => {
+            const { passwordHash: _, ...result } = user;
+            return result;
+        });
+    }
+    async findOne(id) {
+        const user = await this.prisma.user.findUnique({
+            where: { id },
+            include: {
+                role: true,
+                depot: true,
+            },
+        });
+        if (!user)
+            return null;
+        const { passwordHash: _, ...result } = user;
+        return result;
+    }
+    async update(id, updateUserDto) {
+        let passwordHash;
+        if (updateUserDto.password) {
+            passwordHash = await bcrypt.hash(updateUserDto.password, 10);
+        }
+        const data = { ...updateUserDto };
+        delete data.password;
+        if (passwordHash) {
+            data.passwordHash = passwordHash;
+        }
+        const user = await this.prisma.user.update({
+            where: { id },
+            data,
+        });
+        const { passwordHash: _, ...result } = user;
+        return result;
+    }
+    async toggleStatus(id) {
+        const user = await this.prisma.user.findUnique({ where: { id } });
+        if (!user)
+            throw new Error("User not found");
+        const updatedUser = await this.prisma.user.update({
+            where: { id },
+            data: { isActive: !user.isActive },
+        });
+        const { passwordHash: _, ...result } = updatedUser;
+        return result;
+    }
+    async updateLastLogin(id) {
+        return this.prisma.user.update({
+            where: { id },
+            data: { lastLogin: new Date() }
+        });
+    }
+    async updateOtp(userId, otp, expiresAt) {
+        return this.prisma.user.update({
+            where: { id: userId },
+            data: { resetOtp: otp, resetOtpExpiresAt: expiresAt },
+        });
+    }
+    async updatePasswordAndClearOtp(userId, passwordHash) {
+        return this.prisma.user.update({
+            where: { id: userId },
+            data: {
+                passwordHash,
+                resetOtp: null,
+                resetOtpExpiresAt: null,
+            },
+        });
     }
 };
 exports.UsersService = UsersService;
