@@ -10,11 +10,13 @@ exports.RolesModule = void 0;
 const common_1 = require("@nestjs/common");
 const roles_service_1 = require("./roles.service");
 const roles_controller_1 = require("./roles.controller");
+const prisma_module_1 = require("../../core/prisma/prisma.module");
 let RolesModule = class RolesModule {
 };
 exports.RolesModule = RolesModule;
 exports.RolesModule = RolesModule = __decorate([
     (0, common_1.Module)({
+        imports: [prisma_module_1.PrismaModule],
         providers: [roles_service_1.RolesService],
         controllers: [roles_controller_1.RolesController]
     })

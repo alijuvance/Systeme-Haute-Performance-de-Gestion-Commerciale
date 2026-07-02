@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, ConflictException } from '@nestjs/common';
 import { PrismaService } from '../../core/prisma/prisma.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
@@ -18,19 +18,25 @@ export class UsersService {
     const saltRounds = 10;
     const passwordHash = await bcrypt.hash(createUserDto.password, saltRounds);
 
-    const user = await this.prisma.user.create({
-      data: {
-        email: createUserDto.email,
-        passwordHash,
-        fullName: createUserDto.fullName,
-        roleId: createUserDto.roleId,
-        avatar: createUserDto.avatar,
-        depotId: createUserDto.depotId || null,
-      },
-    });
-
-    const { passwordHash: _, ...result } = user;
-    return result;
+    try {
+      const user = await this.prisma.user.create({
+        data: {
+          email: createUserDto.email,
+          passwordHash,
+          fullName: createUserDto.fullName,
+          roleId: createUserDto.roleId,
+          avatar: createUserDto.avatar,
+          depotId: createUserDto.depotId || null,
+        },
+      });
+      const { passwordHash: _, ...result } = user;
+      return result;
+    } catch (error: any) {
+      if (error.code === 'P2002' && error.meta?.target?.includes('email')) {
+        throw new ConflictException('Un utilisateur avec cette adresse email existe déjà.');
+      }
+      throw error;
+    }
   }
 
   async findAll() {
@@ -75,12 +81,19 @@ export class UsersService {
       data.depotId = null;
     }
 
-    const user = await this.prisma.user.update({
-      where: { id },
-      data,
-    });
-    const { passwordHash: _, ...result } = user;
-    return result;
+    try {
+      const user = await this.prisma.user.update({
+        where: { id },
+        data,
+      });
+      const { passwordHash: _, ...result } = user;
+      return result;
+    } catch (error: any) {
+      if (error.code === 'P2002' && error.meta?.target?.includes('email')) {
+        throw new ConflictException('Un utilisateur avec cette adresse email existe déjà.');
+      }
+      throw error;
+    }
   }
 
   async toggleStatus(id: string) {
