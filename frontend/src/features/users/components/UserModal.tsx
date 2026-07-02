@@ -6,6 +6,7 @@ import * as z from 'zod';
 import { Modal } from '@/components/shared/Modal';
 import { Button } from '@/components/shared/Button';
 import { AvatarUpload } from './AvatarUpload';
+import { useToast } from '@/components/providers/ToastProvider';
 import api from '@/api/axios';
 
 const userSchema = z.object({
@@ -30,6 +31,7 @@ export const UserModal = ({ isOpen, onClose, onSuccess, user }: UserModalProps) 
   const [roles, setRoles] = useState<any[]>([]);
   const [depots, setDepots] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(false);
+  const toast = useToast();
 
   const { register, handleSubmit, formState: { errors }, setValue, watch, reset } = useForm<UserFormData>({
     resolver: zodResolver(userSchema),
@@ -93,7 +95,7 @@ export const UserModal = ({ isOpen, onClose, onSuccess, user }: UserModalProps) 
       onClose();
     } catch (error: any) {
       console.error(error);
-      alert(error.response?.data?.message || "Une erreur est survenue.");
+      toast.error(error.response?.data?.message || "Une erreur est survenue.");
     } finally {
       setIsLoading(false);
     }
