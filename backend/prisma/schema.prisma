@@ -31,6 +31,10 @@ model User {
   resetOtpExpiresAt DateTime?
   roleId             String
   role               Role            @relation(fields: [roleId], references: [id])
+  avatar             String?
+  lastLogin          DateTime?
+  depotId            String?
+  depot              Depot?          @relation(fields: [depotId], references: [id])
   stockMovements     StockMovement[]
   transfersDispatched StockTransfer[] @relation("DispatchedBy")
   transfersReceived   StockTransfer[] @relation("ReceivedBy")
@@ -94,6 +98,7 @@ model Depot {
   type             String // CENTRAL, RETAIL, WHOLESALE
   stockLevels      StockLevel[]
   movements        StockMovement[]
+  users            User[]
   transfersFrom    StockTransfer[] @relation("TransferFrom")
   transfersTo      StockTransfer[] @relation("TransferTo")
   purchaseOrders   PurchaseOrder[]
