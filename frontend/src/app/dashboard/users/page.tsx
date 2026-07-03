@@ -148,7 +148,7 @@ export default function UsersPage() {
         </Button>
       </PageHeader>
 
-      <div className="bg-white p-4 rounded-xl border border-slate-200 shadow-sm flex flex-wrap gap-4 items-center">
+      <div className="bg-white p-4 rounded-xl border border-slate-200  flex flex-wrap gap-4 items-center">
         <div className="relative flex-1 min-w-[250px]">
           <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
           <input 
@@ -156,13 +156,13 @@ export default function UsersPage() {
             placeholder="Rechercher un utilisateur (Nom, Email)..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full pl-9 pr-4 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+            className="w-full pl-9 pr-4 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:border-gray-950 focus:ring-1 focus:ring-gray-950"
           />
         </div>
         <select 
           value={filterRole} 
           onChange={(e) => setFilterRole(e.target.value)}
-          className="px-3 py-2 border border-slate-200 rounded-lg text-sm bg-white focus:outline-none focus:border-blue-500"
+          className="px-3 py-2 border border-slate-200 rounded-lg text-sm bg-white focus:outline-none focus:border-blue-950"
         >
           <option value="">Tous les rôles</option>
           <option value="ADMIN">Admin</option>
@@ -171,7 +171,7 @@ export default function UsersPage() {
         <select 
           value={filterStatus} 
           onChange={(e) => setFilterStatus(e.target.value)}
-          className="px-3 py-2 border border-slate-200 rounded-lg text-sm bg-white focus:outline-none focus:border-blue-500"
+          className="px-3 py-2 border border-slate-200 rounded-lg text-sm bg-white focus:outline-none focus:border-blue-950"
         >
           <option value="">Tous les statuts</option>
           <option value="ACTIVE">Actif</option>
