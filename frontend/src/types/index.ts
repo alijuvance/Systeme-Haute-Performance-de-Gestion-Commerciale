@@ -1,10 +1,12 @@
 export interface User {
   id: string;
   email: string;
-  firstName?: string;
-  lastName?: string;
+  fullName: string;
+  avatar?: string;
   roleId: string;
   role?: Role | any;
+  depotId?: string | null;
+  isActive?: boolean;
 }
 
 export interface Role {
