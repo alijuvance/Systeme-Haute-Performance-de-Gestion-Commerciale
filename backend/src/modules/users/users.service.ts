@@ -1,4 +1,4 @@
-import { Injectable, ConflictException } from '@nestjs/common';
+import { Injectable, ConflictException, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../../core/prisma/prisma.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
@@ -67,29 +67,41 @@ export class UsersService {
   }
 
   async update(id: string, updateUserDto: UpdateUserDto) {
-    let passwordHash;
-    if (updateUserDto.password) {
-      passwordHash = await bcrypt.hash(updateUserDto.password, 10);
+    // Vérifier que l'utilisateur existe
+    const existingUser = await this.prisma.user.findUnique({ where: { id } });
+    if (!existingUser) {
+      throw new NotFoundException('Utilisateur introuvable.');
     }
 
-    const data: any = { ...updateUserDto };
-    delete data.password;
-    if (passwordHash) {
-      data.passwordHash = passwordHash;
+    // Construire explicitement l'objet de mise à jour
+    const data: Record<string, any> = {};
+
+    if (updateUserDto.fullName !== undefined) data.fullName = updateUserDto.fullName;
+    if (updateUserDto.email !== undefined) data.email = updateUserDto.email;
+    if (updateUserDto.roleId !== undefined) data.roleId = updateUserDto.roleId;
+    if (updateUserDto.avatar !== undefined) data.avatar = updateUserDto.avatar;
+    if (updateUserDto.isActive !== undefined) data.isActive = updateUserDto.isActive;
+
+    // Gestion spéciale de depotId (nullable en base)
+    if (updateUserDto.depotId !== undefined) {
+      data.depotId = updateUserDto.depotId || null;
     }
-    if (data.depotId === '') {
-      data.depotId = null;
+
+    // Gestion du mot de passe (hash uniquement si fourni)
+    if (updateUserDto.password) {
+      data.passwordHash = await bcrypt.hash(updateUserDto.password, 10);
     }
 
     try {
       const user = await this.prisma.user.update({
         where: { id },
         data,
+        include: { role: true, depot: true },
       });
       const { passwordHash: _, ...result } = user;
       return result;
     } catch (error: any) {
-      if (error.code === 'P2002' && error.meta?.target?.includes('email')) {
+      if (error.code === 'P2002') {
         throw new ConflictException('Un utilisateur avec cette adresse email existe déjà.');
       }
       throw error;
