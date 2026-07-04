@@ -4,6 +4,7 @@ import Cropper from 'react-easy-crop';
 import { UploadCloud, Check, X, Camera } from 'lucide-react';
 import { Modal } from '@/components/shared/Modal';
 import { Button } from '@/components/shared/Button';
+import { useToast } from '@/components/providers/ToastProvider';
 import api from '@/api/axios';
 
 interface AvatarUploadProps {
@@ -53,6 +54,7 @@ export const AvatarUpload = ({ currentAvatar, onUploadSuccess }: AvatarUploadPro
   const [croppedAreaPixels, setCroppedAreaPixels] = useState(null);
   const [isUploading, setIsUploading] = useState(false);
   const [preview, setPreview] = useState(currentAvatar || null);
+  const toast = useToast();
 
   const onFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files.length > 0) {
@@ -90,7 +92,7 @@ export const AvatarUpload = ({ currentAvatar, onUploadSuccess }: AvatarUploadPro
       setImageSrc(null); // Close modal
     } catch (error) {
       console.error('Upload failed', error);
-      alert("Erreur lors de l'upload de l'image");
+      toast.error("Erreur lors de l'upload de l'image.");
     } finally {
       setIsUploading(false);
     }
