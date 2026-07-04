@@ -7,6 +7,7 @@ import { Button } from '@/components/shared/Button';
 import { DataTable, ColumnDef } from '@/components/shared/DataTable';
 import { formatDate } from '@/utils/formatters';
 import { UserModal } from '@/features/users/components/UserModal';
+import { useToast } from '@/components/providers/ToastProvider';
 
 export default function UsersPage() {
   const [users, setUsers] = useState<any[]>([]);
@@ -16,6 +17,7 @@ export default function UsersPage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedUser, setSelectedUser] = useState<any | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const toast = useToast();
 
   const fetchUsers = async () => {
     try {
@@ -39,7 +41,7 @@ export default function UsersPage() {
       fetchUsers();
     } catch (error) {
       console.error(error);
-      alert('Erreur lors du changement de statut');
+      toast.error('Erreur lors du changement de statut.');
     }
   };
 
@@ -148,7 +150,7 @@ export default function UsersPage() {
         </Button>
       </PageHeader>
 
-      <div className="bg-white p-4 rounded-xl border border-slate-200  flex flex-wrap gap-4 items-center">
+      <div className="bg-white p-4 rounded-xl border border-slate-200 flex flex-wrap gap-4 items-center">
         <div className="relative flex-1 min-w-[250px]">
           <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
           <input 
@@ -156,13 +158,13 @@ export default function UsersPage() {
             placeholder="Rechercher un utilisateur (Nom, Email)..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full pl-9 pr-4 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:border-gray-950 focus:ring-1 focus:ring-gray-950"
+            className="w-full pl-9 pr-4 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-slate-900 focus:border-slate-900"
           />
         </div>
         <select 
           value={filterRole} 
           onChange={(e) => setFilterRole(e.target.value)}
-          className="px-3 py-2 border border-slate-200 rounded-lg text-sm bg-white focus:outline-none focus:border-blue-950"
+          className="px-3 py-2 border border-slate-200 rounded-lg text-sm bg-white focus:outline-none focus:ring-2 focus:ring-slate-900 focus:border-slate-900"
         >
           <option value="">Tous les rôles</option>
           <option value="ADMIN">Admin</option>
@@ -171,7 +173,7 @@ export default function UsersPage() {
         <select 
           value={filterStatus} 
           onChange={(e) => setFilterStatus(e.target.value)}
-          className="px-3 py-2 border border-slate-200 rounded-lg text-sm bg-white focus:outline-none focus:border-blue-950"
+          className="px-3 py-2 border border-slate-200 rounded-lg text-sm bg-white focus:outline-none focus:ring-2 focus:ring-slate-900 focus:border-slate-900"
         >
           <option value="">Tous les statuts</option>
           <option value="ACTIVE">Actif</option>
