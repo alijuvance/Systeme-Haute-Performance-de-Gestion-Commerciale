@@ -32,7 +32,7 @@ export class UsersService {
       const { passwordHash: _, ...result } = user;
       return result;
     } catch (error: any) {
-      if (error.code === 'P2002' && error.meta?.target?.includes('email')) {
+      if (error.code === 'P2002') {
         throw new ConflictException('Un utilisateur avec cette adresse email existe déjà.');
       }
       throw error;
