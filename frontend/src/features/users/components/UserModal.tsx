@@ -83,13 +83,15 @@ export const UserModal = ({ isOpen, onClose, onSuccess, user }: UserModalProps) 
         delete payload.password;
       }
       if (!payload.depotId) {
-        payload.depotId = null;
+        delete payload.depotId;
       }
       
       if (user) {
         await api.patch(`/api/users/${user.id}`, payload);
+        toast.success('Utilisateur modifié avec succès.');
       } else {
         await api.post('/api/users', payload);
+        toast.success('Utilisateur créé avec succès.');
       }
       onSuccess();
       onClose();
@@ -118,7 +120,7 @@ export const UserModal = ({ isOpen, onClose, onSuccess, user }: UserModalProps) 
             <label className="block text-sm font-medium text-slate-700 mb-1">Nom complet</label>
             <input 
               {...register('fullName')} 
-              className="w-full px-3 py-2 border border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full px-3 py-2 border border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-slate-900"
             />
             {errors.fullName && <span className="text-red-500 text-xs">{errors.fullName.message}</span>}
           </div>
@@ -127,7 +129,7 @@ export const UserModal = ({ isOpen, onClose, onSuccess, user }: UserModalProps) 
             <input 
               type="email"
               {...register('email')} 
-              className="w-full px-3 py-2 border border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full px-3 py-2 border border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-slate-900"
             />
             {errors.email && <span className="text-red-500 text-xs">{errors.email.message}</span>}
           </div>
@@ -138,7 +140,7 @@ export const UserModal = ({ isOpen, onClose, onSuccess, user }: UserModalProps) 
             <label className="block text-sm font-medium text-slate-700 mb-1">Rôle</label>
             <select 
               {...register('roleId')}
-              className="w-full px-3 py-2 border border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
+              className="w-full px-3 py-2 border border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-slate-900 bg-white"
             >
               <option value="">Sélectionner un rôle</option>
               {roles.map(r => (
@@ -151,7 +153,7 @@ export const UserModal = ({ isOpen, onClose, onSuccess, user }: UserModalProps) 
             <label className="block text-sm font-medium text-slate-700 mb-1">Dépôt d'affectation</label>
             <select 
               {...register('depotId')}
-              className="w-full px-3 py-2 border border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
+              className="w-full px-3 py-2 border border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-slate-900 bg-white"
             >
               <option value="">Tous les dépôts / Aucun</option>
               {depots.map(d => (
@@ -168,7 +170,7 @@ export const UserModal = ({ isOpen, onClose, onSuccess, user }: UserModalProps) 
           <input 
             type="password"
             {...register('password')} 
-            className="w-full px-3 py-2 border border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full px-3 py-2 border border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-slate-900"
             placeholder={user ? "Laissez vide pour ne pas modifier" : "Mot de passe"}
           />
           {errors.password && <span className="text-red-500 text-xs">{errors.password.message}</span>}
