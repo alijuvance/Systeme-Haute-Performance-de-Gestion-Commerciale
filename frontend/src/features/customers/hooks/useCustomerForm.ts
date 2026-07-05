@@ -1,9 +1,18 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { customerSchema, CustomerFormData, Customer } from '../schemas/customerSchema';
 import { createCustomer, updateCustomer } from '../api/customerApi';
 import { useToast } from '@/components/providers/ToastProvider';
+
+const emptyValues: CustomerFormData = {
+  fullName: '',
+  companyName: '',
+  email: '',
+  phone: '',
+  address: '',
+  type: 'B2B',
+};
 
 export const useCustomerForm = (
   onSuccess: () => void,
@@ -14,23 +23,25 @@ export const useCustomerForm = (
 
   const form = useForm<CustomerFormData>({
     resolver: zodResolver(customerSchema),
-    defaultValues: initialData ? {
-      fullName: initialData.fullName,
-      companyName: initialData.companyName || '',
-      email: initialData.email || '',
-      phone: initialData.phone,
-      address: initialData.address || '',
-      type: initialData.type,
-    } : {
-      fullName: '',
-      companyName: '',
-      email: '',
-      phone: '',
-      address: '',
-      type: 'B2B',
-    },
+    defaultValues: emptyValues,
     mode: 'onChange',
   });
+
+  // 🔑 Réinitialise le formulaire à chaque changement de initialData
+  useEffect(() => {
+    if (initialData) {
+      form.reset({
+        fullName: initialData.fullName,
+        companyName: initialData.companyName || '',
+        email: initialData.email || '',
+        phone: initialData.phone,
+        address: initialData.address || '',
+        type: initialData.type,
+      });
+    } else {
+      form.reset(emptyValues);
+    }
+  }, [initialData]);
 
   const onSubmit = form.handleSubmit(async (data) => {
     try {
