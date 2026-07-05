@@ -13,7 +13,7 @@ export class StockMovementsController {
 
   @Post()
   create(@Body() dto: CreateStockMovementDto, @Request() req: any) {
-    return this.stockMovementsService.registerMovement(dto, req.user.id);
+    return this.stockMovementsService.registerMovement(dto, req.user.userId);
   }
 
   @Get()

@@ -153,7 +153,7 @@ export default function SearchSelect({
           onKeyDown={handleKeyDown}
           placeholder={placeholder}
           className={`
-            w-full rounded-lg border bg-white py-2.5 pl-9 pr-16 text-sm text-slate-900
+            w-full rounded-none border bg-white py-2.5 pl-9 pr-16 text-sm text-slate-900
             placeholder:text-slate-400
             transition-colors
             focus:outline-none focus:ring-2 focus:ring-slate-900
@@ -169,7 +169,7 @@ export default function SearchSelect({
             <button
               type="button"
               onClick={handleClear}
-              className="rounded p-0.5 text-slate-400 transition-colors hover:bg-slate-100 hover:text-slate-600"
+              className="rounded-none p-0.5 text-slate-400 transition-colors hover:bg-slate-100 hover:text-slate-600"
               aria-label="Effacer la sélection"
             >
               <X size={14} />
@@ -186,7 +186,7 @@ export default function SearchSelect({
 
       {/* Dropdown */}
       {isOpen && (
-        <ul className="absolute z-50 mt-1 max-h-48 w-full overflow-y-auto rounded-lg border border-slate-200 bg-white py-1 shadow-lg">
+        <ul className="absolute z-50 mt-1 max-h-48 w-full overflow-y-auto rounded-none border border-slate-200 bg-white py-1 shadow-lg">
           {filteredOptions.length > 0 ? (
             filteredOptions.map((opt) => (
               <li

@@ -1,6 +1,6 @@
 'use client';
 import React, { useState, useEffect } from 'react';
-import { Plus, Search, Shield, ShieldOff, Edit } from 'lucide-react';
+import { Plus, Search, Shield, ShieldOff, Pencil } from 'lucide-react';
 import api from '@/api/axios';
 import { PageHeader } from '@/components/shared/PageHeader';
 import { Button } from '@/components/shared/Button';
@@ -8,6 +8,7 @@ import { DataTable, ColumnDef } from '@/components/shared/DataTable';
 import { formatDate } from '@/utils/formatters';
 import { UserModal } from '@/features/users/components/UserModal';
 import { useToast } from '@/components/providers/ToastProvider';
+import { Badge } from '@/components/shared/Badge';
 
 export default function UsersPage() {
   const [users, setUsers] = useState<any[]>([]);
@@ -59,7 +60,7 @@ export default function UsersPage() {
       key: 'fullName',
       cell: (user) => (
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-full bg-slate-100 overflow-hidden border border-slate-200">
+          <div className="w-10 h-10 rounded-none bg-slate-100 overflow-hidden border border-slate-200">
             {user.avatar ? (
               <img src={`${api.defaults.baseURL}${user.avatar}`} alt={user.fullName} className="w-full h-full object-cover" />
             ) : (
@@ -79,9 +80,9 @@ export default function UsersPage() {
       header: 'Rôle',
       key: 'role',
       cell: (user) => (
-        <span className="px-2 py-1 bg-blue-50 text-blue-700 rounded-md text-xs font-medium">
+        <Badge variant={user.role?.name === 'ADMIN' ? 'primary' : 'info'}>
           {user.role?.name || 'Inconnu'}
-        </span>
+        </Badge>
       )
     },
     {
@@ -97,11 +98,9 @@ export default function UsersPage() {
       header: 'Statut',
       key: 'isActive',
       cell: (user) => (
-        <span className={`px-2 py-1 rounded-md text-xs font-medium ${
-          user.isActive ? 'bg-emerald-50 text-emerald-700' : 'bg-red-50 text-red-700'
-        }`}>
+        <Badge variant={user.isActive ? 'success' : 'danger'}>
           {user.isActive ? 'Actif' : 'Suspendu'}
-        </span>
+        </Badge>
       )
     },
     {
@@ -119,16 +118,17 @@ export default function UsersPage() {
       cell: (user) => (
         <div className="flex items-center justify-end gap-2">
           <Button 
-            variant="outline" 
+            variant="ghost" 
+            size="icon"
             onClick={() => { setSelectedUser(user); setIsModalOpen(true); }}
-            className="h-8 w-8 p-0 flex items-center justify-center"
           >
-            <Edit className="w-4 h-4 text-slate-500" />
+            <Pencil className="w-4 h-4" />
           </Button>
           <Button 
             variant="outline" 
+            size="icon"
             onClick={() => handleToggleStatus(user.id)}
-            className={`h-8 w-8 p-0 flex items-center justify-center ${user.isActive ? 'hover:bg-red-50 hover:text-red-600' : 'hover:bg-emerald-50 hover:text-emerald-600'}`}
+            className={user.isActive ? 'hover:bg-red-50 hover:text-red-600' : 'hover:bg-emerald-50 hover:text-emerald-600'}
             title={user.isActive ? 'Suspendre' : 'Activer'}
           >
             {user.isActive ? <ShieldOff className="w-4 h-4" /> : <Shield className="w-4 h-4" />}
@@ -150,7 +150,7 @@ export default function UsersPage() {
         </Button>
       </PageHeader>
 
-      <div className="bg-white p-4 rounded-xl border border-slate-200 flex flex-wrap gap-4 items-center">
+      <div className="bg-white p-4 rounded-none border border-slate-200 flex flex-wrap gap-4 items-center">
         <div className="relative flex-1 min-w-[250px]">
           <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
           <input 
@@ -158,13 +158,13 @@ export default function UsersPage() {
             placeholder="Rechercher un utilisateur (Nom, Email)..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full pl-9 pr-4 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-slate-900 focus:border-slate-900"
+            className="w-full pl-9 pr-4 py-2 border border-slate-200 rounded-none text-sm focus:outline-none focus:ring-2 focus:ring-slate-900 focus:border-slate-900"
           />
         </div>
         <select 
           value={filterRole} 
           onChange={(e) => setFilterRole(e.target.value)}
-          className="px-3 py-2 border border-slate-200 rounded-lg text-sm bg-white focus:outline-none focus:ring-2 focus:ring-slate-900 focus:border-slate-900"
+          className="px-3 py-2 border border-slate-200 rounded-none text-sm bg-white focus:outline-none focus:ring-2 focus:ring-slate-900 focus:border-slate-900"
         >
           <option value="">Tous les rôles</option>
           <option value="ADMIN">Admin</option>
@@ -173,7 +173,7 @@ export default function UsersPage() {
         <select 
           value={filterStatus} 
           onChange={(e) => setFilterStatus(e.target.value)}
-          className="px-3 py-2 border border-slate-200 rounded-lg text-sm bg-white focus:outline-none focus:ring-2 focus:ring-slate-900 focus:border-slate-900"
+          className="px-3 py-2 border border-slate-200 rounded-none text-sm bg-white focus:outline-none focus:ring-2 focus:ring-slate-900 focus:border-slate-900"
         >
           <option value="">Tous les statuts</option>
           <option value="ACTIVE">Actif</option>

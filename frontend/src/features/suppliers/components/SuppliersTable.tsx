@@ -6,7 +6,7 @@ import { DataTable, ColumnDef } from '@/components/shared/DataTable';
 import { PageHeader } from '@/components/shared/PageHeader';
 import { Button } from '@/components/shared/Button';
 import { Modal } from '@/components/shared/Modal';
-import { Plus, Edit2, Trash2 } from 'lucide-react';
+import { Plus, Pencil, Trash } from 'lucide-react';
 import { useSupplierForm } from '../hooks/useSupplierForm';
 import { useToast } from '@/components/providers/ToastProvider';
 
@@ -80,8 +80,8 @@ export function SuppliersTable() {
       key: 'actions', header: '', align: 'right',
       cell: (s) => (
         <div className="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-          <button onClick={() => { setEditing(s); setIsModalOpen(true); }} className="p-1.5 text-slate-400 hover:text-blue-600 hover:bg-blue-50 transition-colors"><Edit2 className="w-4 h-4" /></button>
-          <button onClick={() => handleDelete(s.id)} className="p-1.5 text-slate-400 hover:text-red-600 hover:bg-red-50 transition-colors"><Trash2 className="w-4 h-4" /></button>
+          <button onClick={() => { setEditing(s); setIsModalOpen(true); }} className="p-1.5 text-slate-400 hover:text-blue-600 hover:bg-blue-50 transition-colors"><Pencil className="w-4 h-4" /></button>
+          <button onClick={() => handleDelete(s.id)} className="p-1.5 text-slate-400 hover:text-red-600 hover:bg-red-50 transition-colors"><Trash className="w-4 h-4" /></button>
         </div>
       )
     }

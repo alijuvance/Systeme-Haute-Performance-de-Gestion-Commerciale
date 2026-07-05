@@ -166,7 +166,7 @@ export const SaleForm: React.FC = () => {
           </div>
 
           {/* Products list */}
-          <div className="flex-1 overflow-y-auto p-4 space-y-2 max-h-[420px]">
+          <div className="flex-1 bg-slate-50 overflow-y-auto p-4 space-y-2 max-h-[420px]">
             {filteredProducts.length === 0 ? (
               <div className="h-full min-h-[200px] flex flex-col items-center justify-center text-slate-400 gap-2">
                 <Package2 className="w-10 h-10 opacity-40" />

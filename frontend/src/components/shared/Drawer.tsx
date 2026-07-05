@@ -73,7 +73,7 @@ export default function Drawer({ isOpen, onClose, title, description, children, 
           <button
             type="button"
             onClick={onClose}
-            className="rounded-lg p-1.5 text-slate-400 transition-colors hover:bg-slate-200 hover:text-slate-600"
+            className="rounded-none p-1.5 text-slate-400 transition-colors hover:bg-slate-200 hover:text-slate-600"
             aria-label="Fermer"
           >
             <X className="h-5 w-5" />

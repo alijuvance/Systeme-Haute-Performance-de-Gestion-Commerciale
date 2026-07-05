@@ -5,7 +5,7 @@ import { Product } from '../schemas/productSchema';
 import { DataTable, ColumnDef } from '@/components/shared/DataTable';
 import { PageHeader } from '@/components/shared/PageHeader';
 import { Button } from '@/components/shared/Button';
-import { Plus, Edit2, Trash2 } from 'lucide-react';
+import { Plus, Pencil, Trash } from 'lucide-react';
 import { formatCurrency } from '@/utils/formatters';
 import { ProductFormModal } from './ProductFormModal';
 import { useToast } from '@/components/providers/ToastProvider';
@@ -52,10 +52,10 @@ export function ProductsTable() {
       cell: (p) => (
         <div className="flex justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
           <button onClick={() => handleOpenEdit(p)} className="p-1.5 text-slate-400 hover:text-blue-600 hover:bg-blue-50 transition-colors">
-            <Edit2 className="w-4 h-4" />
+            <Pencil className="w-4 h-4" />
           </button>
           <button onClick={() => handleDelete(p.id)} className="p-1.5 text-slate-400 hover:text-red-600 hover:bg-red-50 transition-colors">
-            <Trash2 className="w-4 h-4" />
+            <Trash className="w-4 h-4" />
           </button>
         </div>
       )

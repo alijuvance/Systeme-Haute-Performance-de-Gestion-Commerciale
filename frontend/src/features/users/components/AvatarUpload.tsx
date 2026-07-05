@@ -101,7 +101,7 @@ export const AvatarUpload = ({ currentAvatar, onUploadSuccess }: AvatarUploadPro
   return (
     <div className="flex flex-col items-center gap-4">
       <div className="relative group cursor-pointer">
-        <div className="w-24 h-24 rounded-full overflow-hidden border-2 border-slate-200 bg-slate-100 flex items-center justify-center relative">
+        <div className="w-24 h-24 rounded-none overflow-hidden border-2 border-slate-200 bg-slate-100 flex items-center justify-center relative">
           {preview ? (
             <img src={preview} alt="Avatar" className="w-full h-full object-cover" />
           ) : (
@@ -123,13 +123,13 @@ export const AvatarUpload = ({ currentAvatar, onUploadSuccess }: AvatarUploadPro
       <Modal isOpen={!!imageSrc} onClose={() => setImageSrc(null)} title="Recadrer l'avatar">
         {imageSrc && (
           <div className="space-y-4">
-            <div className="relative w-full h-64 bg-slate-900 rounded-lg overflow-hidden">
+            <div className="relative w-full h-64 bg-slate-900 rounded-none overflow-hidden">
               <Cropper
                 image={imageSrc}
                 crop={crop}
                 zoom={zoom}
                 aspect={1}
-                cropShape="round"
+                cropShape="rect"
                 onCropChange={setCrop}
                 onZoomChange={setZoom}
                 onCropComplete={onCropComplete}
