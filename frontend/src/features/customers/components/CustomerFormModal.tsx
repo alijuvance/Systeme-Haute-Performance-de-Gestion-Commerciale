@@ -29,7 +29,7 @@ export function CustomerFormModal({ isOpen, onClose, onSuccess, initialData }: C
         )}
 
         <div>
-          <label className="block text-sm font-semibold text-slate-700 mb-1">Nom complet <span className="text-red-500">*</span></label>
+          <label className="block text-sm font-semibold text-slate-700 mb-1">Nom complet<span className="text-red-500">*</span></label>
           <input
             {...register('fullName')}
             className={`w-full border p-2 text-sm bg-white focus:outline-none focus:ring-1 focus:ring-slate-400 ${errors.fullName ? 'border-red-400' : 'border-slate-300'}`}

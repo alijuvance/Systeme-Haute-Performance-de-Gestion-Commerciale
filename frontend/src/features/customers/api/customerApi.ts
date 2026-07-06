@@ -17,7 +17,7 @@ export const createCustomer = async (data: CustomerFormData): Promise<Customer> 
 };
 
 export const updateCustomer = async (id: string, data: CustomerFormData): Promise<Customer> => {
-  const response = await api.put(`/api/customers/${id}`, data);
+  const response = await api.patch(`/api/customers/${id}`, data);
   return response.data;
 };
 
