@@ -1,6 +1,6 @@
 'use client';
 import React, { useState, useEffect } from 'react';
-import { Plus, Search, Shield, ShieldOff, Pencil } from 'lucide-react';
+import { Plus, Search, Shield, ShieldOff, Pencil, Trash2 } from 'lucide-react';
 import api from '@/api/axios';
 import { PageHeader } from '@/components/shared/PageHeader';
 import { Button } from '@/components/shared/Button';
@@ -45,6 +45,25 @@ export default function UsersPage() {
       toast.error('Erreur lors du changement de statut.');
     }
   };
+
+  const handleDelete = async (id: string) => {
+  const ok = await toast.confirm({
+    title: 'Supprimer cet utilisateur',
+    message: 'Cette action est irréversible. Voulez-vous vraiment supprimer cet utilisateur ?',
+    variant: 'danger',
+    confirmText: 'Supprimer',
+  });
+  if (ok) {
+    try {
+      await api.delete(`/api/users/${id}`);
+      toast.success('Utilisateur supprimé avec succès.');
+      fetchUsers();
+    } catch (error: any) {
+      console.error(error);
+      toast.error(error.response?.data?.message || 'Erreur lors de la suppression.');
+    }
+  }
+};
 
   const filteredUsers = users.filter(u => {
     const matchesSearch = u.fullName.toLowerCase().includes(searchTerm.toLowerCase()) || 
@@ -121,6 +140,7 @@ export default function UsersPage() {
             variant="ghost" 
             size="icon"
             onClick={() => { setSelectedUser(user); setIsModalOpen(true); }}
+            title="Modifier"
           >
             <Pencil className="w-4 h-4" />
           </Button>
@@ -133,6 +153,15 @@ export default function UsersPage() {
           >
             {user.isActive ? <ShieldOff className="w-4 h-4" /> : <Shield className="w-4 h-4" />}
           </Button>
+              <Button 
+        variant="outline" 
+        size="icon"
+        onClick={() => handleDelete(user.id)}
+        className="hover:bg-red-50 hover:text-red-600"
+        title="Supprimer"
+      >
+        <Trash2 className="w-4 h-4" />
+      </Button> 
         </div>
       )
     }

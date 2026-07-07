@@ -134,6 +134,21 @@ export class UsersService {
     });
   }
 
+  async remove(id: string) {
+    try {
+      return await this.prisma.user.delete({
+        where: { id },
+      });
+    } catch (error: any) {
+      if (error.code === 'P2003') {
+        throw new ConflictException(
+          "Impossible de supprimer cet utilisateur car il est associé à des mouvements de stock ou à des transferts. Vous pouvez désactiver son compte à la place."
+        );
+      }
+      throw error;
+    }
+  }
+
   async updatePasswordAndClearOtp(userId: string, passwordHash: string) {
     return this.prisma.user.update({
       where: { id: userId },
