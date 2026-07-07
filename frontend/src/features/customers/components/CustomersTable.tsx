@@ -80,7 +80,7 @@ export function CustomersTable() {
         description="Gérez votre portefeuille de clients professionnels."
         actions={
           <Button onClick={handleOpenCreate} icon={<Plus className="w-4 h-4" />}>
-            Nouveau Clients
+            Nouveau Client
           </Button>
         }
       />

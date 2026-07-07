@@ -28,7 +28,7 @@ export const FinanceOverview: React.FC<FinanceOverviewProps> = ({ kpis, cashflow
             </div>
             <span className="text-xs font-semibold px-2 py-1 bg-slate-100 text-slate-600 rounded-full">Actuel</span>
           </div>
-          <h3 className="text-slate-500 text-sm font-medium">Trésorerie dssdsNette</h3>
+          <h3 className="text-slate-500 text-sm font-medium">Trésorerie Nette</h3>
           <p className="text-2xl font-bold text-slate-900 mt-1">{formatCurrency(kpis.netCash)}</p>
         </div>
 
@@ -50,7 +50,7 @@ export const FinanceOverview: React.FC<FinanceOverviewProps> = ({ kpis, cashflow
             </div>
             <span className="text-xs font-semibold px-2 py-1 bg-red-50 text-red-700 rounded-full">À payer</span>
           </div>
-          <h3 className="text-slate-500 text-sm font-medium">Dettedsv Fournisseurs</h3>
+          <h3 className="text-slate-500 text-sm font-medium">Dettes Fournisseurs</h3>
           <p className="text-2xl font-bold text-red-600 mt-1">-{formatCurrency(kpis.totalPayables)}</p>
         </div>
 
