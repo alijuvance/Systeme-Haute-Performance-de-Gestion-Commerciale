@@ -29,7 +29,7 @@ export function CustomerFormModal({ isOpen, onClose, onSuccess, initialData }: C
         )}
 
         <div>
-          <label className="block text-sm font-semibold text-slate-700 mb-1">Nom complet<span className="text-red-500">*</span></label>
+          <label className="block text-sm font-semibold text-slate-700 mb-1">Nom c <span className="text-red-500">*</span></label>
           <input
             {...register('fullName')}
             className={`w-full border p-2 text-sm bg-white focus:outline-none focus:ring-1 focus:ring-slate-400 ${errors.fullName ? 'border-red-400' : 'border-slate-300'}`}
@@ -73,7 +73,7 @@ export function CustomerFormModal({ isOpen, onClose, onSuccess, initialData }: C
         </div>
 
         <div>
-          <label className="block text-sm font-semibold text-slate-700 mb-1">Type</label>
+          <label className="block text-sm font-semibold text-slate-700 mb-1">Ty</label>
           <select
             {...register('type')}
             className="w-full border border-slate-300 p-2 text-sm bg-white focus:outline-none focus:ring-1 focus:ring-slate-400"
