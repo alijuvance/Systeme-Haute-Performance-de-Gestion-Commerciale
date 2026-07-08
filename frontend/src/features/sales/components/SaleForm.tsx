@@ -7,6 +7,7 @@ import { formatCurrency } from '@/utils/formatters';
 import { Button } from '@/components/shared/Button';
 import SearchSelect from '@/components/shared/SearchSelect';
 import InvoiceDrawer from './InvoiceDrawer';
+import { CustomerFormModal } from '@/features/customers/components/CustomerFormModal';
 import {
   Search, Package2, Tag, Plus, Minus,
   AlertCircle, Loader2, ChevronRight, ShoppingCart,
@@ -19,6 +20,7 @@ export const SaleForm: React.FC = () => {
     customers, products, depots, categories, isLoadingRef,
     addProductToInvoice, incrementLine, decrementLine,
     setLineQuantity, removeLine,
+    addNewCustomer, refreshCustomers,
     totalAmount, submitError,
   } = useSaleForm();
 
@@ -30,6 +32,10 @@ export const SaleForm: React.FC = () => {
 
   // --- Drawer state ---
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+
+  // --- Customer modal state ---
+  const [isCustomerModalOpen, setIsCustomerModalOpen] = useState(false);
+  const [prefilledCustomerName, setPrefilledCustomerName] = useState('');
 
   // --- Watched lines for drawer ---
   const watchedLines = form.watch('lines');
@@ -78,6 +84,7 @@ export const SaleForm: React.FC = () => {
   }
 
   return (
+    <>
     <form onSubmit={onSubmit} className="space-y-6">
       {submitError && (
         <div className="flex items-start gap-3 p-4 bg-red-50 border border-red-200 rounded-xl text-red-700 text-sm">
@@ -101,6 +108,11 @@ export const SaleForm: React.FC = () => {
           onChange={(id) => form.setValue('customerId', id, { shouldValidate: true })}
           error={errors.customerId?.message}
           required
+          onCreateNew={(searchTerm) => {
+            setPrefilledCustomerName(searchTerm);
+            setIsCustomerModalOpen(true);
+          }}
+          createNewLabel="Nouveau client"
         />
         <SearchSelect
           label="Dépôt d'expédition"
@@ -361,5 +373,23 @@ export const SaleForm: React.FC = () => {
         totalAmount={totalAmount}
       />
     </form>
+
+    {/* ═══════════════════════════════════════════════════ */}
+    {/* Modal: Création rapide d'un nouveau client         */}
+    {/* Rendu en dehors du <form> pour éviter les forms imbriqués */}
+    {/* ═══════════════════════════════════════════════════ */}
+    <CustomerFormModal
+      isOpen={isCustomerModalOpen}
+      onClose={() => setIsCustomerModalOpen(false)}
+      onSuccess={async (newCustomer) => {
+        await refreshCustomers();
+        if (newCustomer?.id) {
+          form.setValue('customerId', newCustomer.id, { shouldValidate: true });
+        }
+        setIsCustomerModalOpen(false);
+      }}
+      prefilledName={prefilledCustomerName}
+    />
+    </>
   );
 };

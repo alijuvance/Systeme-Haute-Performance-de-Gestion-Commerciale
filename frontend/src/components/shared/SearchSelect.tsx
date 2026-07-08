@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useRef, useEffect, useMemo, useCallback } from 'react';
-import { Search, X, ChevronDown } from 'lucide-react';
+import { Search, X, ChevronDown, Plus } from 'lucide-react';
 
 interface SearchSelectOption {
   id: string;
@@ -17,6 +17,8 @@ interface SearchSelectProps {
   onChange: (id: string) => void;
   error?: string;
   required?: boolean;
+  onCreateNew?: (searchTerm: string) => void;
+  createNewLabel?: string;
 }
 
 export default function SearchSelect({
@@ -27,6 +29,8 @@ export default function SearchSelect({
   onChange,
   error,
   required,
+  onCreateNew,
+  createNewLabel = 'Ajouter',
 }: SearchSelectProps) {
   const [query, setQuery] = useState('');
   const [isOpen, setIsOpen] = useState(false);
@@ -212,6 +216,19 @@ export default function SearchSelect({
           ) : (
             <li className="px-3 py-2 text-sm text-slate-400">
               Aucun résultat trouvé
+            </li>
+          )}
+          {onCreateNew && query.trim() && (
+            <li
+              onMouseDown={(e) => {
+                e.preventDefault();
+                onCreateNew(query.trim());
+                setIsOpen(false);
+              }}
+              className="cursor-pointer px-3 py-2.5 border-t border-slate-100 text-sm font-medium text-blue-600 hover:bg-blue-50 transition-colors flex items-center gap-2"
+            >
+              <Plus size={14} />
+              {createNewLabel} &laquo; {query.trim()} &raquo;
             </li>
           )}
         </ul>
