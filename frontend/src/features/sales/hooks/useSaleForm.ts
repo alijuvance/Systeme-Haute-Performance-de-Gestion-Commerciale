@@ -5,6 +5,8 @@ import { useRouter } from 'next/navigation';
 import { saleSchema, SaleFormData } from '../schemas/saleSchema';
 import { createSale } from '../api/createSale';
 import { getFormReferenceData } from '../api/getFormReferenceData';
+import { createCustomer } from '@/features/customers/api/customerApi';
+import { CustomerFormData } from '@/features/customers/schemas/customerSchema';
 import { useToast } from '@/components/providers/ToastProvider';
 
 export const useSaleForm = () => {
@@ -18,21 +20,32 @@ export const useSaleForm = () => {
   const [categories, setCategories] = useState<any[]>([]);
   const [isLoadingRef, setIsLoadingRef] = useState(true);
 
+  const load = useCallback(async () => {
+    try {
+      const data = await getFormReferenceData();
+      setCustomers(data.customers);
+      setProducts(data.products);
+      setDepots(data.depots);
+      setCategories(data.categories);
+    } catch (err) {
+      console.error('Erreur lors du chargement des données de référence:', err);
+    } finally {
+      setIsLoadingRef(false);
+    }
+  }, []);
+
   useEffect(() => {
-    const load = async () => {
-      try {
-        const data = await getFormReferenceData();
-        setCustomers(data.customers);
-        setProducts(data.products);
-        setDepots(data.depots);
-        setCategories(data.categories);
-      } catch (err) {
-        console.error('Erreur lors du chargement des données de référence:', err);
-      } finally {
-        setIsLoadingRef(false);
-      }
-    };
     load();
+  }, [load]);
+
+  // --- Refresh customers list only ---
+  const refreshCustomers = useCallback(async () => {
+    try {
+      const data = await getFormReferenceData();
+      setCustomers(data.customers);
+    } catch (err) {
+      console.error('Erreur lors du rafraîchissement des clients:', err);
+    }
   }, []);
 
   // --- React Hook Form + Zod ---
@@ -46,6 +59,14 @@ export const useSaleForm = () => {
     },
     mode: 'onChange',
   });
+
+  // --- Create a new customer inline and auto-select ---
+  const addNewCustomer = useCallback(async (customerData: CustomerFormData) => {
+    const newCustomer = await createCustomer(customerData);
+    await refreshCustomers();
+    form.setValue('customerId', newCustomer.id, { shouldValidate: true });
+    return newCustomer;
+  }, [refreshCustomers, form]);
 
   const { fields, append, remove, update } = useFieldArray({
     control: form.control,
@@ -140,6 +161,8 @@ export const useSaleForm = () => {
     decrementLine,
     setLineQuantity,
     removeLine,
+    addNewCustomer,
+    refreshCustomers,
     // Computed
     totalAmount,
     // Errors
