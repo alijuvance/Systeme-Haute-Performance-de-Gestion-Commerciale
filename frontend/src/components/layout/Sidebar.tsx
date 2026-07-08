@@ -2,6 +2,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useAuth } from "@/contexts/AuthContext";
+import { useToast } from "@/components/providers/ToastProvider";
 import { 
   LayoutDashboard, 
   Package, 
@@ -25,7 +26,8 @@ interface SidebarProps {
 export function Sidebar({ sidebarOpen, setSidebarOpen }: SidebarProps) {
   const pathname = usePathname();
 
-  const { user } = useAuth();
+  const { user, logout } = useAuth();
+  const toast = useToast();
   const role = user?.role?.name || user?.role || 'MANAGER'; // Par défaut, sécurité
 
   const allNavItems = [
@@ -42,6 +44,19 @@ export function Sidebar({ sidebarOpen, setSidebarOpen }: SidebarProps) {
   ];
 
   const navItems = allNavItems.filter(item => !item.roles || item.roles.includes(role));
+
+  const handleLogout = async () => {
+    const ok = await toast.confirm({
+      title: 'Déconnexion',
+      message: 'Voulez-vous vraiment vous déconnecter ?',
+      confirmText: 'Déconnecter',
+      cancelText: 'Annuler',
+      variant: 'warning',
+    });
+    if (ok) {
+      logout();
+    }
+  };
 
   return (
     <aside className={`${sidebarOpen ? "w-64" : "w-16"} transition-all duration-300 bg-white border-r border-slate-200 flex flex-col fixed h-full z-20`}>
@@ -79,12 +94,15 @@ export function Sidebar({ sidebarOpen, setSidebarOpen }: SidebarProps) {
       </nav>
 
       <div className="p-4 border-t border-slate-200">
-        <Link href="/login" className="flex items-center gap-3 px-2 py-2.5 text-slate-600 hover:text-red-600 hover:bg-red-50 transition-colors">
+        <button 
+          onClick={handleLogout} 
+          className="w-full flex items-center gap-3 px-2 py-2.5 text-slate-600 hover:text-red-600 hover:bg-red-50 transition-colors text-left"
+        >
           <LogOut className="w-4 h-4" />
           <span className={`text-sm font-medium whitespace-nowrap overflow-hidden transition-all ${sidebarOpen ? "w-auto opacity-100" : "w-0 opacity-0"}`}>
             Déconnexion
           </span>
-        </Link>
+        </button>
       </div>
     </aside>
   );
