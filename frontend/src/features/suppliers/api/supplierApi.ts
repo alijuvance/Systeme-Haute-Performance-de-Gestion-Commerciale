@@ -12,7 +12,7 @@ export const createSupplier = async (data: SupplierFormData): Promise<Supplier> 
 };
 
 export const updateSupplier = async (id: string, data: SupplierFormData): Promise<Supplier> => {
-  const response = await api.put(`/api/suppliers/${id}`, data);
+  const response = await api.patch(`/api/suppliers/${id}`, data);
   return response.data;
 };
 

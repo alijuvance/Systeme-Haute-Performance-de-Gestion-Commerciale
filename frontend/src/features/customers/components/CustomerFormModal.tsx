@@ -7,15 +7,16 @@ import { Button } from '@/components/shared/Button';
 interface CustomerFormModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onSuccess: () => void;
+  onSuccess: (customer?: Customer) => void;
   initialData?: Customer;
+  prefilledName?: string;
 }
 
-export function CustomerFormModal({ isOpen, onClose, onSuccess, initialData }: CustomerFormModalProps) {
-  const { form, onSubmit, submitError } = useCustomerForm(() => {
-    onSuccess();
+export function CustomerFormModal({ isOpen, onClose, onSuccess, initialData, prefilledName }: CustomerFormModalProps) {
+  const { form, onSubmit, submitError } = useCustomerForm((createdCustomer) => {
+    onSuccess(createdCustomer);
     onClose();
-  }, initialData);
+  }, initialData, prefilledName);
 
   const { register, formState: { errors, isSubmitting } } = form;
 
@@ -47,7 +48,7 @@ export function CustomerFormModal({ isOpen, onClose, onSuccess, initialData }: C
 
         <div className="grid grid-cols-2 gap-4">
           <div>
-            <label className="block text-sm font-semibold text-slate-700 mb-1">Téléphone <span className="text-red-500">*</span></label>
+            <label className="block text-sm font-semibold text-slate-700 mb-1">Téléphone</label>
             <input
               {...register('phone')}
               className={`w-full border p-2 text-sm bg-white focus:outline-none focus:ring-1 focus:ring-slate-400 ${errors.phone ? 'border-red-400' : 'border-slate-300'}`}
