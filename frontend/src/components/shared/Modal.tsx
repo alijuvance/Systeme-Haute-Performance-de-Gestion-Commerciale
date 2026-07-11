@@ -5,23 +5,46 @@ interface ModalProps {
   isOpen: boolean;
   onClose: () => void;
   title: string;
+  description?: string;
   children: React.ReactNode;
+  size?: 'sm' | 'md' | 'lg';
 }
 
-export function Modal({ isOpen, onClose, title, children }: ModalProps) {
+const sizeClasses = {
+  sm: 'max-w-sm',
+  md: 'max-w-lg',
+  lg: 'max-w-2xl',
+};
+
+export function Modal({ isOpen, onClose, title, description, children, size = 'md' }: ModalProps) {
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center">
-      <div className="fixed inset-0 bg-slate-900/50 backdrop-blur-sm" onClick={onClose}></div>
-      <div className="relative bg-white rounded-none border border-slate-200 shadow-xl w-full max-w-lg max-h-[90vh] flex flex-col overflow-hidden">
-        <div className="flex items-center justify-between p-5 border-b border-slate-100 bg-slate-50/50">
-          <h2 className="text-lg font-bold text-slate-900">{title}</h2>
-          <button onClick={onClose} className="text-slate-400 hover:text-slate-700 bg-white hover:bg-slate-100 border border-slate-200 rounded-none transition-colors p-1.5">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+      {/* Backdrop */}
+      <div 
+        className="fixed inset-0 bg-black/40 backdrop-blur-sm animate-fade-in" 
+        onClick={onClose}
+        aria-hidden="true"
+      />
+      {/* Panel */}
+      <div className={`relative bg-white rounded-2xl shadow-xl w-full ${sizeClasses[size]} max-h-[90vh] flex flex-col overflow-hidden animate-scale-in`}>
+        {/* Header */}
+        <div className="flex items-start justify-between px-6 pt-6 pb-4">
+          <div>
+            <h2 className="text-lg font-semibold text-gray-900">{title}</h2>
+            {description && <p className="text-sm text-gray-500 mt-1">{description}</p>}
+          </div>
+          <button 
+            onClick={onClose} 
+            className="p-1.5 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-all duration-200 -mt-1 -mr-1"
+            aria-label="Fermer"
+          >
             <X className="w-5 h-5" />
           </button>
         </div>
-        <div className="p-6 overflow-y-auto flex-1">
+        {/* Content */}
+        <div className="px-6 pb-6 overflow-y-auto flex-1">
           {children}
         </div>
       </div>

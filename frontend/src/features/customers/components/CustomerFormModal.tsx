@@ -3,6 +3,8 @@ import { useCustomerForm } from '../hooks/useCustomerForm';
 import { Customer } from '../schemas/customerSchema';
 import { Modal } from '@/components/shared/Modal';
 import { Button } from '@/components/shared/Button';
+import { Input } from '@/components/shared/Input';
+import { Select } from '@/components/shared/Select';
 
 interface CustomerFormModalProps {
   isOpen: boolean;
@@ -22,69 +24,53 @@ export function CustomerFormModal({ isOpen, onClose, onSuccess, initialData, pre
 
   return (
     <Modal isOpen={isOpen} onClose={onClose} title={initialData ? "Modifier le client" : "Nouveau client"}>
-      <form onSubmit={onSubmit} className="space-y-4">
+      <form onSubmit={onSubmit} className="space-y-5">
         {submitError && (
-          <div className="bg-red-50 border border-red-200 text-red-700 p-3 text-sm">
+          <div className="bg-red-50 text-red-600 p-3 rounded-lg text-sm">
             {submitError}
           </div>
         )}
 
-        <div>
-          <label className="block text-sm font-semibold text-slate-700 mb-1">Nom complet <span className="text-red-500">*</span></label>
-          <input
-            {...register('fullName')}
-            className={`w-full border p-2 text-sm bg-white focus:outline-none focus:ring-1 focus:ring-slate-400 ${errors.fullName ? 'border-red-400' : 'border-slate-300'}`}
-          />
-          {errors.fullName && <p className="text-xs text-red-500 mt-1">{errors.fullName.message}</p>}
-        </div>
+        <Input
+          label="Nom complet *"
+          {...register('fullName')}
+          error={errors.fullName?.message}
+        />
 
-        <div>
-          <label className="block text-sm font-semibold text-slate-700 mb-1">Raison sociale</label>
-          <input
-            {...register('companyName')}
-            className="w-full border border-slate-300 p-2 text-sm bg-white focus:outline-none focus:ring-1 focus:ring-slate-400"
-          />
-        </div>
+        <Input
+          label="Raison sociale"
+          {...register('companyName')}
+        />
 
         <div className="grid grid-cols-2 gap-4">
-          <div>
-            <label className="block text-sm font-semibold text-slate-700 mb-1">Téléphone</label>
-            <input
-              {...register('phone')}
-              className={`w-full border p-2 text-sm bg-white focus:outline-none focus:ring-1 focus:ring-slate-400 ${errors.phone ? 'border-red-400' : 'border-slate-300'}`}
-            />
-            {errors.phone && <p className="text-xs text-red-500 mt-1">{errors.phone.message}</p>}
-          </div>
-          <div>
-            <label className="block text-sm font-semibold text-slate-700 mb-1">Email</label>
-            <input
-              {...register('email')}
-              className={`w-full border p-2 text-sm bg-white focus:outline-none focus:ring-1 focus:ring-slate-400 ${errors.email ? 'border-red-400' : 'border-slate-300'}`}
-            />
-            {errors.email && <p className="text-xs text-red-500 mt-1">{errors.email.message}</p>}
-          </div>
-        </div>
-
-        <div>
-          <label className="block text-sm font-semibold text-slate-700 mb-1">Adresse</label>
-          <input
-            {...register('address')}
-            className="w-full border border-slate-300 p-2 text-sm bg-white focus:outline-none focus:ring-1 focus:ring-slate-400"
+          <Input
+            label="Téléphone"
+            {...register('phone')}
+            error={errors.phone?.message}
+          />
+          
+          <Input
+            label="Email"
+            {...register('email')}
+            error={errors.email?.message}
           />
         </div>
 
-        <div>
-          <label className="block text-sm font-semibold text-slate-700 mb-1">Type</label>
-          <select
-            {...register('type')}
-            className="w-full border border-slate-300 p-2 text-sm bg-white focus:outline-none focus:ring-1 focus:ring-slate-400"
-          >
-            <option value="B2B">B2B (Entreprise)</option>
-            <option value="B2C">B2C (Particulier)</option>
-          </select>
-        </div>
+        <Input
+          label="Adresse"
+          {...register('address')}
+        />
 
-        <div className="flex justify-end gap-3 mt-6 pt-4 border-t border-slate-200">
+        <Select
+          label="Type"
+          {...register('type')}
+          options={[
+            { value: 'B2B', label: 'B2B (Entreprise)' },
+            { value: 'B2C', label: 'B2C (Particulier)' },
+          ]}
+        />
+
+        <div className="flex justify-end gap-3 mt-8 pt-5 border-t border-gray-100">
           <Button type="button" variant="outline" onClick={onClose}>Annuler</Button>
           <Button type="submit" isLoading={isSubmitting}>Enregistrer</Button>
         </div>

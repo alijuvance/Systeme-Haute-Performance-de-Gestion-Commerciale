@@ -1,5 +1,9 @@
 import React from 'react';
 import { Debt } from '../types';
+import { DataTable, ColumnDef } from '@/components/shared/DataTable';
+import { formatCurrency, formatDate } from '@/utils/formatters';
+import { Badge } from '@/components/shared/Badge';
+import { Card } from '@/components/shared/Card';
 
 interface DebtsTableProps {
   debts: Debt[];
@@ -8,54 +12,30 @@ interface DebtsTableProps {
 }
 
 export const DebtsTable: React.FC<DebtsTableProps> = ({ debts, loading, totalDebt }) => {
+  const columns: ColumnDef<Debt>[] = [
+    { key: 'invoice', header: 'Facture N°', cell: (d) => <span className="font-medium text-gray-900">{d.invoiceNumber}</span> },
+    { key: 'date', header: 'Date', cell: (d) => <span className="text-gray-500">{formatDate(d.date)}</span> },
+    { key: 'client', header: 'Client', cell: (d) => <span className="text-gray-900">{d.customer?.companyName || d.customer?.fullName}</span> },
+    { key: 'total', header: 'Total', align: 'right', cell: (d) => <span className="tabular-nums font-medium text-gray-900">{formatCurrency(d.totalAmount)}</span> },
+    { key: 'paid', header: 'Payé', align: 'right', cell: (d) => <span className="tabular-nums text-emerald-600">{formatCurrency(d.amountPaid)}</span> },
+    { key: 'remaining', header: 'Reste à Payer', align: 'right', cell: (d) => <span className="tabular-nums font-semibold text-red-600">{formatCurrency(d.totalAmount - d.amountPaid)}</span> }
+  ];
+
   return (
-    <div className="bg-white rounded-lg shadow overflow-hidden">
-      <table className="min-w-full divide-y divide-gray-200">
-        <thead className="bg-gray-50">
-          <tr>
-            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Facture N°</th>
-            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Date</th>
-            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Client</th>
-            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Total (MGA)</th>
-            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Payé (MGA)</th>
-            <th className="px-6 py-3 text-left text-xs font-medium text-red-500 uppercase">Reste à Payer</th>
-          </tr>
-        </thead>
-        <tbody className="divide-y divide-gray-200">
-          {loading ? (
-            <tr>
-              <td colSpan={6} className="p-4 text-center">Chargement...</td>
-            </tr>
-          ) : (
-            debts.map((d) => (
-              <tr key={d.id}>
-                <td className="px-6 py-4 whitespace-nowrap font-medium text-gray-900">{d.invoiceNumber}</td>
-                <td className="px-6 py-4 whitespace-nowrap text-gray-500">{new Date(d.date).toLocaleDateString()}</td>
-                <td className="px-6 py-4 whitespace-nowrap text-gray-900 font-medium">
-                  {d.customer?.companyName || d.customer?.fullName}
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap text-gray-500">
-                  {new Intl.NumberFormat('fr-MG', { style: 'currency', currency: 'MGA' }).format(d.totalAmount)}
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap text-green-600">
-                  {new Intl.NumberFormat('fr-MG', { style: 'currency', currency: 'MGA' }).format(d.amountPaid)}
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap font-bold text-red-600">
-                  {new Intl.NumberFormat('fr-MG', { style: 'currency', currency: 'MGA' }).format(d.totalAmount - d.amountPaid)}
-                </td>
-              </tr>
-            ))
-          )}
-        </tbody>
-        <tfoot className="bg-gray-50">
-          <tr>
-            <td colSpan={5} className="px-6 py-4 text-right font-bold text-gray-900">Total des Créances :</td>
-            <td className="px-6 py-4 font-bold text-red-600 text-lg">
-              {new Intl.NumberFormat('fr-MG', { style: 'currency', currency: 'MGA' }).format(totalDebt)}
-            </td>
-          </tr>
-        </tfoot>
-      </table>
-    </div>
+    <Card padding="none" className="overflow-hidden">
+      <DataTable
+        data={debts}
+        columns={columns}
+        keyExtractor={(d) => d.id}
+        isLoading={loading}
+        emptyMessage="Aucune créance client (dette) trouvée."
+      />
+      {!loading && debts.length > 0 && (
+        <div className="bg-gray-50/80 px-6 py-4 flex justify-end gap-6 items-center border-t border-gray-100">
+          <span className="text-sm font-semibold text-gray-900 uppercase tracking-wide">Total des Créances</span>
+          <span className="text-xl font-bold text-red-600 tabular-nums">{formatCurrency(totalDebt)}</span>
+        </div>
+      )}
+    </Card>
   );
 };

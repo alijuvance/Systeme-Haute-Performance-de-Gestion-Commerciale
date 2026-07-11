@@ -5,6 +5,7 @@ import { Customer } from '../schemas/customerSchema';
 import { DataTable, ColumnDef } from '@/components/shared/DataTable';
 import { PageHeader } from '@/components/shared/PageHeader';
 import { Button } from '@/components/shared/Button';
+import { Badge } from '@/components/shared/Badge';
 import { Plus, Pencil, Trash } from 'lucide-react';
 import { CustomerFormModal } from './CustomerFormModal';
 import { useToast } from '@/components/providers/ToastProvider';
@@ -39,17 +40,17 @@ export function CustomersTable() {
   };
 
   const columns: ColumnDef<Customer>[] = [
-    { key: 'name', header: 'Nom complet', cell: (c) => <span className="font-medium text-slate-900">{c.fullName}</span> },
-    { key: 'company', header: 'Raison sociale', cell: (c) => c.companyName || '—' },
-    { key: 'phone', header: 'Téléphone', cell: (c) => c.phone },
-    { key: 'email', header: 'Email', cell: (c) => c.email || '—' },
+    { key: 'name', header: 'Nom complet', cell: (c) => <span className="font-medium text-gray-900">{c.fullName}</span> },
+    { key: 'company', header: 'Raison sociale', cell: (c) => <span className="text-gray-600">{c.companyName || '—'}</span> },
+    { key: 'phone', header: 'Téléphone', cell: (c) => <span className="text-gray-600">{c.phone}</span> },
+    { key: 'email', header: 'Email', cell: (c) => <span className="text-gray-600">{c.email || '—'}</span> },
     { 
       key: 'type', 
       header: 'Type', 
       cell: (c) => (
-        <span className={`inline-block px-2 py-0.5 text-xs font-semibold border ${c.type === 'B2B' ? 'text-blue-700 bg-blue-50 border-blue-200' : 'text-emerald-700 bg-emerald-50 border-emerald-200'}`}>
+        <Badge variant={c.type === 'B2B' ? 'info' : 'success'}>
           {c.type}
-        </span>
+        </Badge>
       ) 
     },
     { 
@@ -57,11 +58,11 @@ export function CustomersTable() {
       header: '', 
       align: 'right',
       cell: (c) => (
-        <div className="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-          <button onClick={() => handleOpenEdit(c)} className="p-1.5 text-slate-400 hover:text-blue-600 hover:bg-blue-50 transition-colors">
+        <div className="flex items-center justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+          <button onClick={() => handleOpenEdit(c)} className="p-1.5 text-gray-400 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-all">
             <Pencil className="w-4 h-4" />
           </button>
-          <button onClick={() => handleDelete(c.id)} className="p-1.5 text-slate-400 hover:text-red-600 hover:bg-red-50 transition-colors">
+          <button onClick={() => handleDelete(c.id)} className="p-1.5 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-all">
             <Trash className="w-4 h-4" />
           </button>
         </div>
@@ -70,7 +71,7 @@ export function CustomersTable() {
   ];
 
   if (error) {
-    return <div className="p-4 bg-red-50 text-red-600 border border-red-200">{error}</div>;
+    return <div className="p-4 bg-red-50 text-red-600 rounded-xl text-sm mb-4">{error}</div>;
   }
 
   return (

@@ -71,7 +71,7 @@ const toastConfig: Record<ToastType, { icon: React.ReactNode; bg: string; border
 const confirmVariantConfig: Record<string, { button: string; icon: React.ReactNode }> = {
   danger: { button: 'bg-red-600 hover:bg-red-700 text-white', icon: <XCircle className="w-6 h-6 text-red-500" /> },
   warning: { button: 'bg-amber-500 hover:bg-amber-600 text-white', icon: <AlertTriangle className="w-6 h-6 text-amber-500" /> },
-  info: { button: 'bg-blue-600 hover:bg-blue-700 text-white', icon: <Info className="w-6 h-6 text-blue-500" /> },
+  info: { button: 'bg-gray-900 hover:bg-gray-800 text-white', icon: <Info className="w-6 h-6 text-gray-900" /> },
 };
 
 // ─── Provider ────────────────────────────────────────────
@@ -130,20 +130,20 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
           return (
             <div
               key={toast.id}
-              className={`pointer-events-auto flex items-start gap-3 px-4 py-3 rounded-xl border shadow-lg ${cfg.bg} ${cfg.border} ${cfg.text} transition-all duration-300 ease-out ${
+              className={`pointer-events-auto flex items-start gap-3 px-4 py-3 rounded-2xl shadow-lg border bg-white ${cfg.border} transition-all duration-300 ease-out ${
                 toast.exiting ? 'opacity-0 translate-x-8' : 'opacity-100 translate-x-0 animate-slide-in'
               }`}
             >
-              <span className="flex-shrink-0 mt-0.5">{cfg.icon}</span>
-              <p className="text-sm font-medium flex-1 leading-snug">{toast.message}</p>
+              <div className={`flex-shrink-0 p-1 rounded-full ${cfg.bg} ${cfg.text}`}>
+                {cfg.icon}
+              </div>
+              <p className="text-sm font-medium flex-1 leading-snug mt-1 text-gray-900">{toast.message}</p>
               <button
                 onClick={() => dismissToast(toast.id)}
-                className="flex-shrink-0 p-0.5 rounded hover:bg-black/5 transition"
+                className="flex-shrink-0 p-1 text-gray-400 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-all mt-0.5"
               >
                 <X className="w-4 h-4" />
               </button>
-              {/* Progress bar */}
-              <div className={`absolute bottom-0 left-0 h-0.5 rounded-b-xl ${cfg.bar} animate-shrink`} />
             </div>
           );
         })}
@@ -154,32 +154,32 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
         <div className="fixed inset-0 z-[110] flex items-center justify-center p-4">
           {/* Backdrop */}
           <div
-            className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm animate-fade-in"
+            className="absolute inset-0 bg-black/40 backdrop-blur-sm animate-fade-in"
             onClick={() => handleConfirmResponse(false)}
           />
           {/* Dialog */}
           <div className="relative bg-white rounded-2xl shadow-2xl w-full max-w-md overflow-hidden animate-scale-in">
             <div className="p-6">
               <div className="flex items-start gap-4">
-                <div className="p-2 rounded-xl bg-slate-100">
+                <div className="p-2.5 rounded-xl bg-gray-50 border border-gray-100">
                   {variantCfg.icon}
                 </div>
-                <div className="flex-1">
-                  <h3 className="text-lg font-bold text-slate-900">{confirmState.title}</h3>
-                  <p className="mt-2 text-sm text-slate-600 leading-relaxed">{confirmState.message}</p>
+                <div className="flex-1 mt-1">
+                  <h3 className="text-lg font-semibold text-gray-900">{confirmState.title}</h3>
+                  <p className="mt-1.5 text-sm text-gray-500 leading-relaxed">{confirmState.message}</p>
                 </div>
               </div>
             </div>
-            <div className="flex justify-end gap-3 px-6 py-4 bg-slate-50 border-t border-slate-100">
+            <div className="flex justify-end gap-3 px-6 py-4 bg-gray-50/50 border-t border-gray-100">
               <button
                 onClick={() => handleConfirmResponse(false)}
-                className="px-4 py-2 text-sm font-medium text-slate-600 bg-white border border-slate-200 rounded-xl hover:bg-slate-50 transition"
+                className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-200 rounded-lg hover:bg-gray-50 transition-all shadow-sm"
               >
                 {confirmState.cancelText || 'Annuler'}
               </button>
               <button
                 onClick={() => handleConfirmResponse(true)}
-                className={`px-4 py-2 text-sm font-medium rounded-xl transition ${variantCfg.button}`}
+                className={`px-4 py-2 text-sm font-medium rounded-lg transition-all shadow-sm ${variantCfg.button}`}
               >
                 {confirmState.confirmText || 'Confirmer'}
               </button>

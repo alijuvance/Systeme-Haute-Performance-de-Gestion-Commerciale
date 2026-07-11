@@ -3,51 +3,114 @@
 @custom-variant dark (&:is(.dark *));
 
 :root {
-  /* Minimalist Professional Theme */
-  --primary: #0f172a;        /* Slate 900 for primary actions - very sober */
-  --primary-hover: #1e293b;  
-  --background: #f8fafc;     /* Slate 50 - off white for main background */
-  --foreground: #020617;     /* Slate 950 */
-  --card: #ffffff;           /* Pure white for content areas */
-  --card-foreground: #020617;
+  /* ═══════════════════════════════════════════════════════ */
+  /* Design System Tokens — Modern Minimalist ERP           */
+  /* ═══════════════════════════════════════════════════════ */
+
+  /* ─── Neutral palette (gray) ─── */
+  --color-surface: #ffffff;
+  --color-surface-secondary: #f9fafb;   /* gray-50 */
+  --color-surface-tertiary: #f3f4f6;    /* gray-100 */
+  --color-border-light: #f3f4f6;        /* gray-100 */
+  --color-border: #e5e7eb;              /* gray-200 */
+  --color-border-strong: #d1d5db;       /* gray-300 */
+  --color-text-primary: #111827;        /* gray-900 */
+  --color-text-secondary: #6b7280;      /* gray-500 */
+  --color-text-tertiary: #9ca3af;       /* gray-400 */
+  --color-text-muted: #d1d5db;          /* gray-300 */
+
+  /* ─── Accent (slate-900 — single primary action color) ─── */
+  --color-accent: #111827;
+  --color-accent-hover: #1f2937;
+  --color-accent-foreground: #ffffff;
+
+  /* ─── Semantic colors (used sparingly) ─── */
+  --color-success: #059669;       /* emerald-600 */
+  --color-success-light: #ecfdf5; /* emerald-50 */
+  --color-warning: #d97706;       /* amber-600 */
+  --color-warning-light: #fffbeb; /* amber-50 */
+  --color-error: #dc2626;         /* red-600 */
+  --color-error-light: #fef2f2;   /* red-50 */
+  --color-info: #2563eb;          /* blue-600 */
+  --color-info-light: #eff6ff;    /* blue-50 */
+
+  /* ─── Radius system ─── */
+  --radius-sm: 2px;
+  --radius-md: 2px;
+  --radius-lg: 2px;
+  --radius-xl: 2px;
+  --radius-2xl: 2px;
+  --radius-full: 9999px;
+
+  /* ─── Shadow system (soft, no hard borders) ─── */
+  --shadow-xs: 0 1px 2px rgba(0,0,0,0.04);
+  --shadow-sm: 0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04);
+  --shadow-md: 0 4px 6px -1px rgba(0,0,0,0.06), 0 2px 4px -2px rgba(0,0,0,0.04);
+  --shadow-lg: 0 10px 15px -3px rgba(0,0,0,0.06), 0 4px 6px -4px rgba(0,0,0,0.04);
+  --shadow-xl: 0 20px 25px -5px rgba(0,0,0,0.08), 0 8px 10px -6px rgba(0,0,0,0.04);
+
+  /* ─── Transitions ─── */
+  --transition-fast: 150ms ease;
+  --transition-normal: 200ms ease;
+  --transition-slow: 300ms ease;
+
+  /* ─── Legacy compatibility (old tokens) ─── */
+  --background: #f9fafb;
+  --foreground: #111827;
+  --card: #ffffff;
+  --card-foreground: #111827;
   --popover: #ffffff;
-  --popover-foreground: #020617;
+  --popover-foreground: #111827;
+  --primary: #111827;
+  --primary-hover: #1f2937;
   --primary-foreground: #ffffff;
-  --secondary: #e2e8f0;      /* Slate 200 */
-  --secondary-foreground: #0f172a;
-  --muted: #f1f5f9;          /* Slate 100 */
-  --muted-foreground: #64748b; /* Slate 500 */
-  --accent: #f1f5f9;
-  --accent-foreground: #0f172a;
-  --destructive: #ef4444;    /* Red 500 */
-  --border: #e2e8f0;         /* Sharp thin borders */
-  --input: #e2e8f0;
-  --ring: #94a3b8;           /* Slate 400 for focus rings */
-  
-  /* CRITICAL: No rounded corners for that sharp, enterprise look */
-  --radius: 0px; 
+  --secondary: #e5e7eb;
+  --secondary-foreground: #111827;
+  --muted: #f3f4f6;
+  --muted-foreground: #6b7280;
+  --accent: #f3f4f6;
+  --accent-foreground: #111827;
+  --destructive: #dc2626;
+  --border: #e5e7eb;
+  --input: #e5e7eb;
+  --ring: #9ca3af;
+  --radius: 2px;
 }
 
-/* Optional Dark Mode - kept extremely sober if user toggles it */
+/* ─── Dark Mode ─── */
 .dark {
-  --background: #020617;
-  --foreground: #f8fafc;
-  --card: #0f172a;
-  --card-foreground: #f8fafc;
-  --popover: #0f172a;
-  --popover-foreground: #f8fafc;
-  --primary: #f8fafc;
-  --primary-foreground: #0f172a;
-  --secondary: #1e293b;
-  --secondary-foreground: #f8fafc;
-  --muted: #1e293b;
-  --muted-foreground: #94a3b8;
-  --accent: #1e293b;
-  --accent-foreground: #f8fafc;
-  --destructive: #7f1d1d;
-  --border: #1e293b;
-  --input: #1e293b;
-  --ring: #475569;
+  --color-surface: #111827;
+  --color-surface-secondary: #1f2937;
+  --color-surface-tertiary: #374151;
+  --color-border-light: #1f2937;
+  --color-border: #374151;
+  --color-border-strong: #4b5563;
+  --color-text-primary: #f9fafb;
+  --color-text-secondary: #9ca3af;
+  --color-text-tertiary: #6b7280;
+  --color-text-muted: #4b5563;
+  --color-accent: #f9fafb;
+  --color-accent-hover: #e5e7eb;
+  --color-accent-foreground: #111827;
+
+  --background: #111827;
+  --foreground: #f9fafb;
+  --card: #1f2937;
+  --card-foreground: #f9fafb;
+  --popover: #1f2937;
+  --popover-foreground: #f9fafb;
+  --primary: #f9fafb;
+  --primary-foreground: #111827;
+  --secondary: #374151;
+  --secondary-foreground: #f9fafb;
+  --muted: #374151;
+  --muted-foreground: #9ca3af;
+  --accent: #374151;
+  --accent-foreground: #f9fafb;
+  --destructive: #991b1b;
+  --border: #374151;
+  --input: #374151;
+  --ring: #6b7280;
 }
 
 @theme inline {
@@ -55,7 +118,7 @@
   --color-foreground: var(--foreground);
   --color-primary: var(--primary);
   --color-primary-hover: var(--primary-hover);
-  --font-sans: var(--font-inter), sans-serif;
+  --font-sans: var(--font-inter), 'Inter', system-ui, -apple-system, sans-serif;
   --color-ring: var(--ring);
   --color-input: var(--input);
   --color-border: var(--border);
@@ -71,65 +134,60 @@
   --color-popover: var(--popover);
   --color-card-foreground: var(--card-foreground);
   --color-card: var(--card);
-  
-  /* Enforce 0px radius across the entire tailwind ecosystem */
-  --radius-sm: 0px;
-  --radius-md: 0px;
-  --radius-lg: 0px;
-  --radius-xl: 0px;
-  --radius-2xl: 0px;
-  --radius-3xl: 0px;
-  --radius-full: 0px; /* Only keep full for actual circles like avatars if needed, but override global */
+
+  --radius-sm: 2px;
+  --radius-md: 2px;
+  --radius-lg: 2px;
+  --radius-xl: 2px;
+  --radius-2xl: 2px;
+  --radius-3xl: 2px;
+  --radius-full: 9999px;
 }
 
 body {
   font-family: var(--font-sans);
   -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
   background-color: var(--background);
   color: var(--foreground);
 }
 
-/* Base styles enforcing sharp borders */
+/* ─── Base layer ─── */
 @layer base {
   * {
     @apply border-border outline-ring/50;
-    border-radius: 0px !important; /* Force 0px everywhere */
   }
-  
-  /* Exception for true circles like avatars or status dots */
-  .rounded-full {
-    border-radius: 9999px !important;
-  }
-  
+
   html {
     @apply font-sans;
   }
 }
 
-/* Custom Scrollbar for professional look */
+/* ─── Custom Scrollbar ─── */
 ::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
+  width: 6px;
+  height: 6px;
 }
 ::-webkit-scrollbar-track {
   background: transparent; 
 }
 ::-webkit-scrollbar-thumb {
-  background: #cbd5e1; 
+  background: #d1d5db;
+  border-radius: 9999px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #94a3b8; 
+  background: #9ca3af; 
 }
 .dark ::-webkit-scrollbar-thumb {
-  background: #334155; 
+  background: #4b5563; 
 }
 .dark ::-webkit-scrollbar-thumb:hover {
-  background: #475569; 
+  background: #6b7280; 
 }
 
 /* ─── Toast & Dialog Animations ─── */
 @keyframes slide-in {
-  from { opacity: 0; transform: translateX(2rem); }
+  from { opacity: 0; transform: translateX(1.5rem); }
   to { opacity: 1; transform: translateX(0); }
 }
 @keyframes shrink {
@@ -141,11 +199,27 @@ body {
   to { opacity: 1; }
 }
 @keyframes scale-in {
-  from { opacity: 0; transform: scale(0.95); }
+  from { opacity: 0; transform: scale(0.96); }
   to { opacity: 1; transform: scale(1); }
+}
+@keyframes slide-up {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
 .animate-slide-in { animation: slide-in 0.3s ease-out; }
 .animate-shrink { animation: shrink 4s linear forwards; }
 .animate-fade-in { animation: fade-in 0.2s ease-out; }
 .animate-scale-in { animation: scale-in 0.2s ease-out; }
+.animate-slide-up { animation: slide-up 0.25s ease-out; }
+
+/* ─── Sidebar submenu animation ─── */
+@keyframes submenu-open {
+  from { opacity: 0; max-height: 0; }
+  to { opacity: 1; max-height: 500px; }
+}
+.animate-submenu-open { animation: submenu-open 0.25s ease-out forwards; }
+
+/* ─── Hide scrollbar utility ─── */
+.scrollbar-hide::-webkit-scrollbar { display: none; }
+.scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
