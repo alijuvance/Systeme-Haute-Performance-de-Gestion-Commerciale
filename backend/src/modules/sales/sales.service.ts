@@ -37,7 +37,7 @@ export class SalesService {
       await this.stockMovementsService.registerMovement({
         type: MovementType.OUT,
         reference: `VENTE-${invoiceNumber}`,
-        quantityChanged: line.quantity,
+        quantityChanged: -line.quantity,
         productId: line.productId,
         depotId: dto.depotId
       }, userId);
