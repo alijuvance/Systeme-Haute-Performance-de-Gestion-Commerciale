@@ -47,23 +47,23 @@ export default function UsersPage() {
   };
 
   const handleDelete = async (id: string) => {
-  const ok = await toast.confirm({
-    title: 'Supprimer cet utilisateur',
-    message: 'Cette action est irréversible. Voulez-vous vraiment supprimer cet utilisateur ?',
-    variant: 'danger',
-    confirmText: 'Supprimer',
-  });
-  if (ok) {
-    try {
-      await api.delete(`/api/users/${id}`);
-      toast.success('Utilisateur supprimé avec succès.');
-      fetchUsers();
-    } catch (error: any) {
-      console.error(error);
-      toast.error(error.response?.data?.message || 'Erreur lors de la suppression.');
+    const ok = await toast.confirm({
+      title: 'Supprimer cet utilisateur',
+      message: 'Cette action est irréversible. Voulez-vous vraiment supprimer cet utilisateur ?',
+      variant: 'danger',
+      confirmText: 'Supprimer',
+    });
+    if (ok) {
+      try {
+        await api.delete(`/api/users/${id}`);
+        toast.success('Utilisateur supprimé avec succès.');
+        fetchUsers();
+      } catch (error: any) {
+        console.error(error);
+        toast.error(error.response?.data?.message || 'Erreur lors de la suppression.');
+      }
     }
-  }
-};
+  };
 
   const filteredUsers = users.filter(u => {
     const matchesSearch = u.fullName.toLowerCase().includes(searchTerm.toLowerCase()) || 
@@ -79,18 +79,18 @@ export default function UsersPage() {
       key: 'fullName',
       cell: (user) => (
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-none bg-slate-100 overflow-hidden border border-slate-200">
+          <div className="w-10 h-10 rounded-xl bg-neutral-100 overflow-hidden border border-neutral-200 flex-shrink-0">
             {user.avatar ? (
               <img src={`${api.defaults.baseURL}${user.avatar}`} alt={user.fullName} className="w-full h-full object-cover" />
             ) : (
-              <div className="w-full h-full flex items-center justify-center text-slate-500 font-medium text-sm">
+              <div className="w-full h-full flex items-center justify-center text-neutral-500 font-medium text-sm">
                 {user.fullName.substring(0, 2).toUpperCase()}
               </div>
             )}
           </div>
           <div>
-            <div className="font-medium text-slate-900">{user.fullName}</div>
-            <div className="text-sm text-slate-500">{user.email}</div>
+            <div className="font-medium text-neutral-900">{user.fullName}</div>
+            <div className="text-sm text-neutral-500">{user.email}</div>
           </div>
         </div>
       )
@@ -108,7 +108,7 @@ export default function UsersPage() {
       header: 'Dépôt',
       key: 'depot',
       cell: (user) => (
-        <span className="text-sm text-slate-600">
+        <span className="text-sm text-neutral-600">
           {user.depot?.name || '-'}
         </span>
       )
@@ -126,7 +126,7 @@ export default function UsersPage() {
       header: 'Dernière connexion',
       key: 'lastLogin',
       cell: (user) => (
-        <span className="text-sm text-slate-500">
+        <span className="text-sm text-neutral-500">
           {user.lastLogin ? formatDate(user.lastLogin) : 'Jamais'}
         </span>
       )
@@ -153,15 +153,15 @@ export default function UsersPage() {
           >
             {user.isActive ? <ShieldOff className="w-4 h-4" /> : <Shield className="w-4 h-4" />}
           </Button>
-              <Button 
-        variant="outline" 
-        size="icon"
-        onClick={() => handleDelete(user.id)}
-        className="hover:bg-red-50 hover:text-red-600"
-        title="Supprimer"
-      >
-        <Trash2 className="w-4 h-4" />
-      </Button> 
+          <Button 
+            variant="outline" 
+            size="icon"
+            onClick={() => handleDelete(user.id)}
+            className="hover:bg-red-50 hover:text-red-600"
+            title="Supprimer"
+          >
+            <Trash2 className="w-4 h-4" />
+          </Button>
         </div>
       )
     }
@@ -179,21 +179,21 @@ export default function UsersPage() {
         </Button>
       </PageHeader>
 
-      <div className="bg-white p-4 rounded-none border border-slate-200 flex flex-wrap gap-4 items-center">
+      <div className="bg-white p-4 rounded-2xl border border-neutral-200 shadow-[0_1px_2px_rgba(0,0,0,0.03)] flex flex-wrap gap-4 items-center">
         <div className="relative flex-1 min-w-[250px]">
-          <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+          <Search className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-neutral-400" />
           <input 
             type="text" 
             placeholder="Rechercher un utilisateur (Nom, Email)..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full pl-9 pr-4 py-2 border border-slate-200 rounded-none text-sm focus:outline-none focus:ring-2 focus:ring-slate-900 focus:border-slate-900"
+            className="w-full pl-10 pr-4 py-2.5 bg-neutral-50 border border-neutral-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-neutral-900/10 focus:border-neutral-300 focus:bg-white transition-all duration-200"
           />
         </div>
         <select 
           value={filterRole} 
           onChange={(e) => setFilterRole(e.target.value)}
-          className="px-3 py-2 border border-slate-200 rounded-none text-sm bg-white focus:outline-none focus:ring-2 focus:ring-slate-900 focus:border-slate-900"
+          className="px-3.5 py-2.5 bg-neutral-50 border border-neutral-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-neutral-900/10 focus:border-neutral-300 focus:bg-white transition-all duration-200"
         >
           <option value="">Tous les rôles</option>
           <option value="ADMIN">Admin</option>
@@ -202,7 +202,7 @@ export default function UsersPage() {
         <select 
           value={filterStatus} 
           onChange={(e) => setFilterStatus(e.target.value)}
-          className="px-3 py-2 border border-slate-200 rounded-none text-sm bg-white focus:outline-none focus:ring-2 focus:ring-slate-900 focus:border-slate-900"
+          className="px-3.5 py-2.5 bg-neutral-50 border border-neutral-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-neutral-900/10 focus:border-neutral-300 focus:bg-white transition-all duration-200"
         >
           <option value="">Tous les statuts</option>
           <option value="ACTIVE">Actif</option>

@@ -19,21 +19,21 @@ export function Button({
   ...props 
 }: ButtonProps) {
   
-  const baseStyles = "inline-flex items-center justify-center font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-slate-900 focus:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none rounded-none";
+  const baseStyles = "inline-flex items-center justify-center font-medium transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none cursor-pointer";
   
   const variants = {
-    primary: "bg-slate-900 text-white hover:bg-slate-800",
-    secondary: "bg-slate-100 text-slate-900 hover:bg-slate-200",
-    outline: "border border-slate-300 bg-white text-slate-700 hover:bg-slate-50",
-    danger: "bg-red-600 text-white hover:bg-red-700",
-    ghost: "bg-transparent text-slate-400 hover:text-slate-700 hover:bg-slate-100",
+    primary: "bg-gray-900 text-white hover:bg-gray-800 focus:ring-gray-900/30 rounded-lg shadow-sm",
+    secondary: "bg-gray-100 text-gray-900 hover:bg-gray-200 focus:ring-gray-500/20 rounded-lg",
+    outline: "border border-gray-200 bg-white text-gray-700 hover:bg-gray-50 hover:border-gray-300 focus:ring-gray-500/20 rounded-lg shadow-sm",
+    danger: "bg-red-600 text-white hover:bg-red-700 focus:ring-red-500/30 rounded-lg shadow-sm",
+    ghost: "bg-transparent text-gray-500 hover:text-gray-900 hover:bg-gray-100 focus:ring-gray-500/20 rounded-lg",
   };
   
   const sizes = {
-    sm: "h-8 px-3 text-xs",
-    md: "h-10 px-4 text-sm",
-    lg: "h-12 px-6 text-base",
-    icon: "h-8 w-8 px-0",
+    sm: "h-8 px-3 text-xs gap-1.5",
+    md: "h-9 px-4 text-sm gap-2",
+    lg: "h-11 px-5 text-sm gap-2",
+    icon: "h-9 w-9 px-0",
   };
   
   return (
@@ -42,8 +42,8 @@ export function Button({
       disabled={disabled || isLoading}
       {...props}
     >
-      {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-      {!isLoading && icon && <span className="mr-2">{icon}</span>}
+      {isLoading && <Loader2 className="h-4 w-4 animate-spin" />}
+      {!isLoading && icon && <span className="flex-shrink-0">{icon}</span>}
       {children}
     </button>
   );
