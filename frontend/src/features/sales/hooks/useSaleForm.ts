@@ -27,7 +27,8 @@ export const useSaleForm = () => {
       setProducts(data.products);
       setDepots(data.depots);
       setCategories(data.categories);
-    } catch (err) {
+    } catch (err: any) {
+      toast.error(err.response?.data?.message || err.message || 'Erreur lors du chargement des données de référence');
       console.error('Erreur lors du chargement des données de référence:', err);
     } finally {
       setIsLoadingRef(false);
@@ -43,7 +44,8 @@ export const useSaleForm = () => {
     try {
       const data = await getFormReferenceData();
       setCustomers(data.customers);
-    } catch (err) {
+    } catch (err: any) {
+      toast.error(err.response?.data?.message || err.message || 'Erreur lors du rafraîchissement des clients');
       console.error('Erreur lors du rafraîchissement des clients:', err);
     }
   }, []);

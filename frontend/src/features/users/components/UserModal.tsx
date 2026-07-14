@@ -10,6 +10,7 @@ import { Select } from '@/components/shared/Select';
 import { AvatarUpload } from './AvatarUpload';
 import { useToast } from '@/components/providers/ToastProvider';
 import api from '@/api/axios';
+import { User, Role, Depot } from '@/types';
 
 const userSchema = z.object({
   fullName: z.string().min(2, 'Le nom doit contenir au moins 2 caractères'),
@@ -26,12 +27,12 @@ interface UserModalProps {
   isOpen: boolean;
   onClose: () => void;
   onSuccess: () => void;
-  user?: any;
+  user?: User;
 }
 
 export const UserModal = ({ isOpen, onClose, onSuccess, user }: UserModalProps) => {
-  const [roles, setRoles] = useState<any[]>([]);
-  const [depots, setDepots] = useState<any[]>([]);
+  const [roles, setRoles] = useState<Role[]>([]);
+  const [depots, setDepots] = useState<Depot[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const toast = useToast();
 
@@ -73,14 +74,10 @@ export const UserModal = ({ isOpen, onClose, onSuccess, user }: UserModalProps) 
         avatar: '',
       });
     }
-  }, [user, reset]);
-
-  const avatarUrl = watch('avatar');
-
   const onSubmit = async (data: UserFormData) => {
     try {
       setIsLoading(true);
-      const payload: any = { ...data };
+      const payload: Partial<UserFormData> = { ...data };
       if (!payload.password) {
         delete payload.password;
       }

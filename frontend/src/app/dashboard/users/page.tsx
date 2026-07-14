@@ -9,14 +9,15 @@ import { formatDate } from '@/utils/formatters';
 import { UserModal } from '@/features/users/components/UserModal';
 import { useToast } from '@/components/providers/ToastProvider';
 import { Badge } from '@/components/shared/Badge';
+import { User } from '@/types';
 
 export default function UsersPage() {
-  const [users, setUsers] = useState<any[]>([]);
+  const [users, setUsers] = useState<User[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [filterRole, setFilterRole] = useState('');
   const [filterStatus, setFilterStatus] = useState('');
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [selectedUser, setSelectedUser] = useState<any | null>(null);
+  const [selectedUser, setSelectedUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const toast = useToast();
 
@@ -73,7 +74,7 @@ export default function UsersPage() {
     return matchesSearch && matchesRole && matchesStatus;
   });
 
-  const columns: ColumnDef<any>[] = [
+  const columns: ColumnDef<User>[] = [
     {
       header: 'Utilisateur',
       key: 'fullName',

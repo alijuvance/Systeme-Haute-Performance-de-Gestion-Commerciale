@@ -2,6 +2,8 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import Drawer from '@/components/shared/Drawer';
 import SearchSelect from '@/components/shared/SearchSelect';
+import { Input } from '@/components/shared/Input';
+import { Button } from '@/components/shared/Button';
 import api from '@/api/axios';
 import { useToast } from '@/components/providers/ToastProvider';
 import { formatCurrency } from '@/utils/formatters';
@@ -148,34 +150,32 @@ export function NewPurchaseDrawer({ isOpen, onClose, onSuccess }: NewPurchaseDra
         Total : {formatCurrency(totalAmount)}
       </div>
       <div className="flex gap-3">
-        <button
+        <Button
           type="button"
+          variant="outline"
           onClick={handleClose}
           disabled={isSubmitting}
-          className="px-5 py-2.5 text-sm font-medium text-slate-600 bg-white border border-slate-200 rounded-xl hover:bg-slate-50 transition disabled:opacity-50"
         >
           Annuler
-        </button>
-        <button
+        </Button>
+        <Button
           type="submit"
           form="new-purchase-form"
           disabled={isSubmitting || showSuccess}
-          className="px-5 py-2.5 text-sm font-medium text-white bg-slate-900 rounded-xl hover:bg-slate-800 transition disabled:opacity-50 flex items-center gap-2"
+          isLoading={isSubmitting}
         >
           {showSuccess ? (
-            <>
+            <span className="flex items-center gap-2">
               <CheckCircle className="w-4 h-4" />
               Commande créée !
-            </>
-          ) : isSubmitting ? (
-            'Validation...'
+            </span>
           ) : (
-            <>
+            <span className="flex items-center gap-2">
               <ShoppingBag className="w-4 h-4" />
               Valider la commande
-            </>
+            </span>
           )}
-        </button>
+        </Button>
       </div>
     </div>
   );
@@ -255,25 +255,23 @@ export function NewPurchaseDrawer({ isOpen, onClose, onSuccess }: NewPurchaseDra
                   <div className="grid grid-cols-3 gap-3">
                     {/* Quantity */}
                     <div>
-                      <label className="block text-xs font-medium text-slate-500 mb-1">Quantité *</label>
-                      <input
+                      <Input
                         type="number"
                         min="1"
+                        label="Quantité *"
                         value={line.quantity}
                         onChange={(e) => updateLine(idx, 'quantity', Number(e.target.value))}
-                        className="w-full px-3 py-2 bg-white border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                       />
                     </div>
 
                     {/* Unit price */}
                     <div>
-                      <label className="block text-xs font-medium text-slate-500 mb-1">Prix unitaire (MGA)</label>
-                      <input
+                      <Input
                         type="number"
                         min="0"
+                        label="Prix unitaire (MGA)"
                         value={line.unitPrice}
                         onChange={(e) => updateLine(idx, 'unitPrice', Number(e.target.value))}
-                        className="w-full px-3 py-2 bg-white border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                       />
                     </div>
 

@@ -2,6 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { usePurchases } from '../hooks/usePurchases';
 import { DataTable, ColumnDef } from '@/components/shared/DataTable';
+import { Purchase, Depot } from '@/types';
 import { Modal } from '@/components/shared/Modal';
 import { Input } from '@/components/shared/Input';
 import { Select } from '@/components/shared/Select';
@@ -13,12 +14,12 @@ import { getDepots } from '@/features/stocks/api/getStocks';
 
 export function PurchasesTable() {
   const { data, isLoading, error, recordPayment, receiveOrder } = usePurchases();
-  const [depots, setDepots] = useState<any[]>([]);
+  const [depots, setDepots] = useState<Depot[]>([]);
 
   // Action Modals State
   const [payModalOpen, setPayModalOpen] = useState(false);
   const [receiveModalOpen, setReceiveModalOpen] = useState(false);
-  const [selectedOrder, setSelectedOrder] = useState<any>(null);
+  const [selectedOrder, setSelectedOrder] = useState<Purchase | null>(null);
   
   // Form State
   const [amountInput, setAmountInput] = useState<number | string>('');
@@ -29,13 +30,13 @@ export function PurchasesTable() {
     getDepots().then(setDepots).catch(console.error);
   }, []);
 
-  const openPayModal = (order: any) => {
+  const openPayModal = (order: Purchase) => {
     setSelectedOrder(order);
     setAmountInput(order.totalAmount - (order.amountPaid || 0));
     setPayModalOpen(true);
   };
 
-  const openReceiveModal = (order: any) => {
+  const openReceiveModal = (order: Purchase) => {
     setSelectedOrder(order);
     setDepotIdInput(depots.length > 0 ? depots[0].id : '');
     setReceiveModalOpen(true);
@@ -57,9 +58,9 @@ export function PurchasesTable() {
     if (success) setReceiveModalOpen(false);
   };
 
-  const columns: ColumnDef<any>[] = [
-    { key: 'ref', header: 'Référence', cell: (p) => <span className="font-medium text-gray-900">{p.orderNumber || p.id?.slice(0, 8)}</span> },
-    { key: 'date', header: 'Date', cell: (p) => <span className="text-gray-500">{formatDate(p.date || p.createdAt)}</span> },
+  const columns: ColumnDef<Purchase>[] = [
+    { key: 'ref', header: 'Référence', cell: (p) => <span className="font-medium text-gray-900">{p.orderNumber || p.id.slice(0, 8)}</span> },
+    { key: 'date', header: 'Date', cell: (p) => <span className="text-gray-500">{formatDate(p.createdAt)}</span> },
     { key: 'supplier', header: 'Fournisseur', cell: (p) => <span className="text-gray-900">{p.supplier?.name || '—'}</span> },
     { key: 'total', header: 'Montant (MGA)', align: 'right', cell: (p) => <span className="tabular-nums font-medium text-gray-900">{formatCurrency(p.totalAmount)}</span> },
     { 

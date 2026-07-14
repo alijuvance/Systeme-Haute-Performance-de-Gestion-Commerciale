@@ -4,9 +4,10 @@ import { DataTable, ColumnDef } from '@/components/shared/DataTable';
 import { Badge } from '@/components/shared/Badge';
 import { Printer } from 'lucide-react';
 import { generateInvoicePdf } from '@/utils/pdfGenerator';
+import { Sale } from '@/types';
 
 interface SalesTableProps {
-  sales: any[];
+  sales: Sale[];
   isLoading: boolean;
   error: string | null;
 }
@@ -14,8 +15,8 @@ interface SalesTableProps {
 export const SalesTable: React.FC<SalesTableProps> = ({ sales, isLoading, error }) => {
   if (error) return <div className="p-4 bg-red-50 text-red-600 rounded-xl text-sm">{error}</div>;
 
-  const columns: ColumnDef<any>[] = [
-    { key: 'invoice', header: 'Facture N°', cell: (s) => <span className="font-medium text-gray-900">{s.invoiceNumber}</span> },
+  const columns: ColumnDef<Sale>[] = [
+    { key: 'invoice', header: 'Facture N°', cell: (s) => <span className="font-medium text-gray-900">{s.invoiceNumber || s.reference}</span> },
     { key: 'date', header: 'Date', cell: (s) => <span className="text-gray-500">{formatDate(s.date)}</span> },
     {
       key: 'type', header: 'Type',

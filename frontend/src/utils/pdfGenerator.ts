@@ -2,7 +2,9 @@ import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import { formatCurrency } from './formatters';
 
-export const generateInvoicePdf = (invoice: any) => {
+import { Sale, SaleLine } from '../types';
+
+export const generateInvoicePdf = (invoice: Sale) => {
   const doc = new jsPDF();
   
   // En-tête
@@ -20,7 +22,7 @@ export const generateInvoicePdf = (invoice: any) => {
   if (invoice.customer?.taxId) doc.text(`NIF/STAT: ${invoice.customer.taxId}`, 120, 44);
 
   // Tableau des articles
-  const tableData = invoice.lines?.map((line: any) => [
+  const tableData = invoice.lines?.map((line: SaleLine) => [
     line.product?.name || 'Article inconnu',
     line.quantity.toString(),
     formatCurrency(line.unitPrice),
@@ -36,7 +38,8 @@ export const generateInvoicePdf = (invoice: any) => {
   });
 
   // Totaux
-  const finalY = (doc as any).lastAutoTable.finalY || 55;
+  // @ts-ignore : jspdf-autotable adds lastAutoTable to doc
+  const finalY = (doc as any).lastAutoTable?.finalY || 55;
   
   doc.setFontSize(12);
   doc.text(`Total TTC:`, 130, finalY + 15);

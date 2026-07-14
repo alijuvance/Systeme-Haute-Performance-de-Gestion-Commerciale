@@ -7,6 +7,7 @@ import { Input } from '@/components/shared/Input';
 import SearchSelect from '@/components/shared/SearchSelect';
 import api from '@/api/axios';
 import { Package, Tag, DollarSign } from 'lucide-react';
+import { Category } from '@/types';
 
 interface ProductFormModalProps {
   isOpen: boolean;
@@ -24,7 +25,7 @@ export function ProductFormModal({ isOpen, onClose, onSuccess, initialData }: Pr
   const { register, setValue, watch, formState: { errors, isSubmitting } } = form;
   const categoryId = watch('categoryId');
 
-  const [categories, setCategories] = useState<any[]>([]);
+  const [categories, setCategories] = useState<Category[]>([]);
 
   useEffect(() => {
     api.get('/api/categories').then((res) => {

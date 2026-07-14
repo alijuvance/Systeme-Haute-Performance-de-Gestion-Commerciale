@@ -1,7 +1,7 @@
 'use client';
 import React, { useState, useCallback } from 'react';
 import Cropper from 'react-easy-crop';
-import { UploadCloud, Check, X, Camera } from 'lucide-react';
+import { UploadCloud, Check, Camera } from 'lucide-react';
 import { Modal } from '@/components/shared/Modal';
 import { Button } from '@/components/shared/Button';
 import { useToast } from '@/components/providers/ToastProvider';
@@ -12,7 +12,7 @@ interface AvatarUploadProps {
   onUploadSuccess: (url: string) => void;
 }
 
-const getCroppedImg = async (imageSrc: string, pixelCrop: any): Promise<Blob> => {
+const getCroppedImg = async (imageSrc: string, pixelCrop: { x: number; y: number; width: number; height: number }): Promise<Blob> => {
   const image = new Image();
   image.src = imageSrc;
   await new Promise((resolve) => (image.onload = resolve));
@@ -65,7 +65,7 @@ export const AvatarUpload = ({ currentAvatar, onUploadSuccess }: AvatarUploadPro
     }
   };
 
-  const onCropComplete = useCallback((croppedArea: any, croppedAreaPixels: any) => {
+  const onCropComplete = useCallback((croppedArea: { x: number; y: number; width: number; height: number }, croppedAreaPixels: any) => {
     setCroppedAreaPixels(croppedAreaPixels);
   }, []);
 
@@ -103,6 +103,7 @@ export const AvatarUpload = ({ currentAvatar, onUploadSuccess }: AvatarUploadPro
       <div className="relative group cursor-pointer">
         <div className="w-24 h-24 rounded-none overflow-hidden border-2 border-slate-200 bg-slate-100 flex items-center justify-center relative">
           {preview ? (
+            // eslint-disable-next-line @next/next/no-img-element
             <img src={preview} alt="Avatar" className="w-full h-full object-cover" />
           ) : (
             <Camera className="w-8 h-8 text-slate-400" />

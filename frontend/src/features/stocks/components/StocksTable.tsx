@@ -11,6 +11,7 @@ import { Badge } from '@/components/shared/Badge';
 import SearchSelect from '@/components/shared/SearchSelect';
 import { formatDate } from '@/utils/formatters';
 import { Search, Plus, Warehouse, AlertCircle } from 'lucide-react';
+import { StockLevel, Depot, Product, Category } from '@/types';
 
 export function StocksTable() {
   const {
@@ -30,18 +31,18 @@ export function StocksTable() {
   const [isAdding, setIsAdding] = useState(false);
   const [addError, setAddError] = useState<string | null>(null);
 
-  const depotOptions = depots.map((d: any) => ({
+  const depotOptions = depots.map((d: Depot) => ({
     id: d.id,
     label: d.name,
     sublabel: d.location || '',
   }));
 
-  const productOptions = products.map((p: any) => {
-    const catName = categories.find((c: any) => c.id === p.categoryId)?.name || '';
+  const productOptions = products.map((p: Product) => {
+    const catName = categories.find((c: Category) => c.id === p.categoryId)?.name || '';
     return {
       id: p.id,
       label: p.name,
-      sublabel: `${p.sku} — ${catName}`,
+      sublabel: `${p.sku || ''} — ${catName}`,
     };
   });
 
@@ -66,7 +67,7 @@ export function StocksTable() {
     }
   };
 
-  const columns: ColumnDef<any>[] = [
+  const columns: ColumnDef<StockLevel>[] = [
     {
       key: 'product',
       header: 'Produit',
