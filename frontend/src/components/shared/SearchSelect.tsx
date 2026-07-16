@@ -37,20 +37,17 @@ export default function SearchSelect({
   const containerRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
-  // Resolve the currently selected option from the value prop
   const selectedOption = useMemo(
     () => options.find((opt) => opt.id === value) ?? null,
     [options, value],
   );
 
-  // Keep the input text in sync when the value prop changes externally
   useEffect(() => {
     if (!isOpen) {
       setQuery(selectedOption?.label ?? '');
     }
   }, [selectedOption, isOpen]);
 
-  // Close dropdown on outside click
   useEffect(() => {
     function handleClickOutside(e: MouseEvent) {
       if (
@@ -58,44 +55,36 @@ export default function SearchSelect({
         !containerRef.current.contains(e.target as Node)
       ) {
         setIsOpen(false);
-        // Reset query to the selected label (or empty) when closing
         setQuery(selectedOption?.label ?? '');
       }
     }
-
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, [selectedOption]);
 
-  // Filter options based on query (case-insensitive on label + sublabel)
   const filteredOptions = useMemo(() => {
-    const search = query.toLowerCase().trim();
-    if (!search) return options;
+    const q = query.trim().toLowerCase();
+    if (!q) return options;
     return options.filter(
       (opt) =>
-        opt.label.toLowerCase().includes(search) ||
-        (opt.sublabel && opt.sublabel.toLowerCase().includes(search)),
+        opt.label.toLowerCase().includes(q) ||
+        (opt.sublabel && opt.sublabel.toLowerCase().includes(q))
     );
   }, [query, options]);
 
-  const handleInputChange = useCallback(
-    (e: React.ChangeEvent<HTMLInputElement>) => {
-      const val = e.target.value;
-      setQuery(val);
-      setIsOpen(true);
+  const showCreateOption =
+    onCreateNew &&
+    query.trim().length > 0 &&
+    !options.some((o) => o.label.toLowerCase() === query.trim().toLowerCase());
 
-      // If the user clears the input, deselect
-      if (val === '') {
-        onChange('');
-      }
-    },
-    [onChange],
-  );
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setQuery(e.target.value);
+    if (!isOpen) setIsOpen(true);
+  };
 
-  const handleSelect = useCallback(
-    (opt: SearchSelectOption) => {
-      onChange(opt.id);
-      setQuery(opt.label);
+  const handleSelectOption = useCallback(
+    (optId: string) => {
+      onChange(optId);
       setIsOpen(false);
       inputRef.current?.blur();
     },
@@ -115,7 +104,6 @@ export default function SearchSelect({
 
   const handleFocus = useCallback(() => {
     setIsOpen(true);
-    // Select all text so the user can immediately type to search
     if (selectedOption) {
       setQuery('');
     }
@@ -134,18 +122,15 @@ export default function SearchSelect({
 
   return (
     <div ref={containerRef} className="relative w-full">
-      {/* Label */}
-      <label className="mb-1.5 block text-sm font-medium text-slate-700">
+      <label className="mb-1.5 block text-sm font-medium text-gray-700">
         {label}
         {required && <span className="ml-0.5 text-red-500">*</span>}
       </label>
 
-      {/* Input wrapper */}
       <div className="relative">
-        {/* Search icon */}
         <Search
           size={16}
-          className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"
+          className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
         />
 
         <input
@@ -157,85 +142,88 @@ export default function SearchSelect({
           onKeyDown={handleKeyDown}
           placeholder={placeholder}
           className={`
-            w-full rounded-none border bg-white py-2.5 pl-9 pr-16 text-sm text-slate-900
-            placeholder:text-slate-400
-            transition-colors
-            focus:outline-none focus:ring-2 focus:ring-slate-900
-            ${error ? 'border-red-400' : 'border-slate-300'}
+            w-full rounded-lg border bg-white py-2.5 pl-9 pr-10 text-sm text-gray-900
+            placeholder:text-gray-400
+            transition-all duration-200
+            focus:outline-none focus:ring-2 focus:ring-gray-900/10 focus:border-gray-400
+            hover:border-gray-300
+            ${error ? 'border-red-300 focus:ring-red-500/10 focus:border-red-400' : 'border-gray-200'}
           `}
           autoComplete="off"
         />
 
-        {/* Right-side controls */}
         <div className="absolute right-2 top-1/2 flex -translate-y-1/2 items-center gap-1">
-          {/* Clear button – shown only when a value is selected */}
           {value && (
             <button
               type="button"
               onClick={handleClear}
-              className="rounded-none p-0.5 text-slate-400 transition-colors hover:bg-slate-100 hover:text-slate-600"
+              className="rounded-md p-1 text-gray-400 hover:bg-gray-100 hover:text-gray-600 transition-colors"
               aria-label="Effacer la sélection"
             >
               <X size={14} />
             </button>
           )}
-
-          {/* Chevron indicator */}
-          <ChevronDown
-            size={16}
-            className={`text-slate-400 transition-transform ${isOpen ? 'rotate-180' : ''}`}
-          />
+          {!value && (
+            <div className="p-1 text-gray-400 pointer-events-none">
+              <ChevronDown size={16} />
+            </div>
+          )}
         </div>
       </div>
 
-      {/* Dropdown */}
+      {error && <p className="mt-1.5 text-xs text-red-600">{error}</p>}
+
       {isOpen && (
-        <ul className="absolute z-50 mt-1 max-h-48 w-full overflow-y-auto rounded-none border border-slate-200 bg-white py-1 shadow-lg">
-          {filteredOptions.length > 0 ? (
+        <div className="absolute left-0 right-0 z-50 mt-1 max-h-60 overflow-y-auto rounded-xl border border-gray-100 bg-white py-1 shadow-lg animate-fade-in">
+          {filteredOptions.length === 0 && !showCreateOption ? (
+            <div className="px-4 py-3 text-sm text-gray-500 text-center">
+              Aucun résultat trouvé.
+            </div>
+          ) : (
             filteredOptions.map((opt) => (
-              <li
+              <button
                 key={opt.id}
-                onMouseDown={(e) => {
-                  // Prevent input blur before selection fires
-                  e.preventDefault();
-                  handleSelect(opt);
-                }}
+                type="button"
+                onClick={() => handleSelectOption(opt.id)}
                 className={`
-                  cursor-pointer px-3 py-2 transition-colors hover:bg-slate-50
-                  ${opt.id === value ? 'bg-slate-50 font-medium text-slate-900' : 'text-slate-700'}
+                  flex w-full flex-col items-start px-4 py-2 text-left transition-colors
+                  hover:bg-gray-50
+                  ${opt.id === value ? 'bg-gray-50' : ''}
                 `}
               >
-                <span className="block text-sm">{opt.label}</span>
+                <span className="text-sm font-medium text-gray-900">
+                  {opt.label}
+                </span>
                 {opt.sublabel && (
-                  <span className="block text-xs text-slate-400">
+                  <span className="text-xs text-gray-500 mt-0.5">
                     {opt.sublabel}
                   </span>
                 )}
-              </li>
+              </button>
             ))
-          ) : (
-            <li className="px-3 py-2 text-sm text-slate-400">
-              Aucun résultat trouvé
-            </li>
           )}
-          {onCreateNew && query.trim() && (
-            <li
-              onMouseDown={(e) => {
-                e.preventDefault();
-                onCreateNew(query.trim());
-                setIsOpen(false);
-              }}
-              className="cursor-pointer px-3 py-2.5 border-t border-slate-100 text-sm font-medium text-blue-600 hover:bg-blue-50 transition-colors flex items-center gap-2"
-            >
-              <Plus size={14} />
-              {createNewLabel} &laquo; {query.trim()} &raquo;
-            </li>
-          )}
-        </ul>
-      )}
 
-      {/* Error message */}
-      {error && <p className="mt-1 text-xs text-red-500">{error}</p>}
+          {showCreateOption && (
+            <button
+              type="button"
+              onClick={() => {
+                if (onCreateNew) {
+                  onCreateNew(query.trim());
+                  setIsOpen(false);
+                }
+              }}
+              className="flex w-full items-center gap-2 px-4 py-2.5 text-left text-sm text-gray-900 transition-colors hover:bg-gray-50 border-t border-gray-50"
+            >
+              <div className="flex h-5 w-5 items-center justify-center rounded-md bg-gray-100 text-gray-600">
+                <Plus size={14} />
+              </div>
+              <span className="font-medium">
+                {createNewLabel} <span className="font-bold">"{query.trim()}"</span>
+              </span>
+            </button>
+          )}
+        </div>
+      )}
     </div>
   );
 }

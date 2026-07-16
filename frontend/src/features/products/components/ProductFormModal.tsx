@@ -3,9 +3,11 @@ import { useProductForm } from '../hooks/useProductForm';
 import { Product } from '../schemas/productSchema';
 import { Modal } from '@/components/shared/Modal';
 import { Button } from '@/components/shared/Button';
+import { Input } from '@/components/shared/Input';
 import SearchSelect from '@/components/shared/SearchSelect';
 import api from '@/api/axios';
 import { Package, Tag, DollarSign } from 'lucide-react';
+import { Category } from '@/types';
 
 interface ProductFormModalProps {
   isOpen: boolean;
@@ -23,7 +25,7 @@ export function ProductFormModal({ isOpen, onClose, onSuccess, initialData }: Pr
   const { register, setValue, watch, formState: { errors, isSubmitting } } = form;
   const categoryId = watch('categoryId');
 
-  const [categories, setCategories] = useState<any[]>([]);
+  const [categories, setCategories] = useState<Category[]>([]);
 
   useEffect(() => {
     api.get('/api/categories').then((res) => {
@@ -36,44 +38,31 @@ export function ProductFormModal({ isOpen, onClose, onSuccess, initialData }: Pr
     label: c.name,
   }));
 
-  const inputClass = (error: any) => 
-    `w-full pl-10 pr-4 py-2.5 bg-slate-50 border ${error ? 'border-red-300 ring-4 ring-red-50 focus:border-red-500 focus:ring-red-100' : 'border-slate-200 focus:border-slate-400 focus:bg-white'} rounded-xl text-sm focus:outline-none transition-all`;
-
   return (
     <Modal isOpen={isOpen} onClose={onClose} title={initialData ? "Modifier le produit" : "Nouveau produit"}>
       <form onSubmit={onSubmit} className="space-y-5">
         {submitError && (
-          <div className="bg-red-50 border border-red-200 text-red-700 p-4 rounded-xl text-sm font-medium">
+          <div className="bg-red-50 text-red-600 p-3 rounded-lg text-sm">
             {submitError}
           </div>
         )}
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-          <div>
-            <label className="block text-sm font-semibold text-slate-700 mb-1.5">Référence / SKU <span className="text-red-500">*</span></label>
-            <div className="relative">
-              <Tag className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
-              <input
-                {...register('sku')}
-                placeholder="Ex: PROD-001"
-                className={inputClass(errors.sku)}
-              />
-            </div>
-            {errors.sku && <p className="text-xs font-medium text-red-500 mt-1.5">{errors.sku.message}</p>}
-          </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <Input
+            label="Référence / SKU *"
+            {...register('sku')}
+            error={errors.sku?.message}
+            placeholder="Ex: PROD-001"
+            icon={<Tag className="w-4 h-4" />}
+          />
 
-          <div>
-            <label className="block text-sm font-semibold text-slate-700 mb-1.5">Nom du produit <span className="text-red-500">*</span></label>
-            <div className="relative">
-              <Package className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
-              <input
-                {...register('name')}
-                placeholder="Ex: Ordinateur Portable"
-                className={inputClass(errors.name)}
-              />
-            </div>
-            {errors.name && <p className="text-xs font-medium text-red-500 mt-1.5">{errors.name.message}</p>}
-          </div>
+          <Input
+            label="Nom du produit *"
+            {...register('name')}
+            error={errors.name?.message}
+            placeholder="Ex: Ordinateur Portable"
+            icon={<Package className="w-4 h-4" />}
+          />
         </div>
 
         <div>
@@ -88,41 +77,31 @@ export function ProductFormModal({ isOpen, onClose, onSuccess, initialData }: Pr
           {errors.categoryId && <p className="text-xs font-medium text-red-500 mt-1.5">{errors.categoryId.message}</p>}
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-          <div>
-            <label className="block text-sm font-semibold text-slate-700 mb-1.5">Prix Unitaire <span className="text-slate-400 font-normal">(Vente)</span> <span className="text-red-500">*</span></label>
-            <div className="relative">
-              <DollarSign className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
-              <input
-                type="number"
-                min={0}
-                step="0.01"
-                {...register('defaultPrice', { valueAsNumber: true })}
-                className={inputClass(errors.defaultPrice)}
-              />
-            </div>
-            {errors.defaultPrice && <p className="text-xs font-medium text-red-500 mt-1.5">{errors.defaultPrice.message}</p>}
-          </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <Input
+            label="Prix Unitaire (Vente) *"
+            type="number"
+            min={0}
+            step="0.01"
+            {...register('defaultPrice', { valueAsNumber: true })}
+            error={errors.defaultPrice?.message}
+            icon={<DollarSign className="w-4 h-4" />}
+          />
 
-          <div>
-            <label className="block text-sm font-semibold text-slate-700 mb-1.5">Coût d'achat <span className="text-slate-400 font-normal">(Achat)</span> <span className="text-red-500">*</span></label>
-            <div className="relative">
-              <DollarSign className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
-              <input
-                type="number"
-                min={0}
-                step="0.01"
-                {...register('costPrice', { valueAsNumber: true })}
-                className={inputClass(errors.costPrice)}
-              />
-            </div>
-            {errors.costPrice && <p className="text-xs font-medium text-red-500 mt-1.5">{errors.costPrice.message}</p>}
-          </div>
+          <Input
+            label="Coût d'achat (Achat) *"
+            type="number"
+            min={0}
+            step="0.01"
+            {...register('costPrice', { valueAsNumber: true })}
+            error={errors.costPrice?.message}
+            icon={<DollarSign className="w-4 h-4" />}
+          />
         </div>
 
-        <div className="flex justify-end gap-3 mt-8 pt-5 border-t border-slate-100">
+        <div className="flex justify-end gap-3 mt-8 pt-5 border-t border-gray-100">
           <Button type="button" variant="outline" onClick={onClose}>Annuler</Button>
-          <Button type="submit" isLoading={isSubmitting}>Enregistrer le produit</Button>
+          <Button type="submit" isLoading={isSubmitting}>Enregistrer</Button>
         </div>
       </form>
     </Modal>

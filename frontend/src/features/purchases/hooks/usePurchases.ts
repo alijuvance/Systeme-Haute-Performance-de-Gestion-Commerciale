@@ -1,9 +1,10 @@
 import { useState, useEffect, useCallback } from 'react';
 import api from '@/api/axios';
 import { useToast } from '@/components/providers/ToastProvider';
+import { Purchase } from '@/types';
 
 export const usePurchases = () => {
-  const [data, setData] = useState<any[]>([]);
+  const [data, setData] = useState<Purchase[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const toast = useToast();

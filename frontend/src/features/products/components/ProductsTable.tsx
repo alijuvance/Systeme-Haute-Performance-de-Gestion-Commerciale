@@ -5,6 +5,7 @@ import { Product } from '../schemas/productSchema';
 import { DataTable, ColumnDef } from '@/components/shared/DataTable';
 import { PageHeader } from '@/components/shared/PageHeader';
 import { Button } from '@/components/shared/Button';
+import { Badge } from '@/components/shared/Badge';
 import { Plus, Pencil, Trash } from 'lucide-react';
 import { formatCurrency } from '@/utils/formatters';
 import { ProductFormModal } from './ProductFormModal';
@@ -40,21 +41,21 @@ export function ProductsTable() {
   };
 
   const columns: ColumnDef<Product>[] = [
-    { key: 'ref', header: 'Référence', cell: (p) => <span className="font-medium text-slate-900">{p.sku}</span> },
-    { key: 'name', header: 'Nom du produit', cell: (p) => p.name },
-    { key: 'category', header: 'Catégorie', cell: (p) => <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-slate-100 text-slate-800">{p.categoryId || 'N/A'}</span> },
-    { key: 'price', header: 'Prix de vente', align: 'right', cell: (p) => `${p.defaultPrice.toLocaleString()} Ar` },
-    { key: 'cost', header: 'Coût d\'achat', align: 'right', cell: (p) => `${p.costPrice.toLocaleString()} Ar` },
+    { key: 'ref', header: 'Référence', cell: (p) => <span className="font-medium text-gray-900">{p.sku}</span> },
+    { key: 'name', header: 'Nom du produit', cell: (p) => <span className="text-gray-900">{p.name}</span> },
+    { key: 'category', header: 'Catégorie', cell: (p) => <Badge variant="default">{p.categoryId || 'N/A'}</Badge> },
+    { key: 'price', header: 'Prix de vente', align: 'right', cell: (p) => <span className="tabular-nums font-medium text-gray-900">{`${p.defaultPrice.toLocaleString()} Ar`}</span> },
+    { key: 'cost', header: "Coût d'achat", align: 'right', cell: (p) => <span className="tabular-nums text-gray-500">{`${p.costPrice.toLocaleString()} Ar`}</span> },
     { 
       key: 'actions', 
       header: '', 
       align: 'right',
       cell: (p) => (
-        <div className="flex justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-          <button onClick={() => handleOpenEdit(p)} className="p-1.5 text-slate-400 hover:text-blue-600 hover:bg-blue-50 transition-colors">
+        <div className="flex justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+          <button onClick={() => handleOpenEdit(p)} className="p-1.5 text-gray-400 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-all">
             <Pencil className="w-4 h-4" />
           </button>
-          <button onClick={() => handleDelete(p.id)} className="p-1.5 text-slate-400 hover:text-red-600 hover:bg-red-50 transition-colors">
+          <button onClick={() => handleDelete(p.id)} className="p-1.5 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-all">
             <Trash className="w-4 h-4" />
           </button>
         </div>
@@ -63,7 +64,7 @@ export function ProductsTable() {
   ];
 
   if (error) {
-    return <div className="p-4 bg-red-50 text-red-600 border border-red-200">{error}</div>;
+    return <div className="p-4 bg-red-50 text-red-600 rounded-xl text-sm mb-4">{error}</div>;
   }
 
   return (

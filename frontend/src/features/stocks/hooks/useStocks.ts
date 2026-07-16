@@ -2,12 +2,13 @@ import { useState, useEffect, useCallback } from 'react';
 import { getStocks, getDepots, addStockMovement } from '../api/getStocks';
 import api from '@/api/axios';
 import { useToast } from '@/components/providers/ToastProvider';
+import { StockLevel, Depot, Product, Category } from '@/types';
 
 export const useStocks = () => {
-  const [data, setData] = useState<any[]>([]);
-  const [depots, setDepots] = useState<any[]>([]);
-  const [products, setProducts] = useState<any[]>([]);
-  const [categories, setCategories] = useState<any[]>([]);
+  const [data, setData] = useState<StockLevel[]>([]);
+  const [depots, setDepots] = useState<Depot[]>([]);
+  const [products, setProducts] = useState<Product[]>([]);
+  const [categories, setCategories] = useState<Category[]>([]);
   const [selectedDepotId, setSelectedDepotId] = useState<string>('');
   const [searchTerm, setSearchTerm] = useState('');
   const [isLoading, setIsLoading] = useState(true);
@@ -39,7 +40,8 @@ export const useStocks = () => {
         setDepots(depRes);
         setProducts(prodRes.data || []);
         setCategories(catRes.data || []);
-      } catch (e) {
+      } catch (e: any) {
+        toast.error(e.response?.data?.message || e.message || 'Erreur lors du chargement des références');
         console.error('Erreur chargement refs:', e);
       }
     };

@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useSaleForm } from '../hooks/useSaleForm';
 import { formatCurrency } from '@/utils/formatters';
 import { Button } from '@/components/shared/Button';
+import { Input } from '@/components/shared/Input';
 import SearchSelect from '@/components/shared/SearchSelect';
 import InvoiceDrawer from './InvoiceDrawer';
 import { CustomerFormModal } from '@/features/customers/components/CustomerFormModal';
@@ -135,15 +136,13 @@ export const SaleForm: React.FC = () => {
           <div className="p-5 border-b border-slate-100">
             <h2 className="text-base font-bold text-slate-900 mb-4">Catalogue produits</h2>
 
-            {/* Search bar */}
-            <div className="relative mb-3">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
-              <input
+            <div className="mb-3">
+              <Input
                 type="text"
                 placeholder="Rechercher un produit par nom ou SKU..."
                 value={productSearch}
                 onChange={(e) => setProductSearch(e.target.value)}
-                className="w-full pl-9 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-slate-900 focus:bg-white transition-all"
+                icon={<Search className="w-4 h-4" />}
               />
             </div>
 
@@ -312,17 +311,15 @@ export const SaleForm: React.FC = () => {
               </span>
             </div>
 
-            <div className="flex items-center gap-3">
-              <label className="text-sm font-medium text-slate-600 whitespace-nowrap">Acompte (MGA)</label>
-              <input
-                type="number"
-                min={0}
-                max={totalAmount}
-                {...register('amountPaid', { valueAsNumber: true })}
-                className={`flex-1 border p-2 rounded-lg text-right font-semibold text-sm bg-white focus:outline-none focus:ring-2 focus:ring-slate-900 ${errors.amountPaid ? 'border-red-400' : 'border-slate-200'}`}
-              />
-            </div>
-            {errors.amountPaid && <p className="text-xs text-red-500">{errors.amountPaid.message}</p>}
+            <Input
+              type="number"
+              min={0}
+              max={totalAmount}
+              label="Acompte (MGA)"
+              {...register('amountPaid', { valueAsNumber: true })}
+              error={errors.amountPaid?.message}
+              className="font-semibold"
+            />
 
             {/* Drawer open button */}
             {watchedLines.length > 0 && (
