@@ -74,6 +74,8 @@ export const UserModal = ({ isOpen, onClose, onSuccess, user }: UserModalProps) 
         avatar: '',
       });
     }
+  }, [user, reset]);
+
   const onSubmit = async (data: UserFormData) => {
     try {
       setIsLoading(true);
