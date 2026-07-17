@@ -19,36 +19,45 @@ export interface Role {
 
 export interface Product {
   id: string;
-  code: string;
+  sku: string;
+  barcode?: string;
   name: string;
-  sku?: string;
+  description?: string;
+  defaultPrice: number;
+  costPrice: number;
+  isActive?: boolean;
   categoryId?: string;
   category?: Category;
-  description?: string;
-  costPrice: number;
-  wholesalePrice: number;
-  retailPrice: number;
 }
 
 export interface Category {
   id: string;
   name: string;
+  parentId?: string;
   description?: string;
 }
 
 export interface Customer {
   id: string;
-  name: string;
-  email?: string;
+  type: string;
+  companyName?: string;
+  fullName?: string;
   phone?: string;
+  email?: string;
   address?: string;
+  taxId?: string;
+  creditLimit?: number;
+  currentDebt?: number;
 }
 
 export interface Supplier {
   id: string;
   name: string;
+  contactName?: string;
   email?: string;
   phone?: string;
+  address?: string;
+  taxId?: string;
 }
 
 export interface SaleLine {
@@ -57,18 +66,22 @@ export interface SaleLine {
   product?: Product;
   quantity: number;
   unitPrice: number;
+  discount?: number;
 }
 
 export interface Sale {
   id: string;
-  reference: string;
-  invoiceNumber?: string;
+  invoiceNumber: string;
   customerId?: string;
   customer?: Customer;
+  depotId: string;
+  depot?: Depot;
   totalAmount: number;
+  taxAmount?: number;
   amountPaid: number;
   status: string;
-  type?: string;
+  type: string;
+  dueDate?: string;
   date?: string;
   createdAt: string;
   lines?: SaleLine[];
@@ -85,15 +98,15 @@ export interface Depot {
   id: string;
   name: string;
   location?: string;
+  type?: string;
 }
 
-export interface PurchaseItem {
+export interface PurchaseOrderLine {
   id: string;
   productId: string;
   product?: Product;
   quantity: number;
   unitPrice: number;
-  purchaseId: string;
 }
 
 export interface Purchase {
@@ -101,22 +114,29 @@ export interface Purchase {
   orderNumber: string;
   supplierId: string;
   supplier?: Supplier;
+  receivingDepotId?: string;
+  receivingDepot?: Depot;
+  expectedDate?: string;
   status: string;
   totalAmount: number;
   amountPaid: number;
+  date?: string;
   createdAt: string;
-  items?: PurchaseItem[];
+  lines?: PurchaseOrderLine[];
 }
 
 export interface StockMovement {
   id: string;
-  type: 'IN' | 'OUT';
+  type: 'IN' | 'OUT' | 'TRANSFER_IN' | 'TRANSFER_OUT';
   quantityChanged: number;
   productId: string;
   product?: Product;
   depotId: string;
   depot?: Depot;
+  userId: string;
+  user?: User;
   reference?: string;
+  date?: string;
   createdAt: string;
 }
 
@@ -130,4 +150,36 @@ export interface StockLevel {
   minAlertQuantity?: number;
   firstAddedAt?: string;
   lastAddedAt?: string;
+}
+
+export interface StockTransfer {
+  id: string;
+  reference: string;
+  status: 'IN_TRANSIT' | 'COMPLETED' | 'CANCELLED';
+  quantity: number;
+  productId: string;
+  product?: Product;
+  fromDepotId: string;
+  fromDepot?: Depot;
+  toDepotId: string;
+  toDepot?: Depot;
+  dispatchedById: string;
+  dispatchedBy?: { fullName: string };
+  receivedById?: string;
+  receivedBy?: { fullName: string };
+  dispatchedAt: string;
+  receivedAt?: string;
+}
+
+/**
+ * Réponse paginée standardisée (alignée avec le backend).
+ */
+export interface PaginatedResponse<T> {
+  data: T[];
+  meta: {
+    page: number;
+    limit: number;
+    total: number;
+    totalPages: number;
+  };
 }

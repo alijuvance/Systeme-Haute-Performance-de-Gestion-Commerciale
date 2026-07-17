@@ -1,19 +1,22 @@
 import { Injectable, ConflictException, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../../core/prisma/prisma.service';
+import { CounterService } from '../../core/counter/counter.service';
 import { StockMovementsService } from '../stock-movements/stock-movements.service';
 import { CreatePurchaseOrderDto } from './dto/create-purchase-order.dto';
 import { ReceivePurchaseOrderDto } from './dto/receive-purchase-order.dto';
 import { MovementType } from '../stock-movements/dto/create-stock-movement.dto';
+import { PaginationQueryDto, paginate } from '../../common/dto/pagination-query.dto';
 
 @Injectable()
 export class PurchaseOrdersService {
   constructor(
     private prisma: PrismaService,
+    private counterService: CounterService,
     private stockMovementsService: StockMovementsService
   ) {}
 
   async create(dto: CreatePurchaseOrderDto) {
-    const orderNumber = `PO-${new Date().getFullYear()}-${Math.floor(Math.random() * 10000).toString().padStart(4, '0')}`;
+    const orderNumber = await this.counterService.getNextNumber('PURCHASE_ORDER');
     
     let totalAmount = 0;
     dto.lines.forEach(line => { totalAmount += line.quantity * line.unitPrice; });
@@ -65,11 +68,31 @@ export class PurchaseOrdersService {
     return updatedOrder;
   }
 
-  findAll() {
-    return this.prisma.purchaseOrder.findMany({
-      include: { supplier: true, receivingDepot: true },
-      orderBy: { date: 'desc' }
-    });
+  async findAll(query: PaginationQueryDto) {
+    const { page = 1, limit = 20, search } = query;
+    const skip = (page - 1) * limit;
+
+    const where = search
+      ? {
+          OR: [
+            { orderNumber: { contains: search, mode: 'insensitive' as const } },
+            { supplier: { name: { contains: search, mode: 'insensitive' as const } } },
+          ],
+        }
+      : {};
+
+    const [data, total] = await Promise.all([
+      this.prisma.purchaseOrder.findMany({
+        where,
+        include: { supplier: true, receivingDepot: true },
+        orderBy: { date: 'desc' },
+        skip,
+        take: limit,
+      }),
+      this.prisma.purchaseOrder.count({ where }),
+    ]);
+
+    return paginate(data, total, page, limit);
   }
 
   async getPurchaseKPIs() {
@@ -77,18 +100,15 @@ export class PurchaseOrdersService {
     startOfMonth.setDate(1);
     startOfMonth.setHours(0, 0, 0, 0);
 
-    // Dépenses du mois (toutes commandes)
     const monthOrders = await this.prisma.purchaseOrder.findMany({
       where: { date: { gte: startOfMonth }, status: { not: 'CANCELLED' } }
     });
     const monthSpent = monthOrders.reduce((sum, o) => sum + o.totalAmount, 0);
 
-    // À réceptionner (non reçues, non annulées)
     const pendingReceiptCount = await this.prisma.purchaseOrder.count({
       where: { status: { in: ['DRAFT', 'SENT'] } }
     });
 
-    // À payer (Reste à payer > 0, non annulées)
     const unpaidOrders = await this.prisma.purchaseOrder.findMany({
       where: { status: { not: 'CANCELLED' } }
     });
@@ -97,7 +117,6 @@ export class PurchaseOrdersService {
       totalUnpaidAmount += (o.totalAmount - o.amountPaid);
     });
 
-    // Total des commandes actives
     const activeOrdersCount = await this.prisma.purchaseOrder.count({
       where: { status: { not: 'CANCELLED' } }
     });

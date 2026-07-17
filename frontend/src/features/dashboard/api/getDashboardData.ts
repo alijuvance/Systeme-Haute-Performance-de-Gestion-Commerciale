@@ -1,12 +1,18 @@
 import api from '@/api/axios';
 import { AnalyticsKpis } from '@/types';
 
-export const getKpis = async (): Promise<AnalyticsKpis> => {
-  const response = await api.get('/api/analytics/kpis');
+interface DashboardFilters {
+  period?: string;
+  startDate?: string;
+  endDate?: string;
+}
+
+export const getKpis = async (filters?: DashboardFilters): Promise<AnalyticsKpis> => {
+  const response = await api.get('/api/analytics/kpis', { params: filters });
   return response.data;
 };
 
-export const getSalesChart = async (): Promise<any[]> => {
-  const response = await api.get('/api/analytics/sales-chart');
+export const getSalesChart = async (filters?: DashboardFilters): Promise<any[]> => {
+  const response = await api.get('/api/analytics/sales-chart', { params: filters });
   return response.data;
 };

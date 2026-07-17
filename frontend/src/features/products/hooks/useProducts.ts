@@ -11,8 +11,8 @@ export const useProducts = () => {
     setIsLoading(true);
     setError(null);
     try {
-      const data = await getProducts();
-      setProducts(data);
+      const result = await getProducts({ limit: 100 });
+      setProducts(result.data);
     } catch (err: any) {
       setError(err.message || 'Erreur lors du chargement des produits');
     } finally {

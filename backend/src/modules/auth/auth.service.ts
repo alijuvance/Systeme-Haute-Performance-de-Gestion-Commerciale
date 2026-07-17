@@ -1,4 +1,4 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { Injectable, UnauthorizedException, ForbiddenException } from '@nestjs/common';
 import { UsersService } from '../users/users.service';
 import { JwtService } from '@nestjs/jwt';
 import { LoginDto } from './dto/login.dto';
@@ -6,6 +6,8 @@ import { ForgotPasswordDto } from './dto/forgot-password.dto';
 import { ResetPasswordDto } from './dto/reset-password.dto';
 import * as bcrypt from 'bcrypt';
 import { Resend } from 'resend';
+import { PrismaService } from '../../core/prisma/prisma.service';
+import { v4 as uuidv4 } from 'uuid';
 
 const resend = new Resend(process.env.RESEND_API_KEY || 're_default_key');
 
@@ -14,7 +16,32 @@ export class AuthService {
   constructor(
     private usersService: UsersService,
     private jwtService: JwtService,
+    private prisma: PrismaService,
   ) {}
+
+  /**
+   * Génère une paire access_token (15min) + refresh_token (7 jours).
+   */
+  private async generateTokens(userId: string, email: string, roleId: string) {
+    const payload = { sub: userId, email, roleId };
+
+    const [accessToken, refreshToken] = await Promise.all([
+      this.jwtService.signAsync(payload, { expiresIn: '15m' }),
+      this.jwtService.signAsync({ sub: userId, jti: uuidv4() }, { expiresIn: '7d' }),
+    ]);
+
+    // Stocker le hash du refresh token en base
+    const refreshTokenHash = await bcrypt.hash(refreshToken, 10);
+    const refreshTokenExp = new Date();
+    refreshTokenExp.setDate(refreshTokenExp.getDate() + 7);
+
+    await this.prisma.user.update({
+      where: { id: userId },
+      data: { refreshToken: refreshTokenHash, refreshTokenExp },
+    });
+
+    return { access_token: accessToken, refresh_token: refreshToken };
+  }
 
   async login(loginDto: LoginDto) {
     const user = await this.usersService.findByEmail(loginDto.email);
@@ -27,17 +54,13 @@ export class AuthService {
       throw new UnauthorizedException('Identifiants invalides');
     }
 
-    const payload = { 
-      sub: user.id, 
-      email: user.email, 
-      roleId: user.roleId,
-    };
-
     // Mettre à jour lastLogin en tâche de fond (sans await pour ne pas ralentir le login)
     this.usersService.updateLastLogin(user.id).catch(console.error);
 
+    const tokens = await this.generateTokens(user.id, user.email, user.roleId);
+
     return {
-      access_token: await this.jwtService.signAsync(payload),
+      ...tokens,
       user: {
         id: user.id,
         email: user.email,
@@ -45,6 +68,53 @@ export class AuthService {
         role: (user as any).role?.name || 'MANAGER'
       }
     };
+  }
+
+  /**
+   * Renouvelle les tokens via un refresh token valide (rotation).
+   */
+  async refreshTokens(refreshToken: string) {
+    try {
+      const decoded = await this.jwtService.verifyAsync(refreshToken);
+      const user = await this.prisma.user.findUnique({ where: { id: decoded.sub } });
+
+      if (!user || !user.refreshToken || !user.refreshTokenExp) {
+        throw new ForbiddenException('Refresh token invalide');
+      }
+
+      // Vérifier l'expiration
+      if (new Date() > user.refreshTokenExp) {
+        throw new ForbiddenException('Refresh token expiré');
+      }
+
+      // Vérifier le hash
+      const isValid = await bcrypt.compare(refreshToken, user.refreshToken);
+      if (!isValid) {
+        // Possible vol de token — invalider tous les refresh tokens
+        await this.prisma.user.update({
+          where: { id: user.id },
+          data: { refreshToken: null, refreshTokenExp: null },
+        });
+        throw new ForbiddenException('Refresh token invalide — session invalidée');
+      }
+
+      // Rotation : générer une nouvelle paire de tokens
+      return this.generateTokens(user.id, user.email, user.roleId);
+    } catch (error) {
+      if (error instanceof ForbiddenException) throw error;
+      throw new ForbiddenException('Refresh token invalide');
+    }
+  }
+
+  /**
+   * Invalide le refresh token (logout).
+   */
+  async logout(userId: string) {
+    await this.prisma.user.update({
+      where: { id: userId },
+      data: { refreshToken: null, refreshTokenExp: null },
+    });
+    return { message: 'Déconnexion réussie' };
   }
 
   async forgotPassword(forgotPasswordDto: ForgotPasswordDto) {

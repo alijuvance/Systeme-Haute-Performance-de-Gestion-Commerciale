@@ -29,6 +29,8 @@ model User {
   isActive       Boolean         @default(true)
   resetOtp       String?
   resetOtpExpiresAt DateTime?
+  refreshToken     String?
+  refreshTokenExp  DateTime?
   roleId             String
   role               Role            @relation(fields: [roleId], references: [id])
   avatar             String?
@@ -73,6 +75,7 @@ model Product {
   stockTransfers     StockTransfer[]
   purchaseOrderLines PurchaseOrderLine[]
   invoiceLines       InvoiceLine[]
+  creditNoteLines    CreditNoteLine[]
   createdAt      DateTime        @default(now())
   updatedAt      DateTime        @updatedAt
 }
@@ -232,8 +235,45 @@ model Invoice {
   depotId       String
   depot         Depot         @relation(fields: [depotId], references: [id], onDelete: Cascade)
   lines         InvoiceLine[]
+  payments      Payment[]
+  creditNotes   CreditNote[]
   createdAt     DateTime      @default(now())
   updatedAt     DateTime      @updatedAt
+}
+
+model Payment {
+  id          String   @id @default(uuid())
+  amount      Float
+  method      String   @default("CASH") // CASH, BANK_TRANSFER, MOBILE_MONEY, CHECK
+  reference   String?  // Numéro de chèque, référence virement...
+  note        String?
+  invoiceId   String
+  invoice     Invoice  @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
+  createdAt   DateTime @default(now())
+}
+
+model CreditNote {
+  id              String             @id @default(uuid())
+  creditNoteNumber String            @unique
+  date            DateTime           @default(now())
+  reason          String?
+  totalAmount     Float              @default(0)
+  status          String             @default("ISSUED") // ISSUED, APPLIED, REFUNDED
+  invoiceId       String
+  invoice         Invoice            @relation(fields: [invoiceId], references: [id])
+  lines           CreditNoteLine[]
+  createdAt       DateTime           @default(now())
+  updatedAt       DateTime           @updatedAt
+}
+
+model CreditNoteLine {
+  id             String      @id @default(uuid())
+  quantity       Float
+  unitPrice      Float
+  creditNoteId   String
+  creditNote     CreditNote  @relation(fields: [creditNoteId], references: [id], onDelete: Cascade)
+  productId      String
+  product        Product     @relation(fields: [productId], references: [id], onDelete: Cascade)
 }
 
 model InvoiceLine {
@@ -246,3 +286,14 @@ model InvoiceLine {
   productId String
   product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
 }
+
+// ==========================================
+// COMPTEURS SEQUENTIELS
+// ==========================================
+model Counter {
+  id        String   @id        // ex: "INVOICE", "PURCHASE_ORDER"
+  prefix    String               // ex: "INV", "PO"
+  lastValue Int      @default(0)
+  updatedAt DateTime @updatedAt
+}
+

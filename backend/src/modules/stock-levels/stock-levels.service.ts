@@ -1,21 +1,34 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../../core/prisma/prisma.service';
+import { PaginationQueryDto, paginate } from '../../common/dto/pagination-query.dto';
 
 @Injectable()
 export class StockLevelsService {
   constructor(private prisma: PrismaService) {}
 
-  async findAll(depotId?: string) {
-    const where = depotId ? { depotId } : {};
+  async findAll(depotId?: string, query: PaginationQueryDto = {}) {
+    const { page = 1, limit = 20, search } = query;
+    const skip = (page - 1) * limit;
 
-    const stockLevels = await this.prisma.stockLevel.findMany({
-      where,
-      include: {
-        product: { include: { category: true } },
-        depot: true,
-      },
-      orderBy: { updatedAt: 'desc' },
-    });
+    const where: any = {};
+    if (depotId) where.depotId = depotId;
+    if (search) {
+      where.product = { name: { contains: search, mode: 'insensitive' } };
+    }
+
+    const [stockLevels, total] = await Promise.all([
+      this.prisma.stockLevel.findMany({
+        where,
+        include: {
+          product: { include: { category: true } },
+          depot: true,
+        },
+        orderBy: { updatedAt: 'desc' },
+        skip,
+        take: limit,
+      }),
+      this.prisma.stockLevel.count({ where }),
+    ]);
 
     // For each stock level, fetch the first and last stock movement dates
     const enriched = await Promise.all(
@@ -41,6 +54,6 @@ export class StockLevelsService {
       })
     );
 
-    return enriched;
+    return paginate(enriched, total, page, limit);
   }
 }

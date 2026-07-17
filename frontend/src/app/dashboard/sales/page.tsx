@@ -105,7 +105,7 @@ export default function SalesPage() {
       </Card>
 
       {error && <div className="p-4 bg-red-50 text-red-600 rounded-xl text-sm mb-4">{error}</div>}
-      <SalesTable sales={sales} isLoading={isLoading} error={null} />
+      <SalesTable sales={sales} isLoading={isLoading} error={null} onRefresh={() => window.location.reload()} />
     </>
   );
 }

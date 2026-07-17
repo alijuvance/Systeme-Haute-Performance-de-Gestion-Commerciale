@@ -4,10 +4,22 @@ import React from 'react';
 import { useDashboard } from '@/features/dashboard/hooks/useDashboard';
 import { DashboardKpis } from '@/features/dashboard/components/DashboardKpis';
 import { DashboardCharts } from '@/features/dashboard/components/DashboardCharts';
+import { DashboardFilters } from '@/features/dashboard/components/DashboardFilters';
 import { PageHeader } from '@/components/shared/PageHeader';
 
 export default function DashboardPage() {
-  const { kpis, chartData, isLoading, error } = useDashboard();
+  const { 
+    kpis, 
+    chartData, 
+    isLoading, 
+    error,
+    period,
+    setPeriod,
+    startDate,
+    setStartDate,
+    endDate,
+    setEndDate
+  } = useDashboard();
 
   return (
     <>
@@ -21,6 +33,15 @@ export default function DashboardPage() {
           <span className="font-medium">Erreur :</span> {error}
         </div>
       )}
+
+      <DashboardFilters
+        period={period}
+        setPeriod={setPeriod}
+        startDate={startDate}
+        setStartDate={setStartDate}
+        endDate={endDate}
+        setEndDate={setEndDate}
+      />
 
       <DashboardKpis kpis={kpis} isLoading={isLoading} />
       <div className="mt-6">

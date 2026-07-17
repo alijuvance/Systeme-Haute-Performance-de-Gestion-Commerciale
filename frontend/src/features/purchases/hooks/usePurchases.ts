@@ -12,8 +12,10 @@ export const usePurchases = () => {
   const fetchData = useCallback(async () => {
     try {
       setIsLoading(true);
-      const result = await api.get('/api/purchase-orders');
-      setData(result.data);
+      const result = await api.get('/api/purchase-orders', { params: { limit: 100 } });
+      // Le backend retourne maintenant { data, meta }
+      const responseData = result.data;
+      setData(responseData.data || responseData);
     } catch (err: any) {
       setError(err.message || 'Une erreur est survenue lors du chargement.');
     } finally {
