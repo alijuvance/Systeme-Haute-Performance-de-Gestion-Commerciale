@@ -1,8 +1,9 @@
 import { RolesGuard } from '../auth/guards/roles.guard';
 import { Roles } from '../../common/decorators/roles.decorator';
-import { Controller, Post, Get, Body, UseGuards, Request } from '@nestjs/common';
+import { Controller, Post, Get, Body, UseGuards, Request, Query } from '@nestjs/common';
 import { StockMovementsService } from './stock-movements.service';
 import { CreateStockMovementDto } from './dto/create-stock-movement.dto';
+import { PaginationQueryDto } from '../../common/dto/pagination-query.dto';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 
 @Controller('stock-movements')
@@ -17,7 +18,7 @@ export class StockMovementsController {
   }
 
   @Get()
-  findAll() {
-    return this.stockMovementsService.findAll();
+  findAll(@Query() query: PaginationQueryDto) {
+    return this.stockMovementsService.findAll(query);
   }
 }

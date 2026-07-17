@@ -15,8 +15,8 @@ export const useSales = () => {
     const fetchSales = async () => {
       try {
         setIsLoading(true);
-        const data = await getSales();
-        setSales(data);
+        const result = await getSales({ limit: 100 });
+        setSales(result.data);
       } catch (err: any) {
         setError(err.message || 'Une erreur est survenue lors du chargement des ventes.');
       } finally {

@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import api from '@/api/axios';
+import { io } from 'socket.io-client';
 
 export interface AppNotification {
   id: string;
@@ -29,9 +30,23 @@ export const useNotifications = () => {
     };
 
     fetchNotifications();
-    // Rafraîchissement toutes les 2 minutes (optionnel, mais utile)
-    const interval = setInterval(fetchNotifications, 120000);
-    return () => clearInterval(interval);
+
+    // Configuration WebSocket pour les notifications en temps réel
+    const socketURL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
+    const socket = io(socketURL);
+
+    socket.on('connect', () => {
+      console.log('Connecté au serveur de notifications WebSocket');
+    });
+
+    socket.on('refresh_notifications', () => {
+      console.log('Actualisation des notifications via WebSocket');
+      fetchNotifications();
+    });
+
+    return () => {
+      socket.disconnect();
+    };
   }, []);
 
   return { notifications, isLoading, error };

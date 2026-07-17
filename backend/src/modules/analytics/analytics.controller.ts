@@ -1,6 +1,6 @@
 import { RolesGuard } from '../auth/guards/roles.guard';
 import { Roles } from '../../common/decorators/roles.decorator';
-import { Controller, Get, UseGuards } from '@nestjs/common';
+import { Controller, Get, UseGuards, Query } from '@nestjs/common';
 import { AnalyticsService } from './analytics.service';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 
@@ -11,13 +11,21 @@ export class AnalyticsController {
   constructor(private readonly analyticsService: AnalyticsService) {}
 
   @Get('kpis')
-  getKPIs() {
-    return this.analyticsService.getKPIs();
+  getKPIs(
+    @Query('period') period?: string,
+    @Query('startDate') startDate?: string,
+    @Query('endDate') endDate?: string,
+  ) {
+    return this.analyticsService.getKPIs(period, startDate, endDate);
   }
 
   @Get('sales-chart')
-  getSalesChart() {
-    return this.analyticsService.getSalesChart();
+  getSalesChart(
+    @Query('period') period?: string,
+    @Query('startDate') startDate?: string,
+    @Query('endDate') endDate?: string,
+  ) {
+    return this.analyticsService.getSalesChart(period, startDate, endDate);
   }
 
   @Get('debts')
@@ -26,13 +34,21 @@ export class AnalyticsController {
   }
 
   @Get('finance-kpis')
-  getFinanceKPIs() {
-    return this.analyticsService.getFinanceKPIs();
+  getFinanceKPIs(
+    @Query('period') period?: string,
+    @Query('startDate') startDate?: string,
+    @Query('endDate') endDate?: string,
+  ) {
+    return this.analyticsService.getFinanceKPIs(period, startDate, endDate);
   }
 
   @Get('cashflow')
-  getCashflowChart() {
-    return this.analyticsService.getCashflowChart();
+  getCashflowChart(
+    @Query('period') period?: string,
+    @Query('startDate') startDate?: string,
+    @Query('endDate') endDate?: string,
+  ) {
+    return this.analyticsService.getCashflowChart(period, startDate, endDate);
   }
 
   @Get('payables')

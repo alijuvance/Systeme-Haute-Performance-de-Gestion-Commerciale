@@ -11,8 +11,8 @@ export const useCustomers = () => {
     setIsLoading(true);
     setError(null);
     try {
-      const data = await getCustomers();
-      setCustomers(data);
+      const result = await getCustomers({ limit: 100 });
+      setCustomers(result.data);
     } catch (err: any) {
       setError(err.message || 'Erreur lors du chargement des clients');
     } finally {

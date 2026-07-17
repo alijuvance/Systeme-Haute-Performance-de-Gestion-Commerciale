@@ -30,8 +30,11 @@ async function bootstrap() {
     transform: true, // Transforme automatiquement les payloads JSON en instances de classes DTO
   }));
   
-  // Configuration des CORS pour autoriser le frontend Next.js à communiquer avec l'API
-  app.enableCors();
+  // Configuration des CORS — restreint au frontend uniquement
+  app.enableCors({
+    origin: process.env.CORS_ORIGIN || 'http://localhost:3002',
+    credentials: true,
+  });
 
   const port = process.env.PORT || 3001;
   await app.listen(port);

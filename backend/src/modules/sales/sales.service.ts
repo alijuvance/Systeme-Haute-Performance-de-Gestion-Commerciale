@@ -1,20 +1,24 @@
 import { Injectable, ConflictException } from '@nestjs/common';
 import { PrismaService } from '../../core/prisma/prisma.service';
+import { CounterService } from '../../core/counter/counter.service';
 import { StockMovementsService } from '../stock-movements/stock-movements.service';
 import { CustomersService } from '../customers/customers.service';
 import { CreateSaleDto } from './dto/create-sale.dto';
 import { MovementType } from '../stock-movements/dto/create-stock-movement.dto';
+import { PaginationQueryDto, paginate } from '../../common/dto/pagination-query.dto';
 
 @Injectable()
 export class SalesService {
   constructor(
     private prisma: PrismaService,
+    private counterService: CounterService,
     private stockMovementsService: StockMovementsService,
     private customersService: CustomersService
   ) {}
 
   async createSale(dto: CreateSaleDto, userId: string) {
-    const invoiceNumber = `INV-${new Date().getFullYear()}-${Math.floor(Math.random() * 10000).toString().padStart(4, '0')}`;
+    // Numéro séquentiel unique garanti (remplace Math.random())
+    const invoiceNumber = await this.counterService.getNextNumber('INVOICE');
     
     let totalAmount = 0;
     dto.lines.forEach(line => { totalAmount += line.quantity * line.unitPrice; });
@@ -64,14 +68,35 @@ export class SalesService {
     });
   }
 
-  findAll() {
-    return this.prisma.invoice.findMany({
-      include: { 
-        customer: true, 
-        depot: true,
-        lines: { include: { product: true } }
-      },
-      orderBy: { date: 'desc' }
-    });
+  async findAll(query: PaginationQueryDto) {
+    const { page = 1, limit = 20, search } = query;
+    const skip = (page - 1) * limit;
+
+    const where = search
+      ? {
+          OR: [
+            { invoiceNumber: { contains: search, mode: 'insensitive' as const } },
+            { customer: { fullName: { contains: search, mode: 'insensitive' as const } } },
+            { customer: { companyName: { contains: search, mode: 'insensitive' as const } } },
+          ],
+        }
+      : {};
+
+    const [data, total] = await Promise.all([
+      this.prisma.invoice.findMany({
+        where,
+        include: { 
+          customer: true, 
+          depot: true,
+          lines: { include: { product: true } }
+        },
+        orderBy: { date: 'desc' },
+        skip,
+        take: limit,
+      }),
+      this.prisma.invoice.count({ where }),
+    ]);
+
+    return paginate(data, total, page, limit);
   }
 }

@@ -5,31 +5,76 @@ import { PrismaService } from '../../core/prisma/prisma.service';
 export class AnalyticsService {
   constructor(private prisma: PrismaService) {}
 
-  async getKPIs() {
-    // 1. Chiffre d'Affaires total (Toutes les ventes payées ou partielles)
-    const sales = await this.prisma.invoice.findMany({
-      where: { status: { in: ['PAID', 'PARTIAL'] } }
-    });
-    const totalRevenue = sales.reduce((acc, s) => acc + s.totalAmount, 0);
+  private getDateRange(period?: string, startDate?: string, endDate?: string) {
+    if (period === 'custom' && startDate && endDate) {
+      return { gte: new Date(startDate), lte: new Date(endDate) };
+    }
 
-    // 2. Créances (Ce que les clients nous doivent : Total - amountPaid)
-    const debtsFromCustomers = await this.prisma.invoice.findMany({
-      where: { status: { in: ['PARTIAL', 'PENDING'] } }
+    const now = new Date();
+    let gte: Date;
+    let lte = now;
+
+    switch (period) {
+      case 'today':
+        gte = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+        break;
+      case 'week':
+        gte = new Date(now);
+        gte.setDate(now.getDate() - now.getDay()); // Start of current week (Sunday as start, adjust if Monday is needed)
+        gte.setHours(0, 0, 0, 0);
+        break;
+      case 'month':
+        gte = new Date(now.getFullYear(), now.getMonth(), 1);
+        break;
+      case 'year':
+        gte = new Date(now.getFullYear(), 0, 1);
+        break;
+      default:
+        return undefined; // No date filter
+    }
+
+    return { gte, lte };
+  }
+
+  async getKPIs(period?: string, startDate?: string, endDate?: string) {
+    const dateFilter = this.getDateRange(period, startDate, endDate);
+    const whereDate = dateFilter ? { date: dateFilter } : {};
+
+    // 1. Chiffre d'Affaires total
+    const revenueAgg = await this.prisma.invoice.aggregate({
+      where: { status: { in: ['PAID', 'PARTIAL'] }, ...whereDate },
+      _sum: { totalAmount: true },
     });
-    const totalReceivables = debtsFromCustomers.reduce((acc, s) => acc + (s.totalAmount - s.amountPaid), 0);
+    const totalRevenue = revenueAgg._sum.totalAmount || 0;
+
+    // 2. Créances Clients
+    const receivablesAgg = await this.prisma.invoice.aggregate({
+      where: { status: { in: ['PARTIAL', 'PENDING'] }, ...whereDate },
+      _sum: { totalAmount: true, amountPaid: true },
+    });
+    const totalReceivables = (receivablesAgg._sum.totalAmount || 0) - (receivablesAgg._sum.amountPaid || 0);
 
     // 3. Marge Commerciale
     const invoiceLines = await this.prisma.invoiceLine.findMany({
-      include: { product: true, invoice: true }
+      where: {
+        invoice: { 
+          status: { notIn: ['CANCELLED', 'DRAFT'] },
+          ...whereDate
+        }
+      },
+      include: { product: { select: { costPrice: true } } }
     });
     
     let totalCogs = 0;
+    let totalRevFromLines = 0;
     invoiceLines.forEach(line => {
-      if (line.invoice.status !== 'CANCELLED' && line.invoice.status !== 'DRAFT') {
-        totalCogs += line.quantity * line.product.costPrice;
-      }
+      totalCogs += line.quantity * line.product.costPrice;
+      totalRevFromLines += line.quantity * line.unitPrice; // Use unitPrice for exact revenue if needed, or just use totalRevenue.
     });
 
+    // We can use the totalRevenue from the invoice aggregate, minus COGS.
+    // However, some invoices might have discounts not reflected in invoice lines if not properly set. 
+    // Usually Margin = Revenue - COGS.
     const commercialMargin = totalRevenue - totalCogs;
 
     return {
@@ -40,13 +85,17 @@ export class AnalyticsService {
     };
   }
 
-  async getSalesChart() {
+  async getSalesChart(period?: string, startDate?: string, endDate?: string) {
+    const dateFilter = this.getDateRange(period, startDate, endDate);
+    const whereDate = dateFilter ? { date: dateFilter } : {};
+
     const invoices = await this.prisma.invoice.findMany({
-      where: { status: { in: ['PAID', 'PARTIAL'] } },
-      orderBy: { date: 'asc' }
+      where: { status: { in: ['PAID', 'PARTIAL'] }, ...whereDate },
+      orderBy: { date: 'asc' },
+      select: { date: true, totalAmount: true }
     });
 
-    const chartData: any = {};
+    const chartData: Record<string, number> = {};
     invoices.forEach(inv => {
       const date = inv.date.toISOString().split('T')[0];
       if (!chartData[date]) chartData[date] = 0;
@@ -66,34 +115,46 @@ export class AnalyticsService {
     });
   }
 
-  async getFinanceKPIs() {
-    // 1. Total Cash (Trésorerie Actuelle = Total Ventes encaissées - Total Achats décaissés)
-    const sales = await this.prisma.invoice.findMany();
-    const totalSalesPaid = sales.reduce((acc, s) => acc + s.amountPaid, 0);
+  async getFinanceKPIs(period?: string, startDate?: string, endDate?: string) {
+    const dateFilter = this.getDateRange(period, startDate, endDate);
+    const whereDate = dateFilter ? { date: dateFilter } : {};
 
-    const purchases = await this.prisma.purchaseOrder.findMany();
-    const totalPurchasesPaid = purchases.reduce((acc, p) => acc + p.amountPaid, 0);
+    // 1. Agrégats sur les ventes
+    const salesAgg = await this.prisma.invoice.aggregate({
+      where: { ...whereDate },
+      _sum: { amountPaid: true, totalAmount: true },
+    });
+    const totalSalesPaid = salesAgg._sum.amountPaid || 0;
+    const totalSalesAmount = salesAgg._sum.totalAmount || 0;
+
+    // 2. Agrégats sur les achats
+    const purchasesAgg = await this.prisma.purchaseOrder.aggregate({
+      where: { ...whereDate }, // Assuming purchase order has 'date' or we use 'createdAt'. Schema has 'date'.
+      _sum: { amountPaid: true, totalAmount: true },
+    });
+    const totalPurchasesPaid = purchasesAgg._sum.amountPaid || 0;
+    const totalPurchasesAmount = purchasesAgg._sum.totalAmount || 0;
 
     const netCash = totalSalesPaid - totalPurchasesPaid;
+    const totalReceivables = totalSalesAmount - totalSalesPaid;
+    const totalPayables = totalPurchasesAmount - totalPurchasesPaid;
 
-    // 2. Créances Clients (Total facturé - Total encaissé)
-    const totalReceivables = sales.reduce((acc, s) => acc + (s.totalAmount - s.amountPaid), 0);
-
-    // 3. Dettes Fournisseurs (Total commandé - Total décaissé)
-    const totalPayables = purchases.reduce((acc, p) => acc + (p.totalAmount - p.amountPaid), 0);
-
-    // 4. Marge (même calcul qu'avant)
+    // 3. Marge
     const invoiceLines = await this.prisma.invoiceLine.findMany({
-      include: { product: true, invoice: true }
+      where: {
+        invoice: { 
+          status: { notIn: ['CANCELLED', 'DRAFT'] },
+          ...whereDate
+        }
+      },
+      include: { product: { select: { costPrice: true } } }
     });
     
     let totalRevenue = 0;
     let totalCogs = 0;
     invoiceLines.forEach(line => {
-      if (line.invoice.status !== 'CANCELLED' && line.invoice.status !== 'DRAFT') {
-        totalRevenue += line.quantity * line.unitPrice;
-        totalCogs += line.quantity * line.product.costPrice;
-      }
+      totalRevenue += line.quantity * line.unitPrice;
+      totalCogs += line.quantity * line.product.costPrice;
     });
 
     return {
@@ -104,12 +165,17 @@ export class AnalyticsService {
     };
   }
 
-  async getCashflowChart() {
+  async getCashflowChart(period?: string, startDate?: string, endDate?: string) {
+    const dateFilter = this.getDateRange(period, startDate, endDate);
+    const whereDate = dateFilter ? { date: dateFilter } : {};
+
     const invoices = await this.prisma.invoice.findMany({
-      where: { status: { notIn: ['CANCELLED', 'DRAFT'] } }
+      where: { status: { notIn: ['CANCELLED', 'DRAFT'] }, ...whereDate },
+      select: { date: true, amountPaid: true }
     });
     const purchases = await this.prisma.purchaseOrder.findMany({
-      where: { status: { notIn: ['CANCELLED', 'DRAFT'] } }
+      where: { status: { notIn: ['CANCELLED', 'DRAFT'] }, ...whereDate },
+      select: { date: true, amountPaid: true }
     });
 
     const chartMap: Record<string, { inflows: number; outflows: number }> = {};
@@ -117,7 +183,7 @@ export class AnalyticsService {
     invoices.forEach(inv => {
       const date = inv.date.toISOString().split('T')[0];
       if (!chartMap[date]) chartMap[date] = { inflows: 0, outflows: 0 };
-      chartMap[date].inflows += inv.amountPaid; // Assuming amountPaid is recorded at invoice date for simplicity
+      chartMap[date].inflows += inv.amountPaid;
     });
 
     purchases.forEach(p => {
@@ -134,11 +200,11 @@ export class AnalyticsService {
   }
 
   async getPayables() {
-    const purchases = await this.prisma.purchaseOrder.findMany({
-      include: { supplier: true }
-    });
-    
-    // Filtre sur ceux qui ont un reste à payer
-    return purchases.filter(p => (p.totalAmount - p.amountPaid) > 0);
+    return this.prisma.purchaseOrder.findMany({
+      where: {
+        status: { not: 'CANCELLED' },
+      },
+      include: { supplier: true },
+    }).then(purchases => purchases.filter(p => (p.totalAmount - p.amountPaid) > 0));
   }
 }

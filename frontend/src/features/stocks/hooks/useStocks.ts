@@ -34,11 +34,13 @@ export const useStocks = () => {
       try {
         const [depRes, prodRes, catRes] = await Promise.all([
           getDepots(),
-          api.get('/api/products'),
+          api.get('/api/products', { params: { limit: 100 } }),
           api.get('/api/categories'),
         ]);
         setDepots(depRes);
-        setProducts(prodRes.data || []);
+        // Extraire .data du format paginé { data, meta }
+        const prodData = prodRes.data?.data || prodRes.data || [];
+        setProducts(prodData);
         setCategories(catRes.data || []);
       } catch (e: any) {
         toast.error(e.response?.data?.message || e.message || 'Erreur lors du chargement des références');

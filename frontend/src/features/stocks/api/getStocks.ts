@@ -1,9 +1,12 @@
 import api from '@/api/axios';
 
 export const getStocks = async (depotId?: string): Promise<any[]> => {
-  const params = depotId ? { depotId } : {};
+  const params: any = { limit: 100 };
+  if (depotId) params.depotId = depotId;
   const response = await api.get('/api/stock-levels', { params });
-  return response.data;
+  // Le backend retourne maintenant { data, meta }
+  const responseData = response.data;
+  return responseData.data || responseData;
 };
 
 export const getDepots = async (): Promise<any[]> => {

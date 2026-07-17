@@ -1,8 +1,9 @@
 import api from '@/api/axios';
 import { Customer, CustomerFormData } from '../schemas/customerSchema';
+import { PaginatedResponse } from '@/types';
 
-export const getCustomers = async (): Promise<Customer[]> => {
-  const response = await api.get('/api/customers');
+export const getCustomers = async (params?: { page?: number; limit?: number; search?: string }): Promise<PaginatedResponse<Customer>> => {
+  const response = await api.get('/api/customers', { params });
   return response.data;
 };
 

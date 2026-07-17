@@ -41,8 +41,22 @@ async function bootstrap() {
     create: { name: 'Général' },
   });
 
+  // Seed sequential counters
+  await prisma.counter.upsert({
+    where: { id: 'INVOICE' },
+    update: {},
+    create: { id: 'INVOICE', prefix: 'INV', lastValue: 0 },
+  });
+
+  await prisma.counter.upsert({
+    where: { id: 'PURCHASE_ORDER' },
+    update: {},
+    create: { id: 'PURCHASE_ORDER', prefix: 'PO', lastValue: 0 },
+  });
+
   console.log('✅ Seed successful: admin@erp.com / admin123');
   console.log('   Depot:', depot.name, '| Category:', category.name);
+  console.log('   Counters: INVOICE, PURCHASE_ORDER initialized');
   await app.close();
 }
 
