@@ -42,6 +42,18 @@ model User {
   transfersReceived   StockTransfer[] @relation("ReceivedBy")
   createdAt          DateTime        @default(now())
   updatedAt          DateTime        @updatedAt
+  auditLogs          AuditLog[]
+}
+
+model AuditLog {
+  id        String   @id @default(uuid())
+  action    String   // ex: CREATE, UPDATE, DELETE
+  entity    String   // ex: INVOICE, PRODUCT, STOCK_LEVEL
+  entityId  String
+  details   String?  // JSON stringified details of the change
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  createdAt DateTime @default(now())
 }
 
 // ==========================================
@@ -194,6 +206,7 @@ model PurchaseOrder {
 model PurchaseOrderLine {
   id              String        @id @default(uuid())
   quantity        Float
+  quantityReceived Float        @default(0)
   unitPrice       Float         // Prix d'achat unitaire (Ariary)
   purchaseOrderId String
   purchaseOrder   PurchaseOrder @relation(fields: [purchaseOrderId], references: [id], onDelete: Cascade)

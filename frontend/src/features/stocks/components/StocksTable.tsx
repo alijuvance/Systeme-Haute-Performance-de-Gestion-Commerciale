@@ -10,8 +10,9 @@ import { Card } from '@/components/shared/Card';
 import { Badge } from '@/components/shared/Badge';
 import SearchSelect from '@/components/shared/SearchSelect';
 import { formatDate } from '@/utils/formatters';
-import { Search, Plus, Warehouse, AlertCircle } from 'lucide-react';
+import { Search, Plus, Warehouse, AlertCircle, Download } from 'lucide-react';
 import { StockLevel, Depot, Product, Category } from '@/types';
+import { exportToExcel } from '@/utils/exportToExcel';
 
 export function StocksTable() {
   const {
@@ -128,6 +129,20 @@ export function StocksTable() {
     },
   ];
 
+  const handleExport = () => {
+    const dataToExport = data.map(s => ({
+      'Produit': s.product?.name || '—',
+      'SKU': s.product?.sku || '—',
+      'Catégorie': s.product?.category?.name || '—',
+      'Dépôt': s.depot?.name || '—',
+      'Quantité': s.quantity,
+      'Seuil Alerte': s.minAlertQuantity || 0,
+      'Statut': s.quantity <= (s.minAlertQuantity || 0) && (s.minAlertQuantity || 0) > 0 ? 'Stock bas' : 'Normal',
+      'Dernier Ajout': formatDate(s.lastAddedAt)
+    }));
+    exportToExcel(dataToExport, `Stocks_${new Date().toISOString().split('T')[0]}`);
+  };
+
   if (error) {
     return (
       <div className="p-4 bg-red-50 text-red-600 rounded-xl flex items-center gap-2 mb-4 text-sm">
@@ -142,9 +157,14 @@ export function StocksTable() {
         title="Catalogue & Stock" 
         description="Gérez vos stocks par dépôt. Recherchez, filtrez et ajoutez des produits." 
         actions={
-          <Button onClick={() => setIsModalOpen(true)} icon={<Plus className="w-4 h-4" />}>
-            Ajouter au stock
-          </Button>
+          <div className="flex gap-2">
+            <Button variant="outline" onClick={handleExport} icon={<Download className="w-4 h-4" />}>
+              Exporter
+            </Button>
+            <Button onClick={() => setIsModalOpen(true)} icon={<Plus className="w-4 h-4" />}>
+              Ajouter au stock
+            </Button>
+          </div>
         }
       />
 

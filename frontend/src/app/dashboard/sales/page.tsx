@@ -7,7 +7,9 @@ import { Button } from '@/components/shared/Button';
 import { Card } from '@/components/shared/Card';
 import { Input } from '@/components/shared/Input';
 import { Select } from '@/components/shared/Select';
-import { Plus, ShoppingCart, Search } from 'lucide-react';
+import { Plus, ShoppingCart, Search, Download } from 'lucide-react';
+import { exportToExcel } from '@/utils/exportToExcel';
+import { formatCurrency, formatDate } from '@/utils/formatters';
 
 export default function SalesPage() {
   const { 
@@ -18,6 +20,20 @@ export default function SalesPage() {
     statusFilter, setStatusFilter
   } = useSales();
 
+  const handleExport = () => {
+    const dataToExport = sales.map(s => ({
+      'Facture N°': s.invoiceNumber || s.reference,
+      'Date': formatDate(s.date || s.createdAt),
+      'Type': s.type,
+      'Client': s.customer?.companyName || s.customer?.fullName || 'Client Divers',
+      'Total TTC (MGA)': s.totalAmount,
+      'Payé (MGA)': s.amountPaid,
+      'Reste (MGA)': s.totalAmount - (s.amountPaid || 0),
+      'Statut': s.status
+    }));
+    exportToExcel(dataToExport, `Ventes_${new Date().toISOString().split('T')[0]}`);
+  };
+
   return (
     <>
       <PageHeader
@@ -25,6 +41,9 @@ export default function SalesPage() {
         description="Historique des ventes B2B et POS."
         actions={
           <>
+            <Button variant="outline" icon={<Download className="w-4 h-4" />} onClick={handleExport}>
+              Exporter
+            </Button>
             <Link href="/dashboard/pos">
               <Button variant="outline" icon={<ShoppingCart className="w-4 h-4" />}>Caisse POS</Button>
             </Link>

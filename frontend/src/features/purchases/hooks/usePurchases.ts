@@ -39,9 +39,9 @@ export const usePurchases = () => {
     }
   };
 
-  const receiveOrder = async (id: string, depotId: string) => {
+  const receiveOrder = async (id: string, payload: any) => {
     try {
-      await api.put(`/api/purchase-orders/${id}/receive`, { receivingDepotId: depotId });
+      await api.put(`/api/purchase-orders/${id}/receive`, payload);
       await fetchData();
       return true;
     } catch (err: any) {

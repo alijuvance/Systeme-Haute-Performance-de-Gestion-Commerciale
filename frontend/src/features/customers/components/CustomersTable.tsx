@@ -6,9 +6,10 @@ import { DataTable, ColumnDef } from '@/components/shared/DataTable';
 import { PageHeader } from '@/components/shared/PageHeader';
 import { Button } from '@/components/shared/Button';
 import { Badge } from '@/components/shared/Badge';
-import { Plus, Pencil, Trash } from 'lucide-react';
+import { Plus, Pencil, Trash, Download } from 'lucide-react';
 import { CustomerFormModal } from './CustomerFormModal';
 import { useToast } from '@/components/providers/ToastProvider';
+import { exportToExcel } from '@/utils/exportToExcel';
 
 export function CustomersTable() {
   const { customers, isLoading, error, fetchCustomers, removeCustomer } = useCustomers();
@@ -74,15 +75,33 @@ export function CustomersTable() {
     return <div className="p-4 bg-red-50 text-red-600 rounded-xl text-sm mb-4">{error}</div>;
   }
 
+  const handleExport = () => {
+    const dataToExport = customers.map(c => ({
+      'Nom Complet': c.fullName,
+      'Raison Sociale': c.companyName || '—',
+      'Téléphone': c.phone,
+      'Email': c.email || '—',
+      'Type': c.type,
+      'Limite de Crédit (MGA)': c.creditLimit,
+      'Dette Actuelle (MGA)': c.currentDebt
+    }));
+    exportToExcel(dataToExport, `Clients_${new Date().toISOString().split('T')[0]}`);
+  };
+
   return (
     <>
       <PageHeader 
         title="Clients B2B" 
         description="Gérez votre portefeuille de clients professionnels."
         actions={
-          <Button onClick={handleOpenCreate} icon={<Plus className="w-4 h-4" />}>
-            Nouveau Client
-          </Button>
+          <div className="flex gap-2">
+            <Button variant="outline" onClick={handleExport} icon={<Download className="w-4 h-4" />}>
+              Exporter
+            </Button>
+            <Button onClick={handleOpenCreate} icon={<Plus className="w-4 h-4" />}>
+              Nouveau Client
+            </Button>
+          </div>
         }
       />
       
