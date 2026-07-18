@@ -45,25 +45,58 @@ export class PurchaseOrdersService {
     });
 
     if (!order) throw new NotFoundException('Commande introuvable');
-    if (order.status === 'RECEIVED') throw new ConflictException('Commande déjà réceptionnée');
+    if (order.status === 'RECEIVED') throw new ConflictException('Commande déjà réceptionnée complètement');
+
+    let allReceived = true;
+
+    // Process each line in the DTO
+    for (const receiptLine of dto.lines) {
+      const orderLine = order.lines.find(l => l.productId === receiptLine.productId);
+      if (!orderLine) continue;
+
+      // Ensure we don't receive more than ordered (or allow it, but cap for status calculation)
+      const newReceivedQty = orderLine.quantityReceived + receiptLine.quantityReceived;
+
+      await this.prisma.purchaseOrderLine.update({
+        where: { id: orderLine.id },
+        data: { quantityReceived: newReceivedQty }
+      });
+
+      if (receiptLine.quantityReceived > 0) {
+        // Increment stock
+        await this.stockMovementsService.registerMovement({
+          type: MovementType.IN,
+          reference: `RECEPTION-${order.orderNumber}`,
+          quantityChanged: receiptLine.quantityReceived,
+          productId: receiptLine.productId,
+          depotId: dto.receivingDepotId
+        }, userId);
+      }
+
+      if (newReceivedQty < orderLine.quantity) {
+        allReceived = false;
+      }
+    }
+
+    // Double check if any other line is not fully received
+    for (const orderLine of order.lines) {
+      const receiptLine = dto.lines.find(l => l.productId === orderLine.productId);
+      const currentReceived = receiptLine ? (orderLine.quantityReceived + receiptLine.quantityReceived) : orderLine.quantityReceived;
+      if (currentReceived < orderLine.quantity) {
+        allReceived = false;
+      }
+    }
+
+    const newStatus = allReceived ? 'RECEIVED' : 'PARTIAL_RECEIPT';
 
     const updatedOrder = await this.prisma.purchaseOrder.update({
       where: { id },
       data: {
-        status: 'RECEIVED',
+        status: newStatus,
         receivingDepotId: dto.receivingDepotId
-      }
+      },
+      include: { lines: true, supplier: true, receivingDepot: true }
     });
-
-    for (const line of order.lines) {
-      await this.stockMovementsService.registerMovement({
-        type: MovementType.IN,
-        reference: `RECEPTION-${order.orderNumber}`,
-        quantityChanged: line.quantity,
-        productId: line.productId,
-        depotId: dto.receivingDepotId
-      }, userId);
-    }
 
     return updatedOrder;
   }

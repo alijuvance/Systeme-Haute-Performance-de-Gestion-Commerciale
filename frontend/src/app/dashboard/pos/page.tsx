@@ -5,6 +5,7 @@ import { ProductCatalog } from '@/features/pos/components/ProductCatalog';
 import { CartSidebar } from '@/features/pos/components/CartSidebar';
 import { useCart } from '@/features/pos/hooks/useCart';
 import { checkoutSale } from '@/features/pos/api/posApi';
+import { useBarcodeScanner } from '@/hooks/useBarcodeScanner';
 import { Product, Depot } from '@/features/pos/types';
 import { generateInvoicePdf } from '@/utils/pdfGenerator';
 
@@ -24,7 +25,10 @@ export default function POSPage() {
         fetch('/api/products', { headers }),
         fetch('/api/depots', { headers })
       ]);
-      if (prodRes.ok) setProducts(await prodRes.json());
+      if (prodRes.ok) {
+        const p = await prodRes.json();
+        setProducts(p.data || p); // handle pagination wrapper
+      }
       if (depRes.ok) {
         const d = await depRes.json();
         setDepots(d);
@@ -33,6 +37,16 @@ export default function POSPage() {
     };
     fetchInit();
   }, []);
+
+  useBarcodeScanner((barcode) => {
+    const product = products.find(p => p.barcode === barcode);
+    if (product) {
+      addToCart(product);
+      toast.success(`${product.name} ajouté via scan`);
+    } else {
+      toast.error(`Produit avec code-barre ${barcode} introuvable.`);
+    }
+  });
 
   const handleCheckout = async () => {
     if (cart.length === 0) { toast.warning('Le panier est vide'); return; }

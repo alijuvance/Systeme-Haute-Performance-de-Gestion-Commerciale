@@ -1,10 +1,11 @@
 import { Module } from '@nestjs/common';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { ThrottlerModule, ThrottlerGuard } from '@nestjs/throttler';
-import { APP_GUARD } from '@nestjs/core';
+import { APP_GUARD, APP_INTERCEPTOR } from '@nestjs/core';
 import { join } from 'path';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
+import { AuditInterceptor } from './core/interceptors/audit.interceptor';
 import { PrismaModule } from './core/prisma/prisma.module';
 import { CounterModule } from './core/counter/counter.module';
 import { AuthModule } from './modules/auth/auth.module';
@@ -25,6 +26,7 @@ import { NotificationsModule } from './modules/notifications/notifications.modul
 import { PaymentsModule } from './modules/payments/payments.module';
 import { CreditNotesModule } from './modules/credit-notes/credit-notes.module';
 import { EventEmitterModule } from '@nestjs/event-emitter';
+import { AuditLogsModule } from './modules/audit-logs/audit-logs.module';
 
 @Module({
   imports: [
@@ -38,7 +40,7 @@ import { EventEmitterModule } from '@nestjs/event-emitter';
       limit: 60,
     }]),
     EventEmitterModule.forRoot(),
-    PrismaModule, CounterModule, AuthModule, CategoriesModule, ProductsModule, UsersModule, RolesModule, DepotsModule, StockLevelsModule, StockMovementsModule, StockTransfersModule, SuppliersModule, PurchaseOrdersModule, CustomersModule, SalesModule, AnalyticsModule, NotificationsModule, PaymentsModule, CreditNotesModule
+    PrismaModule, CounterModule, AuthModule, CategoriesModule, ProductsModule, UsersModule, RolesModule, DepotsModule, StockLevelsModule, StockMovementsModule, StockTransfersModule, SuppliersModule, PurchaseOrdersModule, CustomersModule, SalesModule, AnalyticsModule, NotificationsModule, PaymentsModule, CreditNotesModule, AuditLogsModule
   ],
   controllers: [AppController],
   providers: [
@@ -47,6 +49,11 @@ import { EventEmitterModule } from '@nestjs/event-emitter';
     {
       provide: APP_GUARD,
       useClass: ThrottlerGuard,
+    },
+    // Intercepteur d'audit global
+    {
+      provide: APP_INTERCEPTOR,
+      useClass: AuditInterceptor,
     },
   ],
 })
