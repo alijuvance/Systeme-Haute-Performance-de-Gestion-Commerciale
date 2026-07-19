@@ -4,6 +4,7 @@ import { useState } from "react";
 import { usePathname } from "next/navigation";
 import { Sidebar } from "@/components/layout/Sidebar";
 import { Header } from "@/components/layout/Header";
+import { CommandPalette } from "@/components/shared/CommandPalette";
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   const [sidebarOpen, setSidebarOpen] = useState(true);
@@ -17,8 +18,11 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       case "/dashboard/purchases": return "Achats (Commandes)";
       case "/dashboard/suppliers": return "Fournisseurs";
       case "/dashboard/sales": return "Ventes & Factures";
+      case "/dashboard/customers": return "Clients B2B";
+      case "/dashboard/stocks": return "Gestion des Stocks";
       case "/dashboard/users": return "Utilisateurs";
       case "/dashboard/settings": return "Paramètres";
+      case "/dashboard/pos": return "Caisse POS";
       default: return "ERP System";
     }
   };
@@ -34,6 +38,9 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           {children}
         </main>
       </div>
+
+      {/* Global Command Palette */}
+      <CommandPalette />
     </div>
   );
 }

@@ -1,10 +1,15 @@
 import { useState, useEffect } from 'react';
-import { getKpis, getSalesChart } from '../api/getDashboardData';
+import { getKpis, getSalesChart, getRecentActivity, getLowStockAlerts, getTopProducts, getSalesByCategory, getDailySummary } from '../api/getDashboardData';
 import { AnalyticsKpis } from '@/types';
 
 export const useDashboard = () => {
   const [kpis, setKpis] = useState<AnalyticsKpis | null>(null);
   const [chartData, setChartData] = useState<any[]>([]);
+  const [recentActivity, setRecentActivity] = useState<any[]>([]);
+  const [lowStockAlerts, setLowStockAlerts] = useState<any[]>([]);
+  const [topProducts, setTopProducts] = useState<any[]>([]);
+  const [salesByCategory, setSalesByCategory] = useState<any[]>([]);
+  const [dailySummary, setDailySummary] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -25,12 +30,23 @@ export const useDashboard = () => {
           filters.endDate = endDate;
         }
 
-        const [kpiData, chart] = await Promise.all([
+        const [kpiData, chart, activity, alerts, topProds, catData, daily] = await Promise.all([
           getKpis(filters),
-          getSalesChart(filters)
+          getSalesChart(filters),
+          getRecentActivity().catch(() => []),
+          getLowStockAlerts().catch(() => []),
+          getTopProducts().catch(() => []),
+          getSalesByCategory(filters).catch(() => []),
+          getDailySummary().catch(() => null),
         ]);
+        
         setKpis(kpiData);
         setChartData(chart);
+        setRecentActivity(activity);
+        setLowStockAlerts(alerts);
+        setTopProducts(topProds);
+        setSalesByCategory(catData);
+        setDailySummary(daily);
       } catch (err: any) {
         setError(err.message || 'Une erreur est survenue lors du chargement des données.');
       } finally {
@@ -42,15 +58,10 @@ export const useDashboard = () => {
   }, [period, startDate, endDate]);
 
   return { 
-    kpis, 
-    chartData, 
-    isLoading, 
-    error,
-    period,
-    setPeriod,
-    startDate,
-    setStartDate,
-    endDate,
-    setEndDate
+    kpis, chartData, recentActivity, lowStockAlerts, topProducts, salesByCategory, dailySummary,
+    isLoading, error,
+    period, setPeriod,
+    startDate, setStartDate,
+    endDate, setEndDate
   };
 };

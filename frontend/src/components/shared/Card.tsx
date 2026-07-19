@@ -4,8 +4,6 @@ interface CardProps {
   children: React.ReactNode;
   variant?: 'default' | 'elevated' | 'bordered';
   padding?: 'none' | 'sm' | 'md' | 'lg';
-  title?: string;
-  description?: string;
   className?: string;
 }
 
@@ -22,15 +20,9 @@ const paddingStyles = {
   lg: 'p-6',
 };
 
-export function Card({ children, variant = 'default', padding = 'md', title, description, className = '' }: CardProps) {
+export function Card({ children, variant = 'default', padding = 'md', className = '' }: CardProps) {
   return (
     <div className={`${variantStyles[variant]} ${paddingStyles[padding]} ${className}`}>
-      {(title || description) && (
-        <CardHeader className={padding === 'none' ? 'p-4 pb-0 mb-0 border-none' : ''}>
-          {title && <CardTitle>{title}</CardTitle>}
-          {description && <CardDescription>{description}</CardDescription>}
-        </CardHeader>
-      )}
       {children}
     </div>
   );
