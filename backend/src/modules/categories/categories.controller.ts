@@ -7,7 +7,7 @@ import { UpdateCategoryDto } from './dto/update-category.dto';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 
 @UseGuards(JwtAuthGuard, RolesGuard)
-@Roles(...['ADMIN', 'MANAGER'])
+@Roles(...['ADMIN', 'MANAGER', 'CASHIER', 'SALES', 'INVENTORY'])
 @Controller('categories')
 export class CategoriesController {
   constructor(private readonly categoriesService: CategoriesService) {}

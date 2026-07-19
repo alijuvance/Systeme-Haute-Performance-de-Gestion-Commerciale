@@ -15,6 +15,23 @@ async function bootstrap() {
     create: { name: 'ADMIN', permissions: 'ALL' },
   });
 
+  await prisma.role.upsert({
+    where: { name: 'MANAGER' },
+    update: {},
+    create: { name: 'MANAGER', permissions: 'ALL' },
+  });
+
+  await prisma.role.upsert({
+    where: { name: 'CASHIER' },
+    update: {},
+    create: { name: 'CASHIER', permissions: 'SALES_ONLY' },
+  });
+
+  await prisma.role.upsert({
+    where: { name: 'INVENTORY' },
+    update: {},
+    create: { name: 'INVENTORY', permissions: 'INVENTORY_ONLY' },
+  });
   const passwordHash = await bcrypt.hash('admin123', 10);
   
   const user = await prisma.user.upsert({

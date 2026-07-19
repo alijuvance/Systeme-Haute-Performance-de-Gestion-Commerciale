@@ -8,7 +8,7 @@ import { PaginationQueryDto } from '../../common/dto/pagination-query.dto';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 
 @UseGuards(JwtAuthGuard, RolesGuard)
-@Roles(...['ADMIN', 'MANAGER'])
+@Roles(...['ADMIN', 'MANAGER', 'CASHIER', 'SALES', 'INVENTORY'])
 @Controller('products')
 export class ProductsController {
   constructor(private readonly productsService: ProductsService) {}
