@@ -43,7 +43,7 @@ export function ProductsTable() {
   const columns: ColumnDef<Product>[] = [
     { key: 'ref', header: 'Référence', cell: (p) => <span className="font-medium text-gray-900">{p.sku}</span> },
     { key: 'name', header: 'Nom du produit', cell: (p) => <span className="text-gray-900">{p.name}</span> },
-    { key: 'category', header: 'Catégorie', cell: (p) => <Badge variant="default">{p.categoryId || 'N/A'}</Badge> },
+    { key: 'category', header: 'Catégorie', cell: (p) => <Badge variant="default">{p.category?.name || 'N/A'}</Badge> },
     { key: 'price', header: 'Prix de vente', align: 'right', cell: (p) => <span className="tabular-nums font-medium text-gray-900">{`${p.defaultPrice.toLocaleString()} Ar`}</span> },
     { key: 'cost', header: "Coût d'achat", align: 'right', cell: (p) => <span className="tabular-nums text-gray-500">{`${p.costPrice.toLocaleString()} Ar`}</span> },
     { 

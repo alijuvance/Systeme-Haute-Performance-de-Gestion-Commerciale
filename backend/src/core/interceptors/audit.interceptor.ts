@@ -22,11 +22,15 @@ export class AuditInterceptor implements NestInterceptor {
             if (url.includes('purchase-orders')) entity = 'PURCHASE_ORDER';
             else if (url.includes('sales') || url.includes('invoices')) entity = 'INVOICE';
             else if (url.includes('products')) entity = 'PRODUCT';
+            else if (url.includes('categories')) entity = 'CATEGORY';
             else if (url.includes('customers')) entity = 'CUSTOMER';
+            else if (url.includes('suppliers')) entity = 'SUPPLIER';
             else if (url.includes('stock-movements') || url.includes('stock-levels')) entity = 'STOCK';
+            else if (url.includes('depots')) entity = 'DEPOT';
             else if (url.includes('auth')) entity = 'AUTH';
             else if (url.includes('credit-notes')) entity = 'CREDIT_NOTE';
             else if (url.includes('payments')) entity = 'PAYMENT';
+            else if (url.includes('settings')) entity = 'SETTINGS';
 
             const action = method === 'POST' ? 'CREATE' : method === 'DELETE' ? 'DELETE' : 'UPDATE';
 
