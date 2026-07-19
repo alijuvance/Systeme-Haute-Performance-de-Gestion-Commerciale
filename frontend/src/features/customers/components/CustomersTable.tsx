@@ -1,16 +1,14 @@
 'use client';
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { useCustomers } from '../hooks/useCustomers';
 import { Customer } from '../schemas/customerSchema';
 import { DataTable, ColumnDef } from '@/components/shared/DataTable';
 import { PageHeader } from '@/components/shared/PageHeader';
 import { Button } from '@/components/shared/Button';
 import { Badge } from '@/components/shared/Badge';
-import { Card } from '@/components/shared/Card';
-import { Input } from '@/components/shared/Input';
-import { SummaryCard } from '@/components/shared/SummaryCard';
+import { StatCard } from '@/components/shared/StatCard';
 import Drawer from '@/components/shared/Drawer';
-import { Plus, Pencil, Trash, Download, Search, Users, CreditCard, Eye, Building2, User } from 'lucide-react';
+import { Plus, Pencil, Trash, Download, Users, DollarSign, CreditCard, Eye, Phone, Mail, MapPin } from 'lucide-react';
 import { CustomerFormModal } from './CustomerFormModal';
 import { useToast } from '@/components/providers/ToastProvider';
 import { exportToExcel } from '@/utils/exportToExcel';
@@ -20,8 +18,7 @@ export function CustomersTable() {
   const { customers, isLoading, error, fetchCustomers, removeCustomer } = useCustomers();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingCustomer, setEditingCustomer] = useState<Customer | undefined>(undefined);
-  const [selectedCustomer, setSelectedCustomer] = useState<Customer | null>(null);
-  const [searchTerm, setSearchTerm] = useState('');
+  const [viewingCustomer, setViewingCustomer] = useState<Customer | null>(null);
   const toast = useToast();
 
   const handleOpenCreate = () => {
@@ -47,39 +44,35 @@ export function CustomersTable() {
     }
   };
 
-  // Client-side filter
-  const filteredCustomers = customers.filter(c =>
-    (c.fullName || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
-    (c.companyName || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
-    (c.phone || '').includes(searchTerm)
-  );
-
-  const totalDebt = customers.reduce((sum, c) => sum + ((c as any).currentDebt || 0), 0);
-  const b2bCount = customers.filter(c => c.type === 'B2B').length;
-
   const columns: ColumnDef<Customer>[] = [
     { 
       key: 'name', 
-      header: 'Client', 
-      cell: (c) => (
-        <div className="flex items-center gap-3">
-          <div className={`w-9 h-9 rounded-full flex items-center justify-center text-sm font-medium ${
-            c.type === 'B2B' ? 'bg-indigo-50 text-indigo-600' : 'bg-emerald-50 text-emerald-600'
-          }`}>
-            {c.type === 'B2B' ? <Building2 className="w-4 h-4" /> : <User className="w-4 h-4" />}
-          </div>
-          <div>
-            <span className="font-medium text-gray-900 block">{c.fullName}</span>
-            {c.companyName && <span className="text-xs text-gray-500">{c.companyName}</span>}
-          </div>
-        </div>
-      )
+      header: 'Nom complet', 
+      sortable: true,
+      sortFn: (a, b) => a.fullName.localeCompare(b.fullName),
+      cell: (c) => <span className="font-medium text-gray-900">{c.fullName}</span> 
     },
-    { key: 'phone', header: 'Téléphone', cell: (c) => <span className="text-gray-600">{c.phone || '—'}</span> },
-    { key: 'email', header: 'Email', cell: (c) => <span className="text-gray-600">{c.email || '—'}</span> },
+    { 
+      key: 'company', 
+      header: 'Raison sociale', 
+      sortable: true,
+      sortFn: (a, b) => (a.companyName || '').localeCompare(b.companyName || ''),
+      cell: (c) => <span className="text-gray-600">{c.companyName || '—'}</span> 
+    },
+    { key: 'phone', header: 'Téléphone', cell: (c) => <span className="text-gray-600">{c.phone}</span> },
+    { 
+      key: 'debt', 
+      header: 'Dette (MGA)', 
+      align: 'right',
+      sortable: true,
+      sortFn: (a, b) => (a.currentDebt || 0) - (b.currentDebt || 0),
+      cell: (c) => <span className={`font-medium ${c.currentDebt && c.currentDebt > 0 ? 'text-amber-600' : 'text-gray-600'}`}>{formatCurrency(c.currentDebt)}</span> 
+    },
     { 
       key: 'type', 
       header: 'Type', 
+      sortable: true,
+      sortFn: (a, b) => a.type.localeCompare(b.type),
       cell: (c) => (
         <Badge variant={c.type === 'B2B' ? 'info' : 'success'}>
           {c.type}
@@ -87,41 +80,24 @@ export function CustomersTable() {
       ) 
     },
     { 
-      key: 'debt', 
-      header: 'Encours', 
-      align: 'right',
-      cell: (c) => {
-        const debt = (c as any).currentDebt || 0;
-        return (
-          <span className={`tabular-nums font-medium ${debt > 0 ? 'text-rose-600' : 'text-gray-400'}`}>
-            {formatCurrency(debt)}
-          </span>
-        );
-      }
-    },
-    { 
       key: 'actions', 
       header: '', 
       align: 'right',
       cell: (c) => (
         <div className="flex items-center justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
-          <button onClick={(e) => { e.stopPropagation(); setSelectedCustomer(c); }} className="p-1.5 text-gray-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-lg transition-all">
+          <button onClick={() => setViewingCustomer(c)} className="p-1.5 text-gray-400 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-all" title="Aperçu rapide">
             <Eye className="w-4 h-4" />
           </button>
-          <button onClick={(e) => { e.stopPropagation(); handleOpenEdit(c); }} className="p-1.5 text-gray-400 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-all">
+          <button onClick={() => handleOpenEdit(c)} className="p-1.5 text-gray-400 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-all" title="Modifier">
             <Pencil className="w-4 h-4" />
           </button>
-          <button onClick={(e) => { e.stopPropagation(); handleDelete(c.id); }} className="p-1.5 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-all">
+          <button onClick={() => handleDelete(c.id)} className="p-1.5 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-all" title="Supprimer">
             <Trash className="w-4 h-4" />
           </button>
         </div>
       )
     }
   ];
-
-  if (error) {
-    return <div className="p-4 bg-red-50 text-red-600 rounded-xl text-sm mb-4">{error}</div>;
-  }
 
   const handleExport = () => {
     const dataToExport = customers.map(c => ({
@@ -130,16 +106,38 @@ export function CustomersTable() {
       'Téléphone': c.phone,
       'Email': c.email || '—',
       'Type': c.type,
-      'Encours (MGA)': (c as any).currentDebt || 0
+      'Limite de Crédit (MGA)': c.creditLimit,
+      'Dette Actuelle (MGA)': c.currentDebt
     }));
     exportToExcel(dataToExport, `Clients_${new Date().toISOString().split('T')[0]}`);
   };
 
+  const summary = useMemo(() => {
+    const totalCustomers = customers.length;
+    let totalDebt = 0;
+    let totalCreditLimit = 0;
+    let b2bCount = 0;
+
+    customers.forEach(c => {
+      totalDebt += c.currentDebt || 0;
+      totalCreditLimit += c.creditLimit || 0;
+      if (c.type === 'B2B') b2bCount++;
+    });
+
+    const avgCredit = totalCustomers > 0 ? totalCreditLimit / totalCustomers : 0;
+
+    return { totalCustomers, totalDebt, avgCredit, b2bCount };
+  }, [customers]);
+
+  if (error) {
+    return <div className="p-4 bg-red-50 text-red-600 rounded-xl text-sm mb-4">{error}</div>;
+  }
+
   return (
     <>
       <PageHeader 
-        title="Portefeuille Clients" 
-        description="Gérez vos relations clients B2B et B2C."
+        title="Clients B2B" 
+        description="Gérez votre portefeuille de clients professionnels."
         actions={
           <div className="flex gap-2">
             <Button variant="outline" onClick={handleExport} icon={<Download className="w-4 h-4" />}>
@@ -151,107 +149,94 @@ export function CustomersTable() {
           </div>
         }
       />
-
-      {/* Summary Widgets */}
+      
+      {/* Summary Cards */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-        <SummaryCard
+        <StatCard
           title="Total Clients"
-          value={customers.length}
-          icon={<Users className="h-5 w-5" />}
-          trend={{ value: 0, isPositive: true, label: 'comptes actifs' }}
+          value={summary.totalCustomers.toString()}
+          icon={<Users className="h-4 w-4 text-gray-600" />}
+          subtitle={`${summary.b2bCount} clients professionnels (B2B)`}
         />
-        <SummaryCard
-          title="Clients B2B"
-          value={b2bCount}
-          icon={<Building2 className="h-5 w-5 text-indigo-500" />}
-          trend={{ value: customers.length > 0 ? Math.round((b2bCount / customers.length) * 100) : 0, isPositive: true, label: 'du portefeuille' }}
+        <StatCard
+          title="Dette Totale"
+          value={formatCurrency(summary.totalDebt)}
+          icon={<DollarSign className="h-4 w-4 text-amber-600" />}
+          iconBg="bg-amber-50"
+          accentColor="#d97706"
         />
-        <SummaryCard
-          title="Créances Totales"
-          value={formatCurrency(totalDebt)}
-          icon={<CreditCard className="h-5 w-5 text-rose-500" />}
-          trend={{ value: totalDebt > 0 ? totalDebt : 0, isPositive: false, label: 'à recouvrer' }}
+        <StatCard
+          title="Limite de Crédit Moyenne"
+          value={formatCurrency(summary.avgCredit)}
+          icon={<CreditCard className="h-4 w-4 text-blue-600" />}
+          iconBg="bg-blue-50"
+          accentColor="#2563eb"
         />
       </div>
 
-      {/* Search */}
-      <Card padding="md" className="mb-6">
-        <Input
-          label="Rechercher un client"
-          type="text"
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-          placeholder="Nom, entreprise, téléphone..."
-          icon={<Search className="w-4 h-4" />}
-        />
-      </Card>
-      
       <DataTable 
-        data={filteredCustomers} 
+        data={customers} 
         columns={columns} 
         keyExtractor={(c) => c.id} 
         isLoading={isLoading}
+        emptyMessage="Aucun client enregistré"
+        emptyIcon={<Users className="w-6 h-6 text-gray-300" />}
+        emptyActionLabel="Ajouter un client"
+        onEmptyAction={handleOpenCreate}
       />
 
-      {/* Customer Profile Drawer */}
+      {/* Customer Quick View Drawer */}
       <Drawer
-        isOpen={!!selectedCustomer}
-        onClose={() => setSelectedCustomer(null)}
-        title="Profil Client"
-        description={selectedCustomer?.fullName || ''}
-        width="xl"
+        isOpen={!!viewingCustomer}
+        onClose={() => setViewingCustomer(null)}
+        title={viewingCustomer?.companyName || viewingCustomer?.fullName || 'Détails du client'}
+        description={`Client ${viewingCustomer?.type === 'B2B' ? 'Professionnel' : 'Particulier'}`}
       >
-        {selectedCustomer && (
+        {viewingCustomer && (
           <div className="space-y-6">
-            {/* Avatar + Name */}
-            <div className="flex items-center gap-4">
-              <div className={`w-16 h-16 rounded-2xl flex items-center justify-center text-xl font-bold ${
-                selectedCustomer.type === 'B2B' ? 'bg-indigo-100 text-indigo-600' : 'bg-emerald-100 text-emerald-600'
-              }`}>
-                {selectedCustomer.fullName?.charAt(0) || '?'}
-              </div>
-              <div>
-                <h3 className="text-xl font-bold text-gray-900">{selectedCustomer.fullName}</h3>
-                {selectedCustomer.companyName && (
-                  <p className="text-sm text-gray-500">{selectedCustomer.companyName}</p>
-                )}
-                <Badge variant={selectedCustomer.type === 'B2B' ? 'info' : 'success'} className="mt-1">
-                  {selectedCustomer.type}
-                </Badge>
+            <div className="bg-gray-50 rounded-xl p-5 border border-gray-100">
+              <h3 className="text-sm font-semibold text-gray-900 mb-4">Informations de contact</h3>
+              <div className="space-y-3">
+                <div className="flex items-center gap-3 text-sm text-gray-600">
+                  <Phone className="w-4 h-4 text-gray-400" />
+                  {viewingCustomer.phone || 'Non renseigné'}
+                </div>
+                <div className="flex items-center gap-3 text-sm text-gray-600">
+                  <Mail className="w-4 h-4 text-gray-400" />
+                  {viewingCustomer.email || 'Non renseigné'}
+                </div>
+                <div className="flex items-start gap-3 text-sm text-gray-600">
+                  <MapPin className="w-4 h-4 text-gray-400 mt-0.5" />
+                  {viewingCustomer.address || 'Non renseigné'}
+                </div>
               </div>
             </div>
 
-            {/* Info Cards */}
             <div className="grid grid-cols-2 gap-4">
-              <div className="bg-gray-50 p-4 rounded-xl border border-gray-100">
-                <p className="text-xs text-gray-500 mb-1">Téléphone</p>
-                <p className="font-medium text-gray-900">{selectedCustomer.phone || '—'}</p>
+              <div className="bg-white border border-gray-100 rounded-xl p-4">
+                <p className="text-xs text-gray-500 mb-1">Dette Actuelle</p>
+                <p className={`text-lg font-semibold ${viewingCustomer.currentDebt && viewingCustomer.currentDebt > 0 ? 'text-amber-600' : 'text-emerald-600'}`}>
+                  {formatCurrency(viewingCustomer.currentDebt)}
+                </p>
               </div>
-              <div className="bg-gray-50 p-4 rounded-xl border border-gray-100">
-                <p className="text-xs text-gray-500 mb-1">Email</p>
-                <p className="font-medium text-gray-900">{selectedCustomer.email || '—'}</p>
-              </div>
-              <div className="bg-gray-50 p-4 rounded-xl border border-gray-100">
-                <p className="text-xs text-gray-500 mb-1">Adresse</p>
-                <p className="font-medium text-gray-900">{selectedCustomer.address || '—'}</p>
-              </div>
-              <div className="bg-gray-50 p-4 rounded-xl border border-gray-100">
-                <p className="text-xs text-gray-500 mb-1">Encours</p>
-                <p className="font-bold text-rose-600 text-lg tabular-nums">
-                  {formatCurrency((selectedCustomer as any).currentDebt || 0)}
+              <div className="bg-white border border-gray-100 rounded-xl p-4">
+                <p className="text-xs text-gray-500 mb-1">Limite de Crédit</p>
+                <p className="text-lg font-semibold text-gray-900">
+                  {formatCurrency(viewingCustomer.creditLimit)}
                 </p>
               </div>
             </div>
 
-            {/* Actions */}
-            <div className="flex gap-3 pt-2">
-              <Button 
-                variant="outline" 
-                onClick={() => { setSelectedCustomer(null); handleOpenEdit(selectedCustomer); }} 
-                icon={<Pencil className="w-4 h-4" />}
-                className="flex-1"
-              >
-                Modifier
+            {viewingCustomer.type === 'B2B' && viewingCustomer.taxId && (
+              <div className="bg-white border border-gray-100 rounded-xl p-4">
+                <p className="text-xs text-gray-500 mb-1">Numéro d'Identification Fiscale (NIF/STAT)</p>
+                <p className="text-sm font-medium text-gray-900">{viewingCustomer.taxId}</p>
+              </div>
+            )}
+            
+            <div className="pt-4 border-t border-gray-100 flex gap-2">
+              <Button className="flex-1" onClick={() => { setViewingCustomer(null); handleOpenEdit(viewingCustomer); }}>
+                Modifier le profil
               </Button>
             </div>
           </div>

@@ -1,15 +1,17 @@
 'use client';
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { usePurchases } from '../hooks/usePurchases';
 import { DataTable, ColumnDef } from '@/components/shared/DataTable';
+import { PageHeader } from '@/components/shared/PageHeader';
 import { Purchase, Depot } from '@/types';
 import { Modal } from '@/components/shared/Modal';
 import { Input } from '@/components/shared/Input';
 import { Select } from '@/components/shared/Select';
 import { Button } from '@/components/shared/Button';
 import { Badge } from '@/components/shared/Badge';
+import { StatCard } from '@/components/shared/StatCard';
 import { formatCurrency, formatDate } from '@/utils/formatters';
-import { CheckCircle, Truck, DollarSign, PackageCheck, AlertCircle } from 'lucide-react';
+import { CheckCircle, Truck, DollarSign, PackageCheck, AlertCircle, FileText, ShoppingCart, Loader2 } from 'lucide-react';
 import { getDepots } from '@/features/stocks/api/getStocks';
 
 export function PurchasesTable() {
@@ -91,12 +93,44 @@ export function PurchasesTable() {
   };
 
   const columns: ColumnDef<Purchase>[] = [
-    { key: 'ref', header: 'Référence', cell: (p) => <span className="font-medium text-gray-900">{p.orderNumber || p.id.slice(0, 8)}</span> },
-    { key: 'date', header: 'Date', cell: (p) => <span className="text-gray-500">{formatDate(p.createdAt)}</span> },
-    { key: 'supplier', header: 'Fournisseur', cell: (p) => <span className="text-gray-900">{p.supplier?.name || '—'}</span> },
-    { key: 'total', header: 'Montant (MGA)', align: 'right', cell: (p) => <span className="tabular-nums font-medium text-gray-900">{formatCurrency(p.totalAmount)}</span> },
     { 
-      key: 'financial_status', header: 'Paiement',
+      key: 'ref', 
+      header: 'Référence', 
+      sortable: true,
+      sortFn: (a, b) => a.orderNumber.localeCompare(b.orderNumber),
+      cell: (p) => <span className="font-medium text-gray-900">{p.orderNumber || p.id.slice(0, 8)}</span> 
+    },
+    { 
+      key: 'date', 
+      header: 'Date', 
+      sortable: true,
+      sortFn: (a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime(),
+      cell: (p) => <span className="text-gray-500">{formatDate(p.createdAt)}</span> 
+    },
+    { 
+      key: 'supplier', 
+      header: 'Fournisseur', 
+      sortable: true,
+      sortFn: (a, b) => (a.supplier?.name || '').localeCompare(b.supplier?.name || ''),
+      cell: (p) => <span className="text-gray-900">{p.supplier?.name || '—'}</span> 
+    },
+    { 
+      key: 'total', 
+      header: 'Montant (MGA)', 
+      align: 'right', 
+      sortable: true,
+      sortFn: (a, b) => a.totalAmount - b.totalAmount,
+      cell: (p) => <span className="tabular-nums font-medium text-gray-900">{formatCurrency(p.totalAmount)}</span> 
+    },
+    { 
+      key: 'financial_status', 
+      header: 'Paiement',
+      sortable: true,
+      sortFn: (a, b) => {
+        const remainingA = a.totalAmount - (a.amountPaid || 0);
+        const remainingB = b.totalAmount - (b.amountPaid || 0);
+        return remainingA - remainingB;
+      },
       cell: (p) => {
         const remaining = p.totalAmount - (p.amountPaid || 0);
         if (remaining <= 0) return <Badge variant="success" icon={<CheckCircle className="w-3 h-3"/>}>Payé</Badge>;
@@ -105,7 +139,10 @@ export function PurchasesTable() {
       }
     },
     {
-      key: 'logistics_status', header: 'Logistique',
+      key: 'logistics_status', 
+      header: 'Logistique',
+      sortable: true,
+      sortFn: (a, b) => a.status.localeCompare(b.status),
       cell: (p) => {
         const variant = p.status === 'RECEIVED' ? 'success' : p.status === 'PARTIAL_RECEIPT' ? 'warning' : p.status === 'SENT' ? 'info' : 'default';
         const icon = p.status === 'RECEIVED' ? <PackageCheck className="w-3 h-3"/> : p.status === 'SENT' ? <Truck className="w-3 h-3"/> : undefined;
@@ -114,7 +151,9 @@ export function PurchasesTable() {
       }
     },
     {
-      key: 'actions', header: '', align: 'right',
+      key: 'actions', 
+      header: '', 
+      align: 'right',
       cell: (p) => (
         <div className="flex gap-2 justify-end opacity-0 group-hover:opacity-100 transition-opacity duration-200">
           {p.totalAmount - (p.amountPaid || 0) > 0 && p.status !== 'CANCELLED' && (
@@ -138,11 +177,77 @@ export function PurchasesTable() {
     }
   ];
 
+  const summary = useMemo(() => {
+    let pendingOrdersCount = 0;
+    let totalCommitment = 0;
+    let pendingLogisticsCount = 0;
+    let unpaidAmount = 0;
+
+    data.forEach(p => {
+      if (p.status !== 'CANCELLED') {
+        if (p.status !== 'RECEIVED') {
+          pendingOrdersCount++;
+          if (p.status !== 'DRAFT') {
+            pendingLogisticsCount++;
+          }
+        }
+        totalCommitment += p.totalAmount;
+        unpaidAmount += Math.max(0, p.totalAmount - (p.amountPaid || 0));
+      }
+    });
+
+    return { pendingOrdersCount, totalCommitment, pendingLogisticsCount, unpaidAmount };
+  }, [data]);
+
   if (error) return <div className="p-4 bg-red-50 text-red-600 rounded-xl mb-4 text-sm">{error}</div>;
 
   return (
     <>
-      <DataTable data={data} columns={columns} keyExtractor={(p) => p.id} isLoading={isLoading} emptyMessage="Aucune commande d'achat pour le moment." />
+      <PageHeader 
+        title="Achats & Fournisseurs" 
+        description="Gérez vos commandes d'achat, réceptions et paiements fournisseurs."
+      />
+
+      {/* Summary Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+        <StatCard
+          title="Commandes en cours"
+          value={summary.pendingOrdersCount.toString()}
+          icon={<ShoppingCart className="h-4 w-4 text-gray-600" />}
+          subtitle="Non annulées, non reçues"
+        />
+        <StatCard
+          title="Montant Total Engagé"
+          value={formatCurrency(summary.totalCommitment)}
+          icon={<DollarSign className="h-4 w-4 text-gray-600" />}
+          subtitle="Toutes commandes valides"
+        />
+        <StatCard
+          title="En attente de réception"
+          value={summary.pendingLogisticsCount.toString()}
+          icon={<Loader2 className="h-4 w-4 text-amber-600" />}
+          iconBg="bg-amber-50"
+          accentColor="#d97706"
+          subtitle="Commandes à réceptionner"
+        />
+        <StatCard
+          title="Dettes Fournisseurs"
+          value={formatCurrency(summary.unpaidAmount)}
+          icon={<AlertCircle className="h-4 w-4 text-red-600" />}
+          iconBg="bg-red-50"
+          accentColor="#dc2626"
+          subtitle="Reste à payer"
+        />
+      </div>
+
+      <DataTable 
+        data={data} 
+        columns={columns} 
+        keyExtractor={(p) => p.id} 
+        isLoading={isLoading} 
+        emptyMessage="Aucune commande d'achat pour le moment."
+        emptyIcon={<FileText className="w-6 h-6 text-gray-300" />}
+      />
 
       {/* Payment Modal */}
       <Modal isOpen={payModalOpen} onClose={() => setPayModalOpen(false)} title="Enregistrer un paiement">
