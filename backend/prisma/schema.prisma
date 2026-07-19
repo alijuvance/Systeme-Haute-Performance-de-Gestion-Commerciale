@@ -310,3 +310,17 @@ model Counter {
   updatedAt DateTime @updatedAt
 }
 
+// ==========================================
+// PARAMÈTRES DU SYSTÈME
+// ==========================================
+model SystemSettings {
+  id              String   @id @default(uuid())
+  companyName     String   @default("Mon Entreprise")
+  taxId           String?
+  address         String?
+  phone           String?
+  email           String?
+  defaultCurrency String   @default("MGA")
+  defaultVatRate  Float    @default(20.0)
+  updatedAt       DateTime @updatedAt
+}

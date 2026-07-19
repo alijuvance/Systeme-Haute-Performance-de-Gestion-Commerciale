@@ -32,7 +32,7 @@ async function bootstrap() {
   
   // Configuration des CORS — restreint au frontend uniquement
   app.enableCors({
-    origin: process.env.CORS_ORIGIN || 'http://localhost:3002',
+    origin: ['http://localhost:3000', 'http://localhost:3001', 'http://localhost:3002'],
     credentials: true,
   });
 
