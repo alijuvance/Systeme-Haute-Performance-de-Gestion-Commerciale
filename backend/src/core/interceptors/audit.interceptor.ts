@@ -38,7 +38,7 @@ export class AuditInterceptor implements NestInterceptor {
                 details: JSON.stringify(body),
                 userId: user.userId,
               },
-            }).catch(err => console.error('Failed to save audit log:', err));
+            }).catch((err: any) => console.error('Failed to save audit log:', err));
           }
         }),
       );
