@@ -40,8 +40,8 @@ export function NewPurchaseDrawer({ isOpen, onClose, onSuccess }: NewPurchaseDra
           api.get('/api/suppliers'),
           api.get('/api/products'),
         ]);
-        setSuppliers(suppRes.data || []);
-        setProducts(prodRes.data || []);
+        setSuppliers(suppRes.data?.data || suppRes.data || []);
+        setProducts(prodRes.data?.data || prodRes.data || []);
       } catch (e) {
         console.error('Erreur chargement refs:', e);
       }
