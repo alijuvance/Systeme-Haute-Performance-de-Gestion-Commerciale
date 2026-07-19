@@ -7,9 +7,12 @@ import { Button } from '@/components/shared/Button';
 import { Card } from '@/components/shared/Card';
 import { Input } from '@/components/shared/Input';
 import { Select } from '@/components/shared/Select';
-import { Plus, ShoppingCart, Search, Download } from 'lucide-react';
+import { StatCard } from '@/components/shared/StatCard';
+import { Progress } from '@/components/shared/Progress';
+import { Plus, ShoppingCart, Search, Download, FileText, DollarSign, AlertCircle, TrendingUp } from 'lucide-react';
 import { exportToExcel } from '@/utils/exportToExcel';
 import { formatCurrency, formatDate } from '@/utils/formatters';
+import { useMemo } from 'react';
 
 export default function SalesPage() {
   const { 
@@ -34,6 +37,26 @@ export default function SalesPage() {
     exportToExcel(dataToExport, `Ventes_${new Date().toISOString().split('T')[0]}`);
   };
 
+  // Calculate summary metrics
+  const summary = useMemo(() => {
+    let totalFactures = sales.length;
+    let montantTotal = 0;
+    let montantPaye = 0;
+    let facturesImpayees = 0;
+
+    sales.forEach(s => {
+      montantTotal += s.totalAmount || 0;
+      montantPaye += s.amountPaid || 0;
+      if (s.status === 'PENDING' || s.status === 'PARTIAL') {
+        facturesImpayees++;
+      }
+    });
+
+    const tauxRecouvrement = montantTotal > 0 ? (montantPaye / montantTotal) * 100 : 0;
+
+    return { totalFactures, montantTotal, montantPaye, facturesImpayees, tauxRecouvrement };
+  }, [sales]);
+
   return (
     <>
       <PageHeader
@@ -53,6 +76,43 @@ export default function SalesPage() {
           </>
         }
       />
+
+      {/* Summary Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4 mb-6">
+        <StatCard
+          title="Total Factures"
+          value={summary.totalFactures.toString()}
+          icon={<FileText className="h-4 w-4 text-gray-600" />}
+          subtitle="Factures filtrées"
+        />
+        <StatCard
+          title="Montant Total (TTC)"
+          value={formatCurrency(summary.montantTotal)}
+          icon={<DollarSign className="h-4 w-4 text-gray-600" />}
+        />
+        <Card padding="md" className="flex flex-col justify-between">
+          <div className="flex items-center justify-between mb-2">
+            <span className="text-[13px] font-medium text-gray-500">Taux de Recouvrement</span>
+            <div className="w-9 h-9 bg-emerald-50 rounded-lg flex items-center justify-center flex-shrink-0">
+              <TrendingUp className="h-4 w-4 text-emerald-600" />
+            </div>
+          </div>
+          <div className="flex-1">
+            <div className="text-2xl font-semibold text-gray-900 tabular-nums mb-3">
+              {summary.tauxRecouvrement.toFixed(1)}%
+            </div>
+            <Progress value={summary.tauxRecouvrement} variant="success" size="sm" />
+          </div>
+        </Card>
+        <StatCard
+          title="Factures Impayées"
+          value={summary.facturesImpayees.toString()}
+          icon={<AlertCircle className="h-4 w-4 text-red-600" />}
+          iconBg="bg-red-50"
+          accentColor="#dc2626"
+          subtitle="PENDING ou PARTIAL"
+        />
+      </div>
 
       {/* Filter bar */}
       <Card padding="md" className="mb-6">

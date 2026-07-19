@@ -55,4 +55,33 @@ export class AnalyticsController {
   getPayables() {
     return this.analyticsService.getPayables();
   }
+
+  @Get('recent-activity')
+  getRecentActivity() {
+    return this.analyticsService.getRecentActivity();
+  }
+
+  @Get('low-stock-alerts')
+  getLowStockAlerts() {
+    return this.analyticsService.getLowStockAlerts();
+  }
+
+  @Get('top-products')
+  getTopProducts() {
+    return this.analyticsService.getTopProducts();
+  }
+
+  @Get('sales-by-category')
+  getSalesByCategory(
+    @Query('period') period?: string,
+    @Query('startDate') startDate?: string,
+    @Query('endDate') endDate?: string,
+  ) {
+    return this.analyticsService.getSalesByCategory(period, startDate, endDate);
+  }
+
+  @Get('daily-summary')
+  getDailySummary() {
+    return this.analyticsService.getDailySummary();
+  }
 }

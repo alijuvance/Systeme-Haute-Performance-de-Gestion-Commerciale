@@ -1,5 +1,5 @@
 'use client';
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { useStocks } from '../hooks/useStocks';
 import { DataTable, ColumnDef } from '@/components/shared/DataTable';
 import { PageHeader } from '@/components/shared/PageHeader';
@@ -8,9 +8,11 @@ import { Modal } from '@/components/shared/Modal';
 import { Input } from '@/components/shared/Input';
 import { Card } from '@/components/shared/Card';
 import { Badge } from '@/components/shared/Badge';
+import { StatCard } from '@/components/shared/StatCard';
+import { Progress } from '@/components/shared/Progress';
 import SearchSelect from '@/components/shared/SearchSelect';
 import { formatDate } from '@/utils/formatters';
-import { Search, Plus, Warehouse, AlertCircle, Download } from 'lucide-react';
+import { Search, Plus, Warehouse, AlertCircle, Download, Package, AlertTriangle, Layers } from 'lucide-react';
 import { StockLevel, Depot, Product, Category } from '@/types';
 import { exportToExcel } from '@/utils/exportToExcel';
 
@@ -72,6 +74,8 @@ export function StocksTable() {
     {
       key: 'product',
       header: 'Produit',
+      sortable: true,
+      sortFn: (a, b) => (a.product?.name || '').localeCompare(b.product?.name || ''),
       cell: (s) => (
         <div>
           <span className="font-medium text-gray-900">{s.product?.name || '—'}</span>
@@ -82,6 +86,8 @@ export function StocksTable() {
     {
       key: 'category',
       header: 'Catégorie',
+      sortable: true,
+      sortFn: (a, b) => (a.product?.category?.name || '').localeCompare(b.product?.category?.name || ''),
       cell: (s) => (
         <Badge variant="default">
           {s.product?.category?.name || '—'}
@@ -91,6 +97,8 @@ export function StocksTable() {
     {
       key: 'depot',
       header: 'Dépôt',
+      sortable: true,
+      sortFn: (a, b) => (a.depot?.name || '').localeCompare(b.depot?.name || ''),
       cell: (s) => (
         <span className="flex items-center gap-1.5 text-sm text-gray-700">
           <Warehouse className="w-3.5 h-3.5 text-gray-400" />
@@ -102,11 +110,33 @@ export function StocksTable() {
       key: 'qty',
       header: 'Quantité',
       align: 'right' as const,
-      cell: (s) => <span className="tabular-nums font-semibold text-gray-900">{s.quantity}</span>,
+      sortable: true,
+      sortFn: (a, b) => a.quantity - b.quantity,
+      cell: (s) => (
+        <div className="flex flex-col items-end gap-1">
+          <span className={`tabular-nums font-semibold ${s.quantity <= (s.minAlertQuantity || 0) && (s.minAlertQuantity || 0) > 0 ? 'text-red-600' : 'text-gray-900'}`}>
+            {s.quantity}
+          </span>
+          {s.minAlertQuantity && s.minAlertQuantity > 0 ? (
+            <Progress 
+              value={(s.quantity / Math.max(s.quantity, s.minAlertQuantity * 2)) * 100} 
+              variant={s.quantity <= s.minAlertQuantity ? 'danger' : 'success'} 
+              size="sm" 
+              className="w-16" 
+            />
+          ) : null}
+        </div>
+      ),
     },
     {
       key: 'status',
       header: 'État',
+      sortable: true,
+      sortFn: (a, b) => {
+        const isLowA = a.quantity <= (a.minAlertQuantity || 0) && (a.minAlertQuantity || 0) > 0;
+        const isLowB = b.quantity <= (b.minAlertQuantity || 0) && (b.minAlertQuantity || 0) > 0;
+        return (isLowA === isLowB) ? 0 : isLowA ? -1 : 1;
+      },
       cell: (s) => {
         const alert = s.minAlertQuantity || 0;
         const isLow = s.quantity <= alert && alert > 0;
@@ -116,16 +146,6 @@ export function StocksTable() {
           </Badge>
         );
       },
-    },
-    {
-      key: 'firstAdded',
-      header: '1er ajout',
-      cell: (s) => <span className="text-xs text-gray-500 tabular-nums">{formatDate(s.firstAddedAt)}</span>,
-    },
-    {
-      key: 'lastAdded',
-      header: 'Dernier ajout',
-      cell: (s) => <span className="text-xs text-gray-500 tabular-nums">{formatDate(s.lastAddedAt)}</span>,
     },
   ];
 
@@ -142,6 +162,21 @@ export function StocksTable() {
     }));
     exportToExcel(dataToExport, `Stocks_${new Date().toISOString().split('T')[0]}`);
   };
+
+  const summary = useMemo(() => {
+    const totalRefs = data.length;
+    let totalItems = 0;
+    let alerts = 0;
+
+    data.forEach(s => {
+      totalItems += s.quantity;
+      if (s.quantity <= (s.minAlertQuantity || 0) && (s.minAlertQuantity || 0) > 0) {
+        alerts++;
+      }
+    });
+
+    return { totalRefs, totalItems, alerts };
+  }, [data]);
 
   if (error) {
     return (
@@ -168,6 +203,32 @@ export function StocksTable() {
         }
       />
 
+      {/* Summary Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+        <StatCard
+          title="Références en Stock"
+          value={summary.totalRefs.toString()}
+          icon={<Package className="h-4 w-4 text-gray-600" />}
+          subtitle="Nombre de produits distincts par dépôt"
+        />
+        <StatCard
+          title="Volume Total"
+          value={summary.totalItems.toString()}
+          icon={<Layers className="h-4 w-4 text-blue-600" />}
+          iconBg="bg-blue-50"
+          accentColor="#2563eb"
+          subtitle="Nombre total d'articles"
+        />
+        <StatCard
+          title="Alertes de Stock"
+          value={summary.alerts.toString()}
+          icon={<AlertTriangle className="h-4 w-4 text-red-600" />}
+          iconBg="bg-red-50"
+          accentColor="#dc2626"
+          subtitle="Produits sous le seuil d'alerte"
+        />
+      </div>
+
       {/* Filter bar */}
       <Card padding="md" className="mb-6">
         <div className="flex flex-col md:flex-row gap-4 items-end">
@@ -190,6 +251,20 @@ export function StocksTable() {
               icon={<Search className="w-4 h-4" />}
             />
           </div>
+          {/* Reset button */}
+          {(searchTerm || selectedDepotId) && (
+            <div className="mb-[1px]">
+              <Button 
+                variant="outline" 
+                onClick={() => {
+                  setSearchTerm('');
+                  setSelectedDepotId('');
+                }}
+              >
+                Réinitialiser
+              </Button>
+            </div>
+          )}
         </div>
       </Card>
 
@@ -200,6 +275,9 @@ export function StocksTable() {
         keyExtractor={(s) => s.id}
         isLoading={isLoading}
         emptyMessage="Aucun stock trouvé. Ajoutez des produits à un dépôt."
+        emptyIcon={<Warehouse className="w-6 h-6 text-gray-300" />}
+        emptyActionLabel="Ajouter au stock"
+        onEmptyAction={() => setIsModalOpen(true)}
       />
 
       {/* Add Stock Modal */}

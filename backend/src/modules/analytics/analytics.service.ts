@@ -207,4 +207,150 @@ export class AnalyticsService {
       include: { supplier: true },
     }).then(purchases => purchases.filter(p => (p.totalAmount - p.amountPaid) > 0));
   }
+
+  /**
+   * Dernières activités (audit log) pour le dashboard
+   */
+  async getRecentActivity() {
+    try {
+      const logs = await this.prisma.auditLog.findMany({
+        take: 10,
+        orderBy: { createdAt: 'desc' },
+        include: { user: { select: { fullName: true, email: true } } },
+      });
+      return logs.map(log => ({
+        id: log.id,
+        action: log.action,
+        entity: log.entity,
+        entityId: log.entityId,
+        user: log.user?.fullName || 'Système',
+        timestamp: log.createdAt,
+      }));
+    } catch {
+      // AuditLog might not exist yet (migration not run)
+      return [];
+    }
+  }
+
+  /**
+   * Produits dont le stock est sous le seuil d'alerte
+   */
+  async getLowStockAlerts() {
+    const stockLevels = await this.prisma.stockLevel.findMany({
+      where: {
+        minAlertQuantity: { gt: 0 },
+      },
+      include: {
+        product: { select: { name: true, sku: true } },
+        depot: { select: { name: true } },
+      },
+    });
+
+    return stockLevels
+      .filter(s => s.quantity <= (s.minAlertQuantity || 0))
+      .map(s => ({
+        id: s.id,
+        productName: s.product.name,
+        sku: s.product.sku,
+        depotName: s.depot.name,
+        quantity: s.quantity,
+        minAlert: s.minAlertQuantity,
+      }));
+  }
+
+  /**
+   * Top 5 produits les plus vendus (par quantité)
+   */
+  async getTopProducts() {
+    const lines = await this.prisma.invoiceLine.findMany({
+      where: {
+        invoice: { status: { notIn: ['CANCELLED', 'DRAFT'] } },
+      },
+      include: { product: { select: { name: true, sku: true } } },
+    });
+
+    const productMap: Record<string, { name: string; sku: string; totalQty: number; totalRevenue: number }> = {};
+    lines.forEach(line => {
+      if (!productMap[line.productId]) {
+        productMap[line.productId] = { name: line.product.name, sku: line.product.sku, totalQty: 0, totalRevenue: 0 };
+      }
+      productMap[line.productId].totalQty += line.quantity;
+      productMap[line.productId].totalRevenue += line.quantity * line.unitPrice;
+    });
+
+    return Object.entries(productMap)
+      .sort(([, a], [, b]) => b.totalQty - a.totalQty)
+      .slice(0, 5)
+      .map(([id, data]) => ({ productId: id, ...data }));
+  }
+
+  /**
+   * Répartition des ventes par catégorie de produit
+   */
+  async getSalesByCategory(period?: string, startDate?: string, endDate?: string) {
+    const dateFilter = this.getDateRange(period, startDate, endDate);
+    const whereDate = dateFilter ? { date: dateFilter } : {};
+
+    const lines = await this.prisma.invoiceLine.findMany({
+      where: {
+        invoice: {
+          status: { notIn: ['CANCELLED', 'DRAFT'] },
+          ...whereDate,
+        },
+      },
+      include: { product: { include: { category: { select: { name: true } } } } },
+    });
+
+    const catMap: Record<string, number> = {};
+    lines.forEach(line => {
+      const catName = line.product.category?.name || 'Sans catégorie';
+      if (!catMap[catName]) catMap[catName] = 0;
+      catMap[catName] += line.quantity * line.unitPrice;
+    });
+
+    return Object.entries(catMap)
+      .sort(([, a], [, b]) => b - a)
+      .map(([name, value]) => ({ name, value }));
+  }
+
+  /**
+   * Résumé du jour vs hier (pour les variations %)
+   */
+  async getDailySummary() {
+    const now = new Date();
+    const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    const yesterdayStart = new Date(todayStart);
+    yesterdayStart.setDate(yesterdayStart.getDate() - 1);
+
+    const [todaySales, yesterdaySales, todayInvoiceCount, yesterdayInvoiceCount] = await Promise.all([
+      this.prisma.invoice.aggregate({
+        where: { date: { gte: todayStart }, status: { notIn: ['CANCELLED', 'DRAFT'] } },
+        _sum: { totalAmount: true },
+      }),
+      this.prisma.invoice.aggregate({
+        where: { date: { gte: yesterdayStart, lt: todayStart }, status: { notIn: ['CANCELLED', 'DRAFT'] } },
+        _sum: { totalAmount: true },
+      }),
+      this.prisma.invoice.count({
+        where: { date: { gte: todayStart }, status: { notIn: ['CANCELLED', 'DRAFT'] } },
+      }),
+      this.prisma.invoice.count({
+        where: { date: { gte: yesterdayStart, lt: todayStart }, status: { notIn: ['CANCELLED', 'DRAFT'] } },
+      }),
+    ]);
+
+    const todayRevenue = todaySales._sum.totalAmount || 0;
+    const yesterdayRevenue = yesterdaySales._sum.totalAmount || 0;
+    const revenueChange = yesterdayRevenue > 0 ? ((todayRevenue - yesterdayRevenue) / yesterdayRevenue) * 100 : 0;
+    const countChange = yesterdayInvoiceCount > 0 ? ((todayInvoiceCount - yesterdayInvoiceCount) / yesterdayInvoiceCount) * 100 : 0;
+
+    return {
+      todayRevenue,
+      yesterdayRevenue,
+      revenueChange,
+      todayInvoiceCount,
+      yesterdayInvoiceCount,
+      countChange,
+    };
+  }
 }
