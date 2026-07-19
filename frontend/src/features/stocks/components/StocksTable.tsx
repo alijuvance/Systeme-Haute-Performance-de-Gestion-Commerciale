@@ -1,5 +1,5 @@
 'use client';
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { useStocks } from '../hooks/useStocks';
 import { DataTable, ColumnDef } from '@/components/shared/DataTable';
 import { PageHeader } from '@/components/shared/PageHeader';
@@ -8,9 +8,10 @@ import { Modal } from '@/components/shared/Modal';
 import { Input } from '@/components/shared/Input';
 import { Card } from '@/components/shared/Card';
 import { Badge } from '@/components/shared/Badge';
+import { SummaryCard } from '@/components/shared/SummaryCard';
 import SearchSelect from '@/components/shared/SearchSelect';
 import { formatDate } from '@/utils/formatters';
-import { Search, Plus, Warehouse, AlertCircle, Download } from 'lucide-react';
+import { Search, Plus, Warehouse, AlertCircle, Download, Package, AlertTriangle, Layers } from 'lucide-react';
 import { StockLevel, Depot, Product, Category } from '@/types';
 import { exportToExcel } from '@/utils/exportToExcel';
 
@@ -100,27 +101,45 @@ export function StocksTable() {
     },
     {
       key: 'qty',
-      header: 'Quantité',
-      align: 'right' as const,
-      cell: (s) => <span className="tabular-nums font-semibold text-gray-900">{s.quantity}</span>,
+      header: 'Niveau de Stock',
+      cell: (s) => {
+        const alert = s.minAlertQuantity || 0;
+        const maxRef = Math.max(alert * 3, s.quantity, 10);
+        const pct = Math.min((s.quantity / maxRef) * 100, 100);
+        const isLow = s.quantity <= alert && alert > 0;
+        const isCritical = s.quantity === 0;
+        const barColor = isCritical
+          ? 'bg-rose-500'
+          : isLow
+            ? 'bg-amber-400'
+            : 'bg-emerald-500';
+        return (
+          <div className="min-w-[160px]">
+            <div className="flex items-center justify-between mb-1">
+              <span className="tabular-nums font-semibold text-gray-900 text-sm">{s.quantity}</span>
+              {isLow && <AlertTriangle className="w-3.5 h-3.5 text-amber-500" />}
+            </div>
+            <div className="w-full bg-gray-100 rounded-full h-1.5">
+              <div className={`${barColor} h-1.5 rounded-full transition-all duration-500`} style={{ width: `${pct}%` }} />
+            </div>
+            {alert > 0 && <p className="text-[10px] text-gray-400 mt-0.5">Seuil: {alert}</p>}
+          </div>
+        );
+      },
     },
     {
       key: 'status',
       header: 'État',
       cell: (s) => {
         const alert = s.minAlertQuantity || 0;
+        const isCritical = s.quantity === 0;
         const isLow = s.quantity <= alert && alert > 0;
         return (
-          <Badge variant={isLow ? 'danger' : 'success'}>
-            {isLow ? 'Stock bas' : 'Normal'}
+          <Badge variant={isCritical ? 'danger' : isLow ? 'warning' : 'success'}>
+            {isCritical ? 'Rupture' : isLow ? 'Stock bas' : 'Normal'}
           </Badge>
         );
       },
-    },
-    {
-      key: 'firstAdded',
-      header: '1er ajout',
-      cell: (s) => <span className="text-xs text-gray-500 tabular-nums">{formatDate(s.firstAddedAt)}</span>,
     },
     {
       key: 'lastAdded',
@@ -154,8 +173,8 @@ export function StocksTable() {
   return (
     <>
       <PageHeader 
-        title="Catalogue & Stock" 
-        description="Gérez vos stocks par dépôt. Recherchez, filtrez et ajoutez des produits." 
+        title="Gestion des Stocks" 
+        description="Vue d'ensemble de vos niveaux de stock par dépôt." 
         actions={
           <div className="flex gap-2">
             <Button variant="outline" onClick={handleExport} icon={<Download className="w-4 h-4" />}>
@@ -167,6 +186,28 @@ export function StocksTable() {
           </div>
         }
       />
+
+      {/* Stock Summary Widgets */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+        <SummaryCard
+          title="Articles en Stock"
+          value={data.length}
+          icon={<Layers className="h-5 w-5" />}
+          trend={{ value: 0, isPositive: true, label: 'références' }}
+        />
+        <SummaryCard
+          title="Alertes Stock Bas"
+          value={data.filter(s => s.quantity <= (s.minAlertQuantity || 0) && (s.minAlertQuantity || 0) > 0).length}
+          icon={<AlertTriangle className="h-5 w-5 text-amber-500" />}
+          trend={{ value: data.filter(s => s.quantity <= (s.minAlertQuantity || 0) && (s.minAlertQuantity || 0) > 0).length, isPositive: false, label: 'produits à réapprovisionner' }}
+        />
+        <SummaryCard
+          title="Ruptures de Stock"
+          value={data.filter(s => s.quantity === 0).length}
+          icon={<AlertCircle className="h-5 w-5 text-rose-500" />}
+          trend={{ value: data.filter(s => s.quantity === 0).length, isPositive: false, label: 'produits en rupture' }}
+        />
+      </div>
 
       {/* Filter bar */}
       <Card padding="md" className="mb-6">
