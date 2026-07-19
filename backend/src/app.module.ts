@@ -27,6 +27,7 @@ import { PaymentsModule } from './modules/payments/payments.module';
 import { CreditNotesModule } from './modules/credit-notes/credit-notes.module';
 import { EventEmitterModule } from '@nestjs/event-emitter';
 import { AuditLogsModule } from './modules/audit-logs/audit-logs.module';
+import { SettingsModule } from './modules/settings/settings.module';
 
 @Module({
   imports: [
@@ -40,7 +41,7 @@ import { AuditLogsModule } from './modules/audit-logs/audit-logs.module';
       limit: 60,
     }]),
     EventEmitterModule.forRoot(),
-    PrismaModule, CounterModule, AuthModule, CategoriesModule, ProductsModule, UsersModule, RolesModule, DepotsModule, StockLevelsModule, StockMovementsModule, StockTransfersModule, SuppliersModule, PurchaseOrdersModule, CustomersModule, SalesModule, AnalyticsModule, NotificationsModule, PaymentsModule, CreditNotesModule, AuditLogsModule
+    PrismaModule, CounterModule, AuthModule, CategoriesModule, ProductsModule, UsersModule, RolesModule, DepotsModule, StockLevelsModule, StockMovementsModule, StockTransfersModule, SuppliersModule, PurchaseOrdersModule, CustomersModule, SalesModule, AnalyticsModule, NotificationsModule, PaymentsModule, CreditNotesModule, AuditLogsModule, SettingsModule
   ],
   controllers: [AppController],
   providers: [

@@ -8,6 +8,8 @@ import {
   Plus, ArrowRight, Command
 } from 'lucide-react';
 
+import { useAuth } from '@/contexts/AuthContext';
+
 interface CommandItem {
   id: string;
   label: string;
@@ -16,23 +18,24 @@ interface CommandItem {
   href?: string;
   action?: () => void;
   group: string;
+  roles?: string[]; // Si vide, accessible à tous
 }
 
 const defaultItems: CommandItem[] = [
   // Navigation
   { id: 'dashboard', label: 'Tableau de bord', icon: <LayoutDashboard className="w-4 h-4" />, href: '/dashboard', group: 'Navigation' },
-  { id: 'sales', label: 'Ventes & Factures', icon: <ShoppingCart className="w-4 h-4" />, href: '/dashboard/sales', group: 'Navigation' },
-  { id: 'products', label: 'Catalogue (Produits)', icon: <Package className="w-4 h-4" />, href: '/dashboard/products', group: 'Navigation' },
-  { id: 'stocks', label: 'Gestion des Stocks', icon: <Warehouse className="w-4 h-4" />, href: '/dashboard/stocks', group: 'Navigation' },
-  { id: 'customers', label: 'Clients', icon: <Users className="w-4 h-4" />, href: '/dashboard/customers', group: 'Navigation' },
-  { id: 'suppliers', label: 'Fournisseurs', icon: <Truck className="w-4 h-4" />, href: '/dashboard/suppliers', group: 'Navigation' },
-  { id: 'purchases', label: 'Achats', icon: <FileText className="w-4 h-4" />, href: '/dashboard/purchases', group: 'Navigation' },
-  { id: 'finance', label: 'Finance', icon: <LineChart className="w-4 h-4" />, href: '/dashboard/finance', group: 'Navigation' },
-  { id: 'users', label: 'Utilisateurs', icon: <Shield className="w-4 h-4" />, href: '/dashboard/users', group: 'Navigation' },
-  { id: 'settings', label: 'Paramètres', icon: <Settings className="w-4 h-4" />, href: '/dashboard/settings', group: 'Navigation' },
+  { id: 'sales', label: 'Ventes & Factures', icon: <ShoppingCart className="w-4 h-4" />, href: '/dashboard/sales', group: 'Navigation', roles: ['ADMIN', 'MANAGER', 'CASHIER', 'SALES'] },
+  { id: 'products', label: 'Catalogue (Produits)', icon: <Package className="w-4 h-4" />, href: '/dashboard/products', group: 'Navigation', roles: ['ADMIN', 'MANAGER', 'CASHIER', 'SALES', 'INVENTORY'] },
+  { id: 'stocks', label: 'Gestion des Stocks', icon: <Warehouse className="w-4 h-4" />, href: '/dashboard/stocks', group: 'Navigation', roles: ['ADMIN', 'MANAGER', 'INVENTORY'] },
+  { id: 'customers', label: 'Clients', icon: <Users className="w-4 h-4" />, href: '/dashboard/customers', group: 'Navigation', roles: ['ADMIN', 'MANAGER', 'CASHIER', 'SALES'] },
+  { id: 'suppliers', label: 'Fournisseurs', icon: <Truck className="w-4 h-4" />, href: '/dashboard/suppliers', group: 'Navigation', roles: ['ADMIN', 'MANAGER', 'INVENTORY'] },
+  { id: 'purchases', label: 'Achats', icon: <FileText className="w-4 h-4" />, href: '/dashboard/purchases', group: 'Navigation', roles: ['ADMIN', 'MANAGER', 'INVENTORY'] },
+  { id: 'finance', label: 'Finance', icon: <LineChart className="w-4 h-4" />, href: '/dashboard/finance', group: 'Navigation', roles: ['ADMIN'] },
+  { id: 'users', label: 'Utilisateurs', icon: <Shield className="w-4 h-4" />, href: '/dashboard/users', group: 'Navigation', roles: ['ADMIN'] },
+  { id: 'settings', label: 'Paramètres', icon: <Settings className="w-4 h-4" />, href: '/dashboard/settings', group: 'Navigation', roles: ['ADMIN'] },
   // Quick Actions
-  { id: 'new-sale', label: 'Nouvelle Facture', description: 'Créer une facture B2B', icon: <Plus className="w-4 h-4" />, href: '/dashboard/sales/new', group: 'Actions rapides' },
-  { id: 'pos', label: 'Ouvrir la Caisse POS', description: 'Interface de vente directe', icon: <ShoppingCart className="w-4 h-4" />, href: '/dashboard/pos', group: 'Actions rapides' },
+  { id: 'new-sale', label: 'Nouvelle Facture', description: 'Créer une facture B2B', icon: <Plus className="w-4 h-4" />, href: '/dashboard/sales/new', group: 'Actions rapides', roles: ['ADMIN', 'MANAGER', 'CASHIER', 'SALES'] },
+  { id: 'pos', label: 'Ouvrir la Caisse POS', description: 'Interface de vente directe', icon: <ShoppingCart className="w-4 h-4" />, href: '/dashboard/pos', group: 'Actions rapides', roles: ['ADMIN', 'MANAGER', 'CASHIER', 'SALES'] },
 ];
 
 export function CommandPalette() {
@@ -41,6 +44,8 @@ export function CommandPalette() {
   const [selectedIndex, setSelectedIndex] = useState(0);
   const inputRef = useRef<HTMLInputElement>(null);
   const router = useRouter();
+  const { user } = useAuth();
+  const currentRole = user?.role?.name || user?.role || 'MANAGER';
 
   // Keyboard shortcut: Ctrl+K or Cmd+K
   useEffect(() => {
@@ -66,13 +71,18 @@ export function CommandPalette() {
     }
   }, [isOpen]);
 
-  // Filter items
+  // Filter items by role first
+  const roleAllowedItems = defaultItems.filter(item => 
+    !item.roles || item.roles.includes(currentRole as string)
+  );
+
+  // Filter items by search query
   const filteredItems = query
-    ? defaultItems.filter(item => 
+    ? roleAllowedItems.filter(item => 
         item.label.toLowerCase().includes(query.toLowerCase()) ||
         (item.description && item.description.toLowerCase().includes(query.toLowerCase()))
       )
-    : defaultItems;
+    : roleAllowedItems;
 
   // Group items
   const groups = filteredItems.reduce<Record<string, CommandItem[]>>((acc, item) => {

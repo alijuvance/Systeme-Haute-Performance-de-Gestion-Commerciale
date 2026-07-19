@@ -9,7 +9,7 @@ import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 
 @Controller('customers')
 @UseGuards(JwtAuthGuard, RolesGuard)
-@Roles(...['ADMIN', 'MANAGER'])
+@Roles(...['ADMIN', 'MANAGER', 'CASHIER', 'SALES'])
 export class CustomersController {
   constructor(private readonly customersService: CustomersService) {}
 

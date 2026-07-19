@@ -19,7 +19,7 @@ export const CreditNoteModal: React.FC<CreditNoteModalProps> = ({ sale, onClose,
   const toast = useToast();
 
   const [reason, setReason] = useState('');
-  const [lines, setLines] = useState<{ productId: string; productName: string; quantityToReturn: number; maxQuantity: number; unitPrice: number }[]>([]);
+  const [lines, setLines] = useState<{ id: string; productId: string; productName: string; quantityToReturn: number; maxQuantity: number; unitPrice: number }[]>([]);
 
   useEffect(() => {
     const fetchCreditNotes = async () => {
@@ -29,7 +29,8 @@ export const CreditNoteModal: React.FC<CreditNoteModalProps> = ({ sale, onClose,
         
         // Initialize lines based on invoice lines
         // For a real app, we should subtract already returned quantities.
-        const initialLines = sale.lines?.map((line: any) => ({
+        const initialLines = sale.lines?.map((line: any, index: number) => ({
+          id: line.id || `${line.productId}-${index}`,
           productId: line.productId,
           productName: line.product?.name || line.productId,
           quantityToReturn: 0,
@@ -48,9 +49,9 @@ export const CreditNoteModal: React.FC<CreditNoteModalProps> = ({ sale, onClose,
     fetchCreditNotes();
   }, [sale.id]);
 
-  const handleQuantityChange = (productId: string, qty: number) => {
+  const handleQuantityChange = (lineId: string, qty: number) => {
     setLines(prev => prev.map(l => {
-      if (l.productId === productId) {
+      if (l.id === lineId) {
         const validQty = Math.max(0, Math.min(l.maxQuantity, qty));
         return { ...l, quantityToReturn: validQty };
       }
@@ -120,7 +121,7 @@ export const CreditNoteModal: React.FC<CreditNoteModalProps> = ({ sale, onClose,
                   </thead>
                   <tbody>
                     {lines.map((line) => (
-                      <tr key={line.productId} className="bg-white border-b border-gray-50">
+                      <tr key={line.id} className="bg-white border-b border-gray-50">
                         <td className="px-4 py-3 font-medium text-gray-900">{line.productName}</td>
                         <td className="px-4 py-3">{formatCurrency(line.unitPrice)}</td>
                         <td className="px-4 py-3">{line.maxQuantity}</td>
@@ -130,7 +131,7 @@ export const CreditNoteModal: React.FC<CreditNoteModalProps> = ({ sale, onClose,
                             min="0"
                             max={line.maxQuantity}
                             value={line.quantityToReturn === 0 ? '' : line.quantityToReturn}
-                            onChange={(e) => handleQuantityChange(line.productId, Number(e.target.value))}
+                            onChange={(e) => handleQuantityChange(line.id, Number(e.target.value))}
                             className="w-full h-8 px-2 text-center"
                             placeholder="0"
                           />

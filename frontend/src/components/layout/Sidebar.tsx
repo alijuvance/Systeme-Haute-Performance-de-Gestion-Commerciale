@@ -96,17 +96,17 @@ export function Sidebar({ sidebarOpen, setSidebarOpen }: SidebarProps) {
       items: [
         { 
           name: "Ventes & Factures", href: "/dashboard/sales", icon: ShoppingCart, 
-          roles: ['ADMIN', 'MANAGER'],
+          roles: ['ADMIN', 'MANAGER', 'CASHIER', 'SALES'],
           children: [
             { name: "Liste des factures", href: "/dashboard/sales" },
             { name: "Nouvelle facture", href: "/dashboard/sales/new" },
           ],
         },
-        { name: "Catalogue (Produits)", href: "/dashboard/products", icon: Package, roles: ['ADMIN', 'MANAGER'] },
-        { name: "Gestion des Stocks", href: "/dashboard/stocks", icon: Warehouse, roles: ['ADMIN'] },
-        { name: "Clients", href: "/dashboard/customers", icon: Users, roles: ['ADMIN', 'MANAGER'] },
-        { name: "Fournisseurs", href: "/dashboard/suppliers", icon: Truck, roles: ['ADMIN'] },
-        { name: "Achats", href: "/dashboard/purchases", icon: FileText, roles: ['ADMIN'] },
+        { name: "Catalogue (Produits)", href: "/dashboard/products", icon: Package, roles: ['ADMIN', 'MANAGER', 'CASHIER', 'SALES', 'INVENTORY'] },
+        { name: "Gestion des Stocks", href: "/dashboard/stocks", icon: Warehouse, roles: ['ADMIN', 'MANAGER', 'INVENTORY'] },
+        { name: "Clients", href: "/dashboard/customers", icon: Users, roles: ['ADMIN', 'MANAGER', 'CASHIER', 'SALES'] },
+        { name: "Fournisseurs", href: "/dashboard/suppliers", icon: Truck, roles: ['ADMIN', 'MANAGER', 'INVENTORY'] },
+        { name: "Achats", href: "/dashboard/purchases", icon: FileText, roles: ['ADMIN', 'MANAGER', 'INVENTORY'] },
       ],
     },
     {
