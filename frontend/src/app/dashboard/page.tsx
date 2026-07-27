@@ -12,47 +12,20 @@ import { Progress } from '@/components/shared/Progress';
 import { formatCurrency } from '@/utils/formatters';
 import { 
   DollarSign, TrendingUp, Users, ShoppingCart, Package, 
-  AlertTriangle, ArrowRight, Plus, Truck, FileText,
-  Clock, Zap
+  AlertTriangle 
 } from 'lucide-react';
 
 export default function DashboardPage() {
   const { 
-    kpis, chartData, recentActivity, lowStockAlerts, topProducts, salesByCategory, dailySummary,
+    kpis, chartData, lowStockAlerts, topProducts, salesByCategory, dailySummary,
     isLoading, error,
     period, setPeriod,
     startDate, setStartDate,
     endDate, setEndDate
   } = useDashboard();
 
-  // Generate fake sparkline data from chart data (last 7 points)
+  // Generate sparkline data from chart data (last 7 days)
   const revenueSparkline = chartData.slice(-7).map(d => d.amount || 0);
-
-  const formatRelativeTime = (timestamp: string) => {
-    const now = new Date();
-    const date = new Date(timestamp);
-    const diff = Math.floor((now.getTime() - date.getTime()) / 1000);
-    if (diff < 60) return 'à l\'instant';
-    if (diff < 3600) return `il y a ${Math.floor(diff / 60)} min`;
-    if (diff < 86400) return `il y a ${Math.floor(diff / 3600)}h`;
-    return `il y a ${Math.floor(diff / 86400)}j`;
-  };
-
-  const getActionLabel = (action: string, entity: string) => {
-    const actions: Record<string, string> = { CREATE: 'a créé', UPDATE: 'a modifié', DELETE: 'a supprimé' };
-    const entities: Record<string, string> = {
-      INVOICE: 'une facture', PRODUCT: 'un produit', CUSTOMER: 'un client',
-      PURCHASE_ORDER: 'un achat', STOCK: 'un mouvement stock', AUTH: 'une connexion',
-      PAYMENT: 'un paiement', CREDIT_NOTE: 'un avoir',
-    };
-    return `${actions[action] || action} ${entities[entity] || entity}`;
-  };
-
-  const getActionColor = (action: string) => {
-    if (action === 'CREATE') return 'bg-emerald-500';
-    if (action === 'DELETE') return 'bg-red-500';
-    return 'bg-amber-500';
-  };
 
   return (
     <>
@@ -149,88 +122,7 @@ export default function DashboardPage() {
         </div>
       </div>
 
-      {/* ═══════ ROW 3: Activity Feed + Quick Actions ═══════ */}
-      <div className="grid grid-cols-1 lg:grid-cols-5 gap-6 mb-6">
-        {/* Recent Activity */}
-        <div className="lg:col-span-3">
-          <Card padding="lg">
-            <CardHeader>
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <Clock className="w-4 h-4 text-gray-400" />
-                  <CardTitle>Activité Récente</CardTitle>
-                </div>
-                <Link href="/dashboard/settings/audit" className="text-xs text-gray-400 hover:text-gray-600 transition-colors">
-                  Voir tout →
-                </Link>
-              </div>
-            </CardHeader>
-            {recentActivity.length > 0 ? (
-              <div className="space-y-0">
-                {recentActivity.slice(0, 8).map((activity) => (
-                  <div key={activity.id} className="flex items-start gap-3 py-3 border-b border-gray-50 last:border-0">
-                    {/* Timeline dot */}
-                    <div className="flex flex-col items-center mt-1.5">
-                      <div className={`w-2 h-2 rounded-full ${getActionColor(activity.action)}`} />
-                    </div>
-                    {/* Content */}
-                    <div className="flex-1 min-w-0">
-                      <p className="text-sm text-gray-700">
-                        <span className="font-medium text-gray-900">{activity.user}</span>
-                        {' '}{getActionLabel(activity.action, activity.entity)}
-                      </p>
-                    </div>
-                    {/* Time */}
-                    <span className="text-[11px] text-gray-400 whitespace-nowrap flex-shrink-0">
-                      {formatRelativeTime(activity.timestamp)}
-                    </span>
-                  </div>
-                ))}
-              </div>
-            ) : (
-              <div className="flex items-center justify-center h-32 text-sm text-gray-400">
-                Aucune activité récente
-              </div>
-            )}
-          </Card>
-        </div>
 
-        {/* Quick Actions */}
-        <div className="lg:col-span-2">
-          <Card padding="lg" className="h-full">
-            <CardHeader>
-              <div className="flex items-center gap-2">
-                <Zap className="w-4 h-4 text-amber-500" />
-                <CardTitle>Actions Rapides</CardTitle>
-              </div>
-            </CardHeader>
-            <div className="grid grid-cols-2 gap-3">
-              {[
-                { label: 'Nouvelle Vente', desc: 'Facture B2B', href: '/dashboard/sales/new', icon: <Plus className="w-5 h-5" />, color: 'bg-emerald-50 text-emerald-600 group-hover:bg-emerald-100' },
-                { label: 'Caisse POS', desc: 'Vente directe', href: '/dashboard/pos', icon: <ShoppingCart className="w-5 h-5" />, color: 'bg-blue-50 text-blue-600 group-hover:bg-blue-100' },
-                { label: 'Nouveau Client', desc: 'Ajouter un client', href: '/dashboard/customers', icon: <Users className="w-5 h-5" />, color: 'bg-violet-50 text-violet-600 group-hover:bg-violet-100' },
-                { label: 'Nouvel Achat', desc: 'Commande fournisseur', href: '/dashboard/purchases', icon: <Truck className="w-5 h-5" />, color: 'bg-amber-50 text-amber-600 group-hover:bg-amber-100' },
-                { label: 'Voir Stocks', desc: 'État des dépôts', href: '/dashboard/stocks', icon: <Package className="w-5 h-5" />, color: 'bg-gray-50 text-gray-600 group-hover:bg-gray-100' },
-                { label: 'Finance', desc: 'Trésorerie', href: '/dashboard/finance', icon: <FileText className="w-5 h-5" />, color: 'bg-rose-50 text-rose-600 group-hover:bg-rose-100' },
-              ].map((action) => (
-                <Link
-                  key={action.href}
-                  href={action.href}
-                  className="group flex flex-col items-center gap-2 p-4 rounded-xl border border-gray-100 hover:border-gray-200 hover:shadow-sm transition-all duration-200"
-                >
-                  <div className={`w-10 h-10 rounded-xl flex items-center justify-center transition-colors ${action.color}`}>
-                    {action.icon}
-                  </div>
-                  <div className="text-center">
-                    <p className="text-xs font-semibold text-gray-900">{action.label}</p>
-                    <p className="text-[10px] text-gray-400">{action.desc}</p>
-                  </div>
-                </Link>
-              ))}
-            </div>
-          </Card>
-        </div>
-      </div>
 
       {/* ═══════ ROW 4: Low Stock Alerts + Top Products ═══════ */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">

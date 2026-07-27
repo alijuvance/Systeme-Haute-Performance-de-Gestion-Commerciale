@@ -22,7 +22,7 @@ export default function POSPage() {
     const fetchInit = async () => {
       const headers = { Authorization: `Bearer ${localStorage.getItem('token')}` };
       const [prodRes, depRes] = await Promise.all([
-        fetch('/api/products', { headers }),
+        fetch('/api/products?limit=1000', { headers }),
         fetch('/api/depots', { headers })
       ]);
       if (prodRes.ok) {
