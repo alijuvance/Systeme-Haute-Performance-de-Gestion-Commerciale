@@ -95,14 +95,40 @@ export class AnalyticsService {
       select: { date: true, totalAmount: true }
     });
 
+    if (invoices.length === 0) {
+      return [];
+    }
+
     const chartData: Record<string, number> = {};
+    
+    // Find min and max dates
+    let minDate = dateFilter?.gte ? new Date(dateFilter.gte) : invoices[0].date;
+    let maxDate = dateFilter?.lte ? new Date(dateFilter.lte) : new Date();
+
+    if (!dateFilter?.gte) {
+      minDate = invoices[0].date;
+    }
+
+    // Generate all dates between min and max
+    const currentDate = new Date(minDate);
+    currentDate.setHours(0, 0, 0, 0);
+    const lastDate = new Date(maxDate);
+    lastDate.setHours(0, 0, 0, 0);
+
+    while (currentDate <= lastDate) {
+      const dateString = currentDate.toISOString().split('T')[0];
+      chartData[dateString] = 0;
+      currentDate.setDate(currentDate.getDate() + 1);
+    }
+
     invoices.forEach(inv => {
       const date = inv.date.toISOString().split('T')[0];
-      if (!chartData[date]) chartData[date] = 0;
-      chartData[date] += inv.totalAmount;
+      if (chartData[date] !== undefined) {
+        chartData[date] += inv.totalAmount;
+      }
     });
 
-    return Object.keys(chartData).map(date => ({
+    return Object.keys(chartData).sort().map(date => ({
       date,
       amount: chartData[date]
     }));
@@ -179,17 +205,47 @@ export class AnalyticsService {
     });
 
     const chartMap: Record<string, { inflows: number; outflows: number }> = {};
+    
+    // Find min and max dates
+    let minDate = new Date();
+    let maxDate = new Date();
+    
+    if (dateFilter?.gte) {
+      minDate = new Date(dateFilter.gte);
+    } else {
+      const allDates = [...invoices.map(i => i.date), ...purchases.map(p => p.date)];
+      if (allDates.length > 0) {
+        minDate = new Date(Math.min(...allDates.map(d => d.getTime())));
+      }
+    }
+    
+    if (dateFilter?.lte) {
+      maxDate = new Date(dateFilter.lte);
+    }
+
+    const currentDate = new Date(minDate);
+    currentDate.setHours(0, 0, 0, 0);
+    const lastDate = new Date(maxDate);
+    lastDate.setHours(0, 0, 0, 0);
+
+    while (currentDate <= lastDate) {
+      const dateString = currentDate.toISOString().split('T')[0];
+      chartMap[dateString] = { inflows: 0, outflows: 0 };
+      currentDate.setDate(currentDate.getDate() + 1);
+    }
 
     invoices.forEach(inv => {
       const date = inv.date.toISOString().split('T')[0];
-      if (!chartMap[date]) chartMap[date] = { inflows: 0, outflows: 0 };
-      chartMap[date].inflows += inv.amountPaid;
+      if (chartMap[date]) {
+        chartMap[date].inflows += inv.amountPaid;
+      }
     });
 
     purchases.forEach(p => {
       const date = p.date.toISOString().split('T')[0];
-      if (!chartMap[date]) chartMap[date] = { inflows: 0, outflows: 0 };
-      chartMap[date].outflows += p.amountPaid;
+      if (chartMap[date]) {
+        chartMap[date].outflows += p.amountPaid;
+      }
     });
 
     return Object.keys(chartMap).sort().map(date => ({
