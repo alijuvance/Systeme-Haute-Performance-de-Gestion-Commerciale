@@ -12,7 +12,9 @@ import { generateInvoicePdf } from '@/utils/pdfGenerator';
 export default function POSPage() {
   const [products, setProducts] = useState<Product[]>([]);
   const [depots, setDepots] = useState<Depot[]>([]);
+  const [customers, setCustomers] = useState<any[]>([]);
   const [selectedDepot, setSelectedDepot] = useState('');
+  const [selectedCustomer, setSelectedCustomer] = useState<string>('');
   const [loading, setLoading] = useState(false);
   const toast = useToast();
   
@@ -21,9 +23,10 @@ export default function POSPage() {
   useEffect(() => {
     const fetchInit = async () => {
       const headers = { Authorization: `Bearer ${localStorage.getItem('token')}` };
-      const [prodRes, depRes] = await Promise.all([
+      const [prodRes, depRes, custRes] = await Promise.all([
         fetch('/api/products?limit=1000', { headers }),
-        fetch('/api/depots', { headers })
+        fetch('/api/depots', { headers }),
+        fetch('/api/customers?limit=1000', { headers })
       ]);
       if (prodRes.ok) {
         const p = await prodRes.json();
@@ -33,6 +36,10 @@ export default function POSPage() {
         const d = await depRes.json();
         setDepots(d);
         if (d.length > 0) setSelectedDepot(d[0].id);
+      }
+      if (custRes.ok) {
+        const c = await custRes.json();
+        setCustomers(c.data || c);
       }
     };
     fetchInit();
@@ -54,13 +61,14 @@ export default function POSPage() {
 
     setLoading(true);
     try {
-      const sale = await checkoutSale(selectedDepot, cart);
+      const sale = await checkoutSale(selectedDepot, cart, selectedCustomer);
       toast.success('Encaissement réussi !');
       const wantPDF = await toast.confirm({ title: 'Ticket de caisse', message: 'Voulez-vous générer le ticket de caisse (PDF) ?', variant: 'info', confirmText: 'Générer' });
       if (wantPDF) {
         generateInvoicePdf(sale);
       }
       clearCart();
+      setSelectedCustomer('');
     } catch (err: any) {
       toast.error(err.message || 'Erreur lors de l\'encaissement');
     } finally {
@@ -85,6 +93,9 @@ export default function POSPage() {
         total={total}
         handleCheckout={handleCheckout}
         loading={loading}
+        customers={customers}
+        selectedCustomer={selectedCustomer}
+        setSelectedCustomer={setSelectedCustomer}
       />
     </div>
   );

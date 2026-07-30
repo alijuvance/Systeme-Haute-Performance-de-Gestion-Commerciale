@@ -24,6 +24,8 @@ interface DataTableProps<T> {
   pageSize?: number;
   showPagination?: boolean;
   showResultCount?: boolean;
+  searchable?: boolean;
+  searchPlaceholder?: string;
 }
 
 type SortDir = 'asc' | 'desc' | null;
@@ -40,21 +42,37 @@ export function DataTable<T>({
   pageSize = 20,
   showPagination = true,
   showResultCount = true,
+  searchable = false,
+  searchPlaceholder = "Rechercher...",
 }: DataTableProps<T>) {
   const [sortKey, setSortKey] = useState<string | null>(null);
   const [sortDir, setSortDir] = useState<SortDir>(null);
   const [currentPage, setCurrentPage] = useState(1);
+  const [globalSearch, setGlobalSearch] = useState('');
+
+  // Filter logic (Global Search)
+  const filteredData = useMemo(() => {
+    if (!searchable || !globalSearch.trim()) return data;
+    const lowerSearch = globalSearch.toLowerCase();
+    
+    return data.filter(item => {
+      // Check every column cell value if possible, or just JSON stringify the object
+      return Object.values(item as any).some(val => 
+        val && String(val).toLowerCase().includes(lowerSearch)
+      );
+    });
+  }, [data, searchable, globalSearch]);
 
   // Sorting logic
   const sortedData = useMemo(() => {
-    if (!sortKey || !sortDir) return data;
+    if (!sortKey || !sortDir) return filteredData;
     const col = columns.find(c => c.key === sortKey);
-    if (!col || !col.sortFn) return data;
-    return [...data].sort((a, b) => {
+    if (!col || !col.sortFn) return filteredData;
+    return [...filteredData].sort((a, b) => {
       const result = col.sortFn!(a, b);
       return sortDir === 'desc' ? -result : result;
     });
-  }, [data, sortKey, sortDir, columns]);
+  }, [filteredData, sortKey, sortDir, columns]);
 
   // Pagination logic
   const totalPages = Math.ceil(sortedData.length / pageSize);
@@ -108,15 +126,32 @@ export function DataTable<T>({
 
   return (
     <div className="w-full bg-white rounded-xl border border-gray-100 overflow-hidden">
-      {/* Result count */}
-      {showResultCount && data.length > 0 && (
-        <div className="px-4 py-2.5 border-b border-gray-50 flex items-center justify-between">
-          <span className="text-xs text-gray-400">
-            {paginatedData.length === data.length 
-              ? `${data.length} résultat${data.length > 1 ? 's' : ''}`
-              : `${(currentPage - 1) * pageSize + 1}–${Math.min(currentPage * pageSize, data.length)} sur ${data.length}`
-            }
-          </span>
+      {/* Header controls: Search & Result count */}
+      {(showResultCount || searchable) && data.length > 0 && (
+        <div className="px-4 py-3 border-b border-gray-50 flex flex-wrap gap-3 items-center justify-between bg-gray-50/30">
+          {searchable ? (
+            <div className="relative max-w-sm w-full md:w-64">
+              <input
+                type="text"
+                placeholder={searchPlaceholder}
+                value={globalSearch}
+                onChange={(e) => setGlobalSearch(e.target.value)}
+                className="w-full pl-9 pr-4 py-1.5 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all bg-white"
+              />
+              <svg className="w-4 h-4 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+              </svg>
+            </div>
+          ) : <div />}
+          
+          {showResultCount && (
+            <span className="text-xs text-gray-400 font-medium">
+              {paginatedData.length === filteredData.length 
+                ? `${filteredData.length} résultat${filteredData.length > 1 ? 's' : ''}`
+                : `${(currentPage - 1) * pageSize + 1}–${Math.min(currentPage * pageSize, filteredData.length)} sur ${filteredData.length}`
+              }
+            </span>
+          )}
         </div>
       )}
 
