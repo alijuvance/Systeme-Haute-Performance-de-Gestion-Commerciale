@@ -78,7 +78,7 @@ export const SalesTable: React.FC<SalesTableProps> = ({ sales, isLoading, error,
 
   return (
     <>
-      <DataTable data={sales} columns={columns} keyExtractor={(s) => s.id} isLoading={isLoading} emptyMessage="Aucune vente trouvée avec ces filtres." />
+      <DataTable data={sales} columns={columns} keyExtractor={(s) => s.id} isLoading={isLoading} emptyMessage="Aucune vente trouvée avec ces filtres." searchable={true} searchPlaceholder="Rechercher dans ce tableau..." />
       {selectedSaleForPayment && (
         <PaymentModal
           sale={selectedSaleForPayment}

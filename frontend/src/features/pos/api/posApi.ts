@@ -1,4 +1,4 @@
-export const checkoutSale = async (selectedDepot: string, cart: any[]) => {
+export const checkoutSale = async (selectedDepot: string, cart: any[], customerId?: string) => {
   const res = await fetch('/api/sales', {
     method: 'POST',
     headers: {
@@ -8,6 +8,7 @@ export const checkoutSale = async (selectedDepot: string, cart: any[]) => {
     body: JSON.stringify({
       type: 'POS',
       depotId: selectedDepot,
+      customerId: customerId || undefined,
       lines: cart.map(c => ({
         productId: c.product.id,
         quantity: c.quantity,
