@@ -84,6 +84,10 @@ export function ProductsTable() {
         columns={columns} 
         keyExtractor={(p) => p.id} 
         isLoading={isLoading}
+        searchable={true}
+        searchPlaceholder="Rechercher un produit..."
+        exportable={true}
+        exportFilename="catalogue_produits.csv"
       />
 
       <ProductFormModal 

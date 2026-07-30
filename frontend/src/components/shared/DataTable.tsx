@@ -26,6 +26,8 @@ interface DataTableProps<T> {
   showResultCount?: boolean;
   searchable?: boolean;
   searchPlaceholder?: string;
+  exportable?: boolean;
+  exportFilename?: string;
 }
 
 type SortDir = 'asc' | 'desc' | null;
@@ -44,6 +46,8 @@ export function DataTable<T>({
   showResultCount = true,
   searchable = false,
   searchPlaceholder = "Rechercher...",
+  exportable = false,
+  exportFilename = "export_donnees.csv",
 }: DataTableProps<T>) {
   const [sortKey, setSortKey] = useState<string | null>(null);
   const [sortDir, setSortDir] = useState<SortDir>(null);
@@ -83,7 +87,38 @@ export function DataTable<T>({
   // Reset page when data changes
   React.useEffect(() => {
     setCurrentPage(1);
-  }, [data.length]);
+  }, [filteredData.length]);
+
+  const handleExportCSV = () => {
+    if (filteredData.length === 0) return;
+    
+    // Headers
+    const headerRow = columns.map(c => `"${String(c.header).replace(/"/g, '""')}"`).join(',');
+    
+    // Rows (extract raw text/data depending on cell content. Since cell returns ReactNode, we might have to use raw data. We'll use object values for simplicity, or if columns have an accessor, we'd use that. Since columns only have 'cell', we will try our best or fall back to extracting stringified object data)
+    // A robust CSV export in a React table where `cell` is a function returning JSX can be tricky.
+    // A simpler approach: iterate keys of the data objects.
+    const exportData = filteredData.map(row => {
+      return columns.map(col => {
+         // Attempt to find a matching key in row object
+         const val = (row as any)[col.key] !== undefined ? (row as any)[col.key] : '';
+         const strVal = String(val).replace(/"/g, '""');
+         return `"${strVal}"`;
+      }).join(',');
+    });
+
+    const csvContent = [headerRow, ...exportData].join('\n');
+    const blob = new Blob(['\uFEFF' + csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    
+    const link = document.createElement('a');
+    link.href = url;
+    link.setAttribute('download', exportFilename);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+  };
 
   const handleSort = (col: ColumnDef<T>) => {
     if (!col.sortable) return;
@@ -145,12 +180,25 @@ export function DataTable<T>({
           ) : <div />}
           
           {showResultCount && (
-            <span className="text-xs text-gray-400 font-medium">
+            <span className="text-xs text-gray-400 font-medium whitespace-nowrap">
               {paginatedData.length === filteredData.length 
                 ? `${filteredData.length} résultat${filteredData.length > 1 ? 's' : ''}`
                 : `${(currentPage - 1) * pageSize + 1}–${Math.min(currentPage * pageSize, filteredData.length)} sur ${filteredData.length}`
               }
             </span>
+          )}
+          
+          {exportable && data.length > 0 && (
+            <button
+              onClick={handleExportCSV}
+              className="ml-auto inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-gray-700 bg-white border border-gray-200 rounded-lg hover:bg-gray-50 hover:text-indigo-600 transition-colors shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
+              title="Exporter au format CSV"
+            >
+              <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+              </svg>
+              Exporter
+            </button>
           )}
         </div>
       )}
