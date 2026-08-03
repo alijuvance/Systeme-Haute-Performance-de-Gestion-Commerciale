@@ -23,6 +23,15 @@ export const useCart = () => {
     }));
   };
 
+  const setQuantity = (productId: string, quantity: number) => {
+    setCart(cart.map(item => {
+      if (item.product.id === productId) {
+        return quantity > 0 ? { ...item, quantity } : item;
+      }
+      return item;
+    }));
+  };
+
   const removeFromCart = (productId: string) => {
     setCart(cart.filter(item => item.product.id !== productId));
   };
@@ -33,5 +42,5 @@ export const useCart = () => {
 
   const total = cart.reduce((acc, item) => acc + (item.quantity * item.unitPrice), 0);
 
-  return { cart, addToCart, updateQuantity, removeFromCart, clearCart, total };
+  return { cart, addToCart, updateQuantity, setQuantity, removeFromCart, clearCart, total };
 };
