@@ -10,11 +10,11 @@ interface ProgressProps {
   animated?: boolean;
 }
 
-export function Progress({ 
-  value, 
-  size = 'md', 
-  variant = 'default', 
-  showLabel = false, 
+export function Progress({
+  value,
+  size = 'md',
+  variant = 'default',
+  showLabel = false,
   label,
   className = '',
   animated = false
@@ -23,32 +23,32 @@ export function Progress({
 
   const sizeStyles = {
     sm: 'h-1',
-    md: 'h-2',
-    lg: 'h-3',
+    md: 'h-1.5',
+    lg: 'h-2.5',
   };
 
   const barColors = {
-    default: 'bg-gray-900',
+    default: 'bg-zinc-900',
     success: 'bg-emerald-500',
     warning: 'bg-amber-500',
-    danger: 'bg-red-500',
-    info: 'bg-blue-500',
+    danger:  'bg-red-500',
+    info:    'bg-blue-500',
   };
 
   const trackColors = {
-    default: 'bg-gray-100',
+    default: 'bg-zinc-100',
     success: 'bg-emerald-50',
     warning: 'bg-amber-50',
-    danger: 'bg-red-50',
-    info: 'bg-blue-50',
+    danger:  'bg-red-50',
+    info:    'bg-blue-50',
   };
 
   return (
     <div className={`w-full ${className}`}>
       {(showLabel || label) && (
-        <div className="flex items-center justify-between mb-1.5">
-          {label && <span className="text-xs font-medium text-gray-600">{label}</span>}
-          {showLabel && <span className="text-xs font-semibold text-gray-900 tabular-nums">{Math.round(clampedValue)}%</span>}
+        <div className="flex items-center justify-between mb-1">
+          {label && <span className="text-[12px] font-medium text-zinc-600">{label}</span>}
+          {showLabel && <span className="text-[12px] font-semibold text-zinc-900 tabular-nums">{Math.round(clampedValue)}%</span>}
         </div>
       )}
       <div className={`w-full ${sizeStyles[size]} ${trackColors[variant]} rounded-full overflow-hidden`}>

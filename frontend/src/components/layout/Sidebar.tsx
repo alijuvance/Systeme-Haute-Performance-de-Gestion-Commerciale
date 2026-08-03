@@ -5,22 +5,21 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useAuth } from "@/contexts/AuthContext";
 import { useToast } from "@/components/providers/ToastProvider";
-import { 
-  LayoutDashboard, 
-  Package, 
-  ShoppingCart, 
-  Users, 
-  Settings, 
-  LogOut, 
-  Menu,
+import {
+  LayoutDashboard,
+  Package,
+  ShoppingCart,
+  Users,
+  Settings,
+  LogOut,
   Truck,
   FileText,
   LineChart,
   Warehouse,
   Shield,
   ChevronDown,
-  ChevronRight,
-  User,
+  PanelLeftClose,
+  PanelLeft,
 } from "lucide-react";
 
 // ═══════════════════════════════════════════════════════
@@ -52,17 +51,30 @@ interface SidebarProps {
 }
 
 // ═══════════════════════════════════════════════════════
-// Logo Component (Geometric icon inspired by Brainwave)
+// Logo — Geometric modern icon
 // ═══════════════════════════════════════════════════════
 
-function AppLogo() {
+function AppLogo({ collapsed }: { collapsed: boolean }) {
   return (
-    <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-      <rect x="2" y="2" width="12" height="12" rx="3" fill="#171717" />
-      <rect x="18" y="2" width="12" height="12" rx="3" fill="#a3a3a3" />
-      <rect x="2" y="18" width="12" height="12" rx="3" fill="#a3a3a3" />
-      <rect x="18" y="18" width="12" height="12" rx="3" fill="#171717" />
-    </svg>
+    <div className="flex items-center gap-2.5 overflow-hidden">
+      <div className="w-8 h-8 rounded-lg bg-zinc-900 flex items-center justify-center flex-shrink-0">
+        <svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+          <rect x="1" y="1" width="7" height="7" rx="1.5" fill="#ffffff" />
+          <rect x="10" y="1" width="7" height="7" rx="1.5" fill="#a1a1aa" />
+          <rect x="1" y="10" width="7" height="7" rx="1.5" fill="#a1a1aa" />
+          <rect x="10" y="10" width="7" height="7" rx="1.5" fill="#ffffff" />
+        </svg>
+      </div>
+      <span
+        className={`
+          font-semibold text-[15px] text-zinc-900 tracking-tight whitespace-nowrap
+          transition-all duration-200
+          ${collapsed ? "w-0 opacity-0" : "w-auto opacity-100"}
+        `}
+      >
+        FANJAVA
+      </span>
+    </div>
   );
 }
 
@@ -75,42 +87,42 @@ export function Sidebar({ sidebarOpen, setSidebarOpen }: SidebarProps) {
   const { user, logout } = useAuth();
   const toast = useToast();
   const role = user?.role?.name || user?.role || 'MANAGER';
+  const collapsed = !sidebarOpen;
 
-  // --- Sous-menus ouverts (tracked by section label) ---
   const [openSections, setOpenSections] = useState<Record<string, boolean>>({});
 
   const toggleSection = (itemName: string) => {
     setOpenSections(prev => ({ ...prev, [itemName]: !prev[itemName] }));
   };
 
-  // ─── Navigation structure groupée par sections ───
+  // ─── Navigation structure ───
   const allSections: NavSection[] = [
     {
-      label: 'NAVIGATION',
+      label: 'Principal',
       items: [
         { name: "Tableau de bord", href: "/dashboard", icon: LayoutDashboard },
       ],
     },
     {
-      label: 'GESTION',
+      label: 'Gestion',
       items: [
-        { 
-          name: "Ventes & Factures", href: "/dashboard/sales", icon: ShoppingCart, 
+        {
+          name: "Ventes", href: "/dashboard/sales", icon: ShoppingCart,
           roles: ['ADMIN', 'MANAGER', 'CASHIER', 'SALES'],
           children: [
-            { name: "Liste des factures", href: "/dashboard/sales" },
-            { name: "Nouvelle facture", href: "/dashboard/sales/new" },
+            { name: "Toutes les ventes", href: "/dashboard/sales" },
+            { name: "Nouvelle vente", href: "/dashboard/sales/new" },
           ],
         },
-        { name: "Catalogue (Produits)", href: "/dashboard/products", icon: Package, roles: ['ADMIN', 'MANAGER', 'CASHIER', 'SALES', 'INVENTORY'] },
-        { name: "Gestion des Stocks", href: "/dashboard/stocks", icon: Warehouse, roles: ['ADMIN', 'MANAGER', 'INVENTORY'] },
+        { name: "Produits", href: "/dashboard/products", icon: Package, roles: ['ADMIN', 'MANAGER', 'CASHIER', 'SALES', 'INVENTORY'] },
+        { name: "Stocks", href: "/dashboard/stocks", icon: Warehouse, roles: ['ADMIN', 'MANAGER', 'INVENTORY'] },
         { name: "Clients", href: "/dashboard/customers", icon: Users, roles: ['ADMIN', 'MANAGER', 'CASHIER', 'SALES'] },
         { name: "Fournisseurs", href: "/dashboard/suppliers", icon: Truck, roles: ['ADMIN', 'MANAGER', 'INVENTORY'] },
         { name: "Achats", href: "/dashboard/purchases", icon: FileText, roles: ['ADMIN', 'MANAGER', 'INVENTORY'] },
       ],
     },
     {
-      label: 'ADMINISTRATION',
+      label: 'Administration',
       items: [
         { name: "Finance", href: "/dashboard/finance", icon: LineChart, roles: ['ADMIN'] },
         { name: "Utilisateurs", href: "/dashboard/users", icon: Shield, roles: ['ADMIN'] },
@@ -119,7 +131,6 @@ export function Sidebar({ sidebarOpen, setSidebarOpen }: SidebarProps) {
     },
   ];
 
-  // --- Filtre par rôle ---
   const filteredSections = allSections
     .map(section => ({
       ...section,
@@ -127,7 +138,6 @@ export function Sidebar({ sidebarOpen, setSidebarOpen }: SidebarProps) {
     }))
     .filter(section => section.items.length > 0);
 
-  // --- Check active state ---
   const isActive = (href: string) => pathname === href;
   const isSectionActive = (item: NavItem) => {
     if (isActive(item.href)) return true;
@@ -135,7 +145,6 @@ export function Sidebar({ sidebarOpen, setSidebarOpen }: SidebarProps) {
     return false;
   };
 
-  // --- Logout handler (with confirmation toast) ---
   const handleLogout = async () => {
     const ok = await toast.confirm({
       title: 'Déconnexion',
@@ -144,58 +153,48 @@ export function Sidebar({ sidebarOpen, setSidebarOpen }: SidebarProps) {
       cancelText: 'Annuler',
       variant: 'warning',
     });
-    if (ok) {
-      logout();
-    }
+    if (ok) logout();
   };
 
-  // --- Username display ---
   const displayName = user?.fullName || 'Utilisateur';
   const initials = displayName.substring(0, 2).toUpperCase();
 
   return (
     <aside
       className={`
-        ${sidebarOpen ? "w-[272px]" : "w-16"} 
-        transition-all duration-300 ease-in-out
-        bg-white 
+        ${sidebarOpen ? "w-[260px]" : "w-16"}
+        transition-all duration-300 ease-[cubic-bezier(0.25,0.1,0.25,1)]
+        bg-white
         flex flex-col fixed h-full z-20
-        shadow-[1px_0_12px_rgba(0,0,0,0.03)]
+        border-r border-zinc-100
       `}
       aria-label="Sidebar de navigation"
     >
-      {/* ═══════════ Logo + App name ═══════════ */}
-      <div className="h-[72px] flex items-center justify-between px-5 border-b border-neutral-100">
-        <div className="flex items-center gap-3 overflow-hidden">
-          <AppLogo />
-          <span 
-            className={`
-              font-bold text-xl text-neutral-900 tracking-tight whitespace-nowrap
-              transition-all duration-300
-              ${sidebarOpen ? "w-auto opacity-100" : "w-0 opacity-0"}
-            `}
-          >
-            FANJAVA
-          </span>
-        </div>
-        <button 
-          onClick={() => setSidebarOpen(!sidebarOpen)} 
-          className="p-2 text-neutral-400 hover:text-neutral-700 hover:bg-neutral-100 rounded-xl transition-all duration-200"
+      {/* ═══════════ Logo + Toggle ═══════════ */}
+      <div className="h-14 flex items-center justify-between px-4">
+        <AppLogo collapsed={collapsed} />
+        <button
+          onClick={() => setSidebarOpen(!sidebarOpen)}
+          className="p-1.5 text-zinc-400 hover:text-zinc-600 hover:bg-zinc-50 rounded-md transition-all duration-150"
           aria-label={sidebarOpen ? "Réduire la sidebar" : "Développer la sidebar"}
         >
-          <Menu className="w-5 h-5" />
+          {sidebarOpen ? (
+            <PanelLeftClose className="w-4 h-4" />
+          ) : (
+            <PanelLeft className="w-4 h-4" />
+          )}
         </button>
       </div>
 
       {/* ═══════════ Navigation ═══════════ */}
-      <nav className="flex-1 overflow-y-auto py-5 px-3 scrollbar-hide" aria-label="Navigation principale">
+      <nav className="flex-1 overflow-y-auto py-3 px-2.5 scrollbar-hide" aria-label="Navigation principale">
         {filteredSections.map((section) => (
-          <div key={section.label} className="mb-6">
+          <div key={section.label} className="mb-4">
             {/* Section label */}
             <div
               className={`
-                px-3 mb-2.5 text-[11px] font-semibold uppercase tracking-widest text-neutral-400
-                transition-all duration-300
+                px-2.5 mb-1 text-[10px] font-semibold uppercase tracking-[0.08em] text-zinc-400
+                transition-all duration-200
                 ${sidebarOpen ? "opacity-100" : "opacity-0 h-0 mb-0 overflow-hidden"}
               `}
             >
@@ -203,7 +202,7 @@ export function Sidebar({ sidebarOpen, setSidebarOpen }: SidebarProps) {
             </div>
 
             {/* Section items */}
-            <div className="flex flex-col gap-1">
+            <div className="flex flex-col gap-px">
               {section.items.map((item) => {
                 const Icon = item.icon;
                 const active = isSectionActive(item);
@@ -218,40 +217,30 @@ export function Sidebar({ sidebarOpen, setSidebarOpen }: SidebarProps) {
                         onClick={() => toggleSection(item.name)}
                         aria-expanded={isExpanded}
                         className={`
-                          w-full flex items-center gap-3 px-2.5 py-2.5 
-                          rounded-2xl transition-all duration-200 group cursor-pointer
+                          w-full flex items-center gap-2.5 px-2.5 py-[7px]
+                          rounded-md transition-all duration-150 group cursor-pointer
                           ${active
-                            ? "bg-neutral-100" 
-                            : "hover:bg-neutral-50"
+                            ? "bg-zinc-100/80 text-zinc-900"
+                            : "text-zinc-500 hover:text-zinc-700 hover:bg-zinc-50"
                           }
                         `}
                       >
+                        <Icon className="w-4 h-4 flex-shrink-0" strokeWidth={1.75} />
                         <span className={`
-                          flex items-center justify-center w-8 h-8 rounded-xl flex-shrink-0 transition-all duration-200
-                          ${active
-                            ? "bg-white shadow-[0_1px_2px_rgba(0,0,0,0.06),0_1px_6px_rgba(0,0,0,0.06)] text-neutral-900"
-                            : "text-neutral-400 group-hover:text-neutral-600"
-                          }
-                        `}>
-                          <Icon className="w-[18px] h-[18px]" strokeWidth={2} />
-                        </span>
-                        <span className={`
-                          text-sm whitespace-nowrap overflow-hidden transition-all duration-300
-                          ${active ? "text-neutral-900 font-semibold" : "text-neutral-600 group-hover:text-neutral-900"}
+                          text-[13px] whitespace-nowrap overflow-hidden transition-all duration-200
+                          ${active ? "font-medium" : "font-normal"}
                           ${sidebarOpen ? "flex-1 opacity-100 text-left" : "w-0 opacity-0"}
                         `}>
                           {item.name}
                         </span>
-                        {/* Badge */}
                         {item.badge && sidebarOpen && (
-                          <span className="px-2.5 py-1 text-xs font-medium text-neutral-500 bg-white rounded-xl border border-neutral-200">
+                          <span className="px-1.5 py-0.5 text-[10px] font-medium text-zinc-500 bg-zinc-100 rounded-full tabular-nums">
                             {item.badge}
                           </span>
                         )}
-                        {/* Chevron */}
                         {sidebarOpen && (
-                          <ChevronDown 
-                            className={`w-4 h-4 text-neutral-400 transition-transform duration-200 ${isExpanded ? "rotate-0" : "-rotate-90"}`} 
+                          <ChevronDown
+                            className={`w-3.5 h-3.5 text-zinc-400 transition-transform duration-200 ${isExpanded ? "rotate-0" : "-rotate-90"}`}
                           />
                         )}
                       </button>
@@ -259,42 +248,33 @@ export function Sidebar({ sidebarOpen, setSidebarOpen }: SidebarProps) {
                       <Link
                         href={item.href}
                         className={`
-                          flex items-center gap-3 px-2.5 py-2.5 
-                          rounded-2xl transition-all duration-200 group
+                          flex items-center gap-2.5 px-2.5 py-[7px]
+                          rounded-md transition-all duration-150 group
                           ${active
-                            ? "bg-neutral-100" 
-                            : "hover:bg-neutral-50"
+                            ? "bg-zinc-100/80 text-zinc-900"
+                            : "text-zinc-500 hover:text-zinc-700 hover:bg-zinc-50"
                           }
                         `}
                       >
+                        <Icon className="w-4 h-4 flex-shrink-0" strokeWidth={1.75} />
                         <span className={`
-                          flex items-center justify-center w-8 h-8 rounded-xl flex-shrink-0 transition-all duration-200
-                          ${active
-                            ? "bg-white shadow-[0_1px_2px_rgba(0,0,0,0.06),0_1px_6px_rgba(0,0,0,0.06)] text-neutral-900"
-                            : "text-neutral-400 group-hover:text-neutral-600"
-                          }
-                        `}>
-                          <Icon className="w-[18px] h-[18px]" strokeWidth={2} />
-                        </span>
-                        <span className={`
-                          text-sm whitespace-nowrap overflow-hidden transition-all duration-300
-                          ${active ? "text-neutral-900 font-semibold" : "text-neutral-600 group-hover:text-neutral-900"}
+                          text-[13px] whitespace-nowrap overflow-hidden transition-all duration-200
+                          ${active ? "font-medium" : "font-normal"}
                           ${sidebarOpen ? "flex-1 opacity-100" : "w-0 opacity-0"}
                         `}>
                           {item.name}
                         </span>
-                        {/* Badge */}
                         {item.badge && sidebarOpen && (
-                          <span className="px-2.5 py-1 text-xs font-medium text-neutral-500 bg-white rounded-xl border border-neutral-200">
+                          <span className="px-1.5 py-0.5 text-[10px] font-medium text-zinc-500 bg-zinc-100 rounded-full tabular-nums">
                             {item.badge}
                           </span>
                         )}
                       </Link>
                     )}
 
-                    {/* ─── Children (submenu) with vertical line indicator ─── */}
+                    {/* ─── Submenu ─── */}
                     {hasChildren && isExpanded && sidebarOpen && (
-                      <div className="ml-[30px] mt-1 mb-1 pl-4 border-l-2 border-neutral-200 animate-submenu-open overflow-hidden">
+                      <div className="ml-[22px] mt-0.5 mb-0.5 pl-3 border-l border-zinc-200 animate-submenu-open overflow-hidden">
                         {item.children!.map((child) => {
                           const childActive = isActive(child.href);
                           return (
@@ -302,10 +282,10 @@ export function Sidebar({ sidebarOpen, setSidebarOpen }: SidebarProps) {
                               key={child.href}
                               href={child.href}
                               className={`
-                                block py-2 px-3 text-sm rounded-xl transition-all duration-200
+                                block py-[5px] px-2.5 text-[13px] rounded-md transition-all duration-150
                                 ${childActive
-                                  ? "text-neutral-900 font-semibold bg-neutral-50" 
-                                  : "text-neutral-500 hover:text-neutral-900 hover:bg-neutral-50"
+                                  ? "text-zinc-900 font-medium bg-zinc-50"
+                                  : "text-zinc-400 hover:text-zinc-700 hover:bg-zinc-50"
                                 }
                               `}
                             >
@@ -323,34 +303,32 @@ export function Sidebar({ sidebarOpen, setSidebarOpen }: SidebarProps) {
         ))}
       </nav>
 
-      {/* ═══════════ Footer: User + Logout ═══════════ */}
-      <div className="border-t border-neutral-100 p-3">
+      {/* ═══════════ Footer ═══════════ */}
+      <div className="border-t border-zinc-100 p-2.5">
         {/* User info */}
-        <div className={`flex items-center gap-3 px-2.5 py-2.5 mb-1 rounded-2xl transition-all duration-200 ${sidebarOpen ? "" : "justify-center"}`}>
-          <div className="w-8 h-8 rounded-xl bg-neutral-900 text-white flex items-center justify-center text-xs font-semibold flex-shrink-0">
+        <div className={`flex items-center gap-2.5 px-2 py-2 rounded-md transition-all duration-150 ${sidebarOpen ? "" : "justify-center"}`}>
+          <div className="w-7 h-7 rounded-md bg-zinc-900 text-white flex items-center justify-center text-[10px] font-semibold flex-shrink-0">
             {initials}
           </div>
-          <div className={`overflow-hidden transition-all duration-300 ${sidebarOpen ? "w-auto opacity-100" : "w-0 opacity-0"}`}>
-            <p className="text-sm font-medium text-neutral-900 whitespace-nowrap truncate max-w-[160px]">{displayName}</p>
-            <p className="text-xs text-neutral-400 whitespace-nowrap">{typeof role === 'string' ? role : ''}</p>
+          <div className={`overflow-hidden transition-all duration-200 ${sidebarOpen ? "w-auto opacity-100" : "w-0 opacity-0"}`}>
+            <p className="text-[13px] font-medium text-zinc-900 whitespace-nowrap truncate max-w-[160px]">{displayName}</p>
+            <p className="text-[11px] text-zinc-400 whitespace-nowrap">{typeof role === 'string' ? role : ''}</p>
           </div>
         </div>
 
-        {/* Logout button */}
-        <button 
-          onClick={handleLogout} 
+        {/* Logout */}
+        <button
+          onClick={handleLogout}
           className={`
-            w-full flex items-center gap-3 px-2.5 py-2.5 
-            rounded-2xl transition-all duration-200 group
-            text-neutral-500 hover:text-red-600 hover:bg-red-50
+            w-full flex items-center gap-2.5 px-2 py-2
+            rounded-md transition-all duration-150 group
+            text-zinc-400 hover:text-red-600 hover:bg-red-50/50
             ${!sidebarOpen ? "justify-center" : ""}
           `}
           aria-label="Se déconnecter"
         >
-          <span className="flex items-center justify-center w-8 h-8 rounded-xl flex-shrink-0">
-            <LogOut className="w-[18px] h-[18px] transition-colors duration-200 group-hover:text-red-500" strokeWidth={2} />
-          </span>
-          <span className={`text-sm font-medium whitespace-nowrap overflow-hidden transition-all duration-300 ${sidebarOpen ? "w-auto opacity-100" : "w-0 opacity-0"}`}>
+          <LogOut className="w-4 h-4 flex-shrink-0 transition-colors duration-150" strokeWidth={1.75} />
+          <span className={`text-[13px] font-normal whitespace-nowrap overflow-hidden transition-all duration-200 ${sidebarOpen ? "w-auto opacity-100" : "w-0 opacity-0"}`}>
             Déconnexion
           </span>
         </button>
