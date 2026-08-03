@@ -5,6 +5,7 @@ import { CartItem } from '../types';
 interface CartSidebarProps {
   cart: CartItem[];
   updateQuantity: (productId: string, delta: number) => void;
+  setQuantity: (productId: string, quantity: number) => void;
   removeFromCart: (productId: string) => void;
   total: number;
   handleCheckout: () => void;
@@ -17,6 +18,7 @@ interface CartSidebarProps {
 export const CartSidebar: React.FC<CartSidebarProps> = ({
   cart,
   updateQuantity,
+  setQuantity,
   removeFromCart,
   total,
   handleCheckout,
@@ -28,9 +30,19 @@ export const CartSidebar: React.FC<CartSidebarProps> = ({
   return (
     <div className="w-96 bg-white border-l shadow-xl flex flex-col z-10">
       <div className="p-4 border-b bg-gray-50 flex flex-col gap-3">
-        <h2 className="text-lg font-bold flex items-center gap-2">
-          <ShoppingCart className="w-5 h-5" /> Ticket de caisse
-        </h2>
+        <div className="flex items-center justify-between">
+          <h2 className="text-lg font-bold flex items-center gap-2">
+            <ShoppingCart className="w-5 h-5" /> Ticket de caisse
+          </h2>
+          {cart.length > 0 && (
+            <span className="text-[10px] bg-red-100 text-red-700 px-2 py-1 rounded font-bold cursor-pointer hover:bg-red-200" title="Vider le panier" onClick={() => {
+              if (window.confirm("Voulez-vous vraiment vider le panier actuel ?")) {
+                const event = new KeyboardEvent('keydown', { key: 'F9' });
+                window.dispatchEvent(event);
+              }
+            }}>F9 : Vider</span>
+          )}
+        </div>
         {setSelectedCustomer && (
           <select 
             value={selectedCustomer} 
@@ -58,12 +70,22 @@ export const CartSidebar: React.FC<CartSidebarProps> = ({
                 <span>{new Intl.NumberFormat('fr-MG', { style: 'currency', currency: 'MGA' }).format(item.unitPrice * item.quantity)}</span>
               </div>
               <div className="flex justify-between items-center mt-2">
-                <div className="flex items-center gap-3 bg-white border rounded-lg px-2 py-1">
-                  <button onClick={() => updateQuantity(item.product.id, -1)} className="text-gray-500 hover:text-black">
+                <div className="flex items-center gap-2 bg-white border rounded-lg px-2 py-1">
+                  <button onClick={() => updateQuantity(item.product.id, -1)} className="text-gray-500 hover:text-black focus:outline-none">
                     <Minus className="w-4 h-4" />
                   </button>
-                  <span className="font-semibold w-6 text-center">{item.quantity}</span>
-                  <button onClick={() => updateQuantity(item.product.id, 1)} className="text-gray-500 hover:text-black">
+                  <input 
+                    type="number" 
+                    value={item.quantity}
+                    onChange={(e) => {
+                      const val = parseInt(e.target.value);
+                      if (!isNaN(val)) setQuantity(item.product.id, val);
+                    }}
+                    onFocus={(e) => e.target.select()}
+                    className="font-semibold w-12 text-center focus:outline-none focus:ring-1 focus:ring-indigo-500 rounded bg-gray-50 border-gray-200 border hide-arrows"
+                    min="1"
+                  />
+                  <button onClick={() => updateQuantity(item.product.id, 1)} className="text-gray-500 hover:text-black focus:outline-none">
                     <Plus className="w-4 h-4" />
                   </button>
                 </div>
@@ -84,9 +106,10 @@ export const CartSidebar: React.FC<CartSidebarProps> = ({
         <button 
           disabled={loading || cart.length === 0} 
           onClick={handleCheckout}
-          className="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-4 rounded-xl text-lg shadow-lg disabled:opacity-50 transition-all active:scale-95"
+          className="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-4 rounded-xl text-lg shadow-lg disabled:opacity-50 transition-all active:scale-95 flex flex-col items-center justify-center gap-1"
         >
-          {loading ? 'Encaissement...' : 'ENCAISSER'}
+          <span>{loading ? 'Encaissement...' : 'ENCAISSER'}</span>
+          {!loading && <span className="text-xs font-normal opacity-80">(Appuyez sur F8)</span>}
         </button>
       </div>
     </div>
