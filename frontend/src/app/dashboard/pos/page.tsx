@@ -18,7 +18,7 @@ export default function POSPage() {
   const [loading, setLoading] = useState(false);
   const toast = useToast();
   
-  const { cart, addToCart, updateQuantity, removeFromCart, clearCart, total } = useCart();
+  const { cart, addToCart, updateQuantity, setQuantity, removeFromCart, clearCart, total } = useCart();
 
   useEffect(() => {
     const fetchInit = async () => {
@@ -76,6 +76,28 @@ export default function POSPage() {
     }
   };
 
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      // Ignore if inside an input other than the pos-search (except F keys which we want to override)
+      if (e.key === 'F2') {
+        e.preventDefault();
+        document.getElementById('pos-search')?.focus();
+      } else if (e.key === 'F8') {
+        e.preventDefault();
+        handleCheckout();
+      } else if (e.key === 'F9') {
+        e.preventDefault();
+        if (cart.length > 0) {
+          const ok = window.confirm("Voulez-vous vraiment vider le panier actuel ?");
+          if (ok) clearCart();
+        }
+      }
+    };
+    
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [cart, selectedDepot, selectedCustomer]);
+
   return (
     <div className="flex h-[calc(100vh-4rem)] -m-8">
       <ProductCatalog 
@@ -89,6 +111,7 @@ export default function POSPage() {
       <CartSidebar 
         cart={cart}
         updateQuantity={updateQuantity}
+        setQuantity={setQuantity}
         removeFromCart={removeFromCart}
         total={total}
         handleCheckout={handleCheckout}

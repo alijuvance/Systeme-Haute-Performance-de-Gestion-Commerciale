@@ -52,8 +52,9 @@ export const ProductCatalog: React.FC<ProductCatalogProps> = ({
         <div className="flex items-center gap-3">
           <div className="w-64">
             <Input
+              id="pos-search"
               type="text"
-              placeholder="Rechercher un produit..."
+              placeholder="Rechercher un produit... (F2)"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               icon={<Search className="w-4 h-4" />}
