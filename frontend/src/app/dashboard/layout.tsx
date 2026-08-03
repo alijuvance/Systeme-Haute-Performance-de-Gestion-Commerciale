@@ -6,35 +6,38 @@ import { Sidebar } from "@/components/layout/Sidebar";
 import { Header } from "@/components/layout/Header";
 import { CommandPalette } from "@/components/shared/CommandPalette";
 
+const PAGE_TITLES: Record<string, string> = {
+  "/dashboard": "Tableau de bord",
+  "/dashboard/finance": "Finance & Trésorerie",
+  "/dashboard/products": "Catalogue & Stocks",
+  "/dashboard/purchases": "Achats",
+  "/dashboard/suppliers": "Fournisseurs",
+  "/dashboard/sales": "Ventes & Factures",
+  "/dashboard/customers": "Clients",
+  "/dashboard/stocks": "Gestion des Stocks",
+  "/dashboard/users": "Utilisateurs",
+  "/dashboard/settings": "Paramètres",
+  "/dashboard/pos": "Point de Vente",
+};
+
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const pathname = usePathname();
 
-  const getTitle = () => {
-    switch (pathname) {
-      case "/dashboard": return "Tableau de bord";
-      case "/dashboard/finance": return "Finance & Trésorerie";
-      case "/dashboard/products": return "Catalogue & Stocks";
-      case "/dashboard/purchases": return "Achats (Commandes)";
-      case "/dashboard/suppliers": return "Fournisseurs";
-      case "/dashboard/sales": return "Ventes & Factures";
-      case "/dashboard/customers": return "Clients B2B";
-      case "/dashboard/stocks": return "Gestion des Stocks";
-      case "/dashboard/users": return "Utilisateurs";
-      case "/dashboard/settings": return "Paramètres";
-      case "/dashboard/pos": return "Caisse POS";
-      default: return "ERP System";
-    }
-  };
+  const title = PAGE_TITLES[pathname] || "ERP System";
 
   return (
-    <div className="min-h-screen bg-gray-50 flex text-slate-900">
+    <div className="min-h-screen bg-[var(--background)] flex">
       <Sidebar sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} />
 
-      <div className={`flex-1 flex flex-col min-h-screen transition-all duration-300 ${sidebarOpen ? "ml-[272px]" : "ml-16"}`}>
-        <Header title={getTitle()} />
+      <div
+        className={`flex-1 flex flex-col min-h-screen transition-[margin] duration-300 ease-[cubic-bezier(0.25,0.1,0.25,1)] ${
+          sidebarOpen ? "ml-[260px]" : "ml-16"
+        }`}
+      >
+        <Header title={title} />
 
-        <main className="p-6 flex-1">
+        <main className="flex-1 px-6 py-6 lg:px-8">
           {children}
         </main>
       </div>

@@ -8,20 +8,20 @@ interface StatCardProps {
   icon?: React.ReactNode;
   iconBg?: string;
   trend?: {
-    value: number; // percentage, e.g. +12.5 or -3.2
-    label?: string; // e.g. "vs hier", "vs semaine dernière"
+    value: number;
+    label?: string;
   };
   sparklineData?: number[];
-  accentColor?: string; // For the sparkline color
+  accentColor?: string;
   className?: string;
   onClick?: () => void;
 }
 
-function MiniSparkline({ data, color = '#111827' }: { data: number[]; color?: string }) {
+function MiniSparkline({ data, color = '#18181b' }: { data: number[]; color?: string }) {
   if (!data || data.length < 2) return null;
 
-  const width = 80;
-  const height = 32;
+  const width = 72;
+  const height = 28;
   const padding = 2;
 
   const min = Math.min(...data);
@@ -36,30 +36,31 @@ function MiniSparkline({ data, color = '#111827' }: { data: number[]; color?: st
 
   const pathD = `M ${points.join(' L ')}`;
   const areaD = `${pathD} L ${width - padding},${height} L ${padding},${height} Z`;
+  const gradientId = `spark-${color.replace('#', '')}`;
 
   return (
-    <svg width={width} height={height} className="flex-shrink-0" aria-hidden="true">
+    <svg width={width} height={height} className="flex-shrink-0 opacity-60" aria-hidden="true">
       <defs>
-        <linearGradient id={`sparkGrad-${color.replace('#', '')}`} x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%" stopColor={color} stopOpacity={0.12} />
+        <linearGradient id={gradientId} x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stopColor={color} stopOpacity={0.1} />
           <stop offset="100%" stopColor={color} stopOpacity={0} />
         </linearGradient>
       </defs>
-      <path d={areaD} fill={`url(#sparkGrad-${color.replace('#', '')})`} />
+      <path d={areaD} fill={`url(#${gradientId})`} />
       <path d={pathD} fill="none" stroke={color} strokeWidth={1.5} strokeLinecap="round" strokeLinejoin="round" />
     </svg>
   );
 }
 
-export function StatCard({ 
-  title, 
-  value, 
-  subtitle, 
-  icon, 
-  iconBg = 'bg-gray-100', 
-  trend, 
+export function StatCard({
+  title,
+  value,
+  subtitle,
+  icon,
+  iconBg = 'bg-zinc-100',
+  trend,
   sparklineData,
-  accentColor = '#111827',
+  accentColor = '#18181b',
   className = '',
   onClick,
 }: StatCardProps) {
@@ -68,21 +69,22 @@ export function StatCard({
   const trendIsNeutral = trend && trend.value === 0;
 
   return (
-    <div 
+    <div
       className={`
-        bg-white rounded-xl border border-gray-100 p-5 
-        hover:shadow-md hover:border-gray-200 
-        transition-all duration-200 
-        ${onClick ? 'cursor-pointer' : ''} 
+        bg-white rounded-xl p-5
+        shadow-[var(--shadow-card)]
+        hover:shadow-[var(--shadow-card-hover)]
+        transition-all duration-200
+        ${onClick ? 'cursor-pointer' : ''}
         ${className}
       `}
       onClick={onClick}
     >
       {/* Header: Title + Icon */}
       <div className="flex items-center justify-between mb-3">
-        <span className="text-[13px] font-medium text-gray-500">{title}</span>
+        <span className="text-[12px] font-medium text-zinc-500 uppercase tracking-wide">{title}</span>
         {icon && (
-          <div className={`w-9 h-9 ${iconBg} rounded-lg flex items-center justify-center flex-shrink-0`}>
+          <div className={`w-8 h-8 ${iconBg} rounded-lg flex items-center justify-center flex-shrink-0`}>
             {icon}
           </div>
         )}
@@ -91,36 +93,36 @@ export function StatCard({
       {/* Value + Sparkline */}
       <div className="flex items-end justify-between gap-3">
         <div className="min-w-0">
-          <div className="text-2xl font-semibold text-gray-900 tabular-nums truncate">{value}</div>
-          
+          <div className="text-2xl font-semibold text-zinc-900 tabular-nums tracking-tight truncate">{value}</div>
+
           {/* Trend indicator */}
           {trend && (
             <div className="flex items-center gap-1.5 mt-1.5">
               {trendIsPositive && (
-                <span className="inline-flex items-center gap-0.5 text-xs font-medium text-emerald-700 bg-emerald-50 px-1.5 py-0.5 rounded-md">
+                <span className="inline-flex items-center gap-0.5 text-[11px] font-medium text-emerald-700 bg-emerald-50 px-1.5 py-0.5 rounded-md ring-1 ring-inset ring-emerald-600/10">
                   <TrendingUp className="w-3 h-3" />
                   +{trend.value.toFixed(1)}%
                 </span>
               )}
               {trendIsNegative && (
-                <span className="inline-flex items-center gap-0.5 text-xs font-medium text-red-700 bg-red-50 px-1.5 py-0.5 rounded-md">
+                <span className="inline-flex items-center gap-0.5 text-[11px] font-medium text-red-700 bg-red-50 px-1.5 py-0.5 rounded-md ring-1 ring-inset ring-red-600/10">
                   <TrendingDown className="w-3 h-3" />
                   {trend.value.toFixed(1)}%
                 </span>
               )}
               {trendIsNeutral && (
-                <span className="inline-flex items-center gap-0.5 text-xs font-medium text-gray-500 bg-gray-50 px-1.5 py-0.5 rounded-md">
+                <span className="inline-flex items-center gap-0.5 text-[11px] font-medium text-zinc-500 bg-zinc-50 px-1.5 py-0.5 rounded-md ring-1 ring-inset ring-zinc-500/10">
                   <Minus className="w-3 h-3" />
                   0%
                 </span>
               )}
-              {trend.label && <span className="text-[11px] text-gray-400">{trend.label}</span>}
+              {trend.label && <span className="text-[11px] text-zinc-400">{trend.label}</span>}
             </div>
           )}
-          
+
           {/* Subtitle */}
           {subtitle && !trend && (
-            <p className="text-xs text-gray-400 mt-1.5">{subtitle}</p>
+            <p className="text-[11px] text-zinc-400 mt-1.5">{subtitle}</p>
           )}
         </div>
 
