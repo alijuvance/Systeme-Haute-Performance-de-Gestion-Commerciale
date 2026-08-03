@@ -1,34 +1,75 @@
 'use client';
-import { Search, Command } from "lucide-react";
+import { usePathname } from 'next/navigation';
+import Link from 'next/link';
+import { Search, Command, ChevronRight } from "lucide-react";
 import { NotificationDropdown } from "./NotificationDropdown";
 import { useAuth } from "@/contexts/AuthContext";
 import api from '@/api/axios';
 
+const BREADCRUMB_LABELS: Record<string, string> = {
+  dashboard: "Accueil",
+  finance: "Finance",
+  products: "Produits",
+  purchases: "Achats",
+  suppliers: "Fournisseurs",
+  sales: "Ventes",
+  customers: "Clients",
+  stocks: "Stocks",
+  users: "Utilisateurs",
+  settings: "Paramètres",
+  pos: "Point de Vente",
+  new: "Nouveau",
+};
+
 export function Header({ title }: { title: string }) {
   const { user } = useAuth();
+  const pathname = usePathname();
   const initials = user?.fullName ? user.fullName.substring(0, 2).toUpperCase() : 'AD';
 
+  // Build breadcrumbs from pathname
+  const segments = pathname.split('/').filter(Boolean);
+  const breadcrumbs = segments.map((seg, i) => ({
+    label: BREADCRUMB_LABELS[seg] || seg,
+    href: '/' + segments.slice(0, i + 1).join('/'),
+    isLast: i === segments.length - 1,
+  }));
+
   const openCommandPalette = () => {
-    // Dispatch Ctrl+K event to trigger the CommandPalette
     window.dispatchEvent(new KeyboardEvent('keydown', { key: 'k', ctrlKey: true }));
   };
 
   return (
-    <header className="h-[72px] bg-white/90 backdrop-blur-md sticky top-0 z-10 flex items-center justify-between px-8 border-b border-neutral-100">
-      <h2 className="font-semibold text-neutral-900 text-xl tracking-tight">
-        {title}
-      </h2>
+    <header className="h-14 bg-white/80 backdrop-blur-xl sticky top-0 z-10 flex items-center justify-between px-6 lg:px-8 border-b border-zinc-100/80">
+      {/* Left: Breadcrumbs */}
+      <nav className="flex items-center gap-1 text-[13px]" aria-label="Fil d'Ariane">
+        {breadcrumbs.map((crumb, i) => (
+          <span key={crumb.href} className="flex items-center gap-1">
+            {i > 0 && <ChevronRight className="w-3 h-3 text-zinc-300" />}
+            {crumb.isLast ? (
+              <span className="font-medium text-zinc-900">{crumb.label}</span>
+            ) : (
+              <Link
+                href={crumb.href}
+                className="text-zinc-400 hover:text-zinc-600 transition-colors duration-150"
+              >
+                {crumb.label}
+              </Link>
+            )}
+          </span>
+        ))}
+      </nav>
 
-      <div className="flex items-center gap-3">
-        {/* Command Palette trigger (search bar) */}
+      {/* Right: Actions */}
+      <div className="flex items-center gap-2">
+        {/* Command Palette trigger */}
         <button
           onClick={openCommandPalette}
-          className="hidden md:flex items-center bg-neutral-100/80 hover:bg-neutral-100 px-4 py-2.5 rounded-2xl transition-all duration-200 w-64 group"
+          className="hidden md:flex items-center bg-zinc-50 hover:bg-zinc-100 border border-zinc-200/60 px-3 py-1.5 rounded-lg transition-all duration-150 w-56 group"
           aria-label="Recherche rapide"
         >
-          <Search className="w-4 h-4 text-neutral-400 mr-2.5 flex-shrink-0" aria-hidden="true" />
-          <span className="text-sm text-neutral-400 flex-1 text-left">Rechercher...</span>
-          <kbd className="hidden sm:inline-flex items-center gap-0.5 px-1.5 py-0.5 text-[10px] font-medium text-neutral-400 bg-white/80 border border-neutral-200 rounded-md ml-2">
+          <Search className="w-3.5 h-3.5 text-zinc-400 mr-2 flex-shrink-0" aria-hidden="true" />
+          <span className="text-[13px] text-zinc-400 flex-1 text-left">Rechercher...</span>
+          <kbd className="hidden sm:inline-flex items-center gap-0.5 px-1.5 py-0.5 text-[10px] font-medium text-zinc-400 bg-white border border-zinc-200 rounded ml-2">
             <Command className="w-2.5 h-2.5" />K
           </kbd>
         </button>
@@ -40,7 +81,7 @@ export function Header({ title }: { title: string }) {
         <button
           type="button"
           aria-label={user?.fullName ? `Profil de ${user.fullName}` : 'Profil utilisateur'}
-          className="w-9 h-9 rounded-2xl bg-neutral-900 text-white flex items-center justify-center font-medium text-xs cursor-pointer overflow-hidden ring-1 ring-neutral-200 shadow-sm hover:opacity-90 focus:outline-none focus-visible:ring-2 focus-visible:ring-neutral-900 focus-visible:ring-offset-2 transition-opacity"
+          className="w-8 h-8 rounded-lg bg-zinc-900 text-white flex items-center justify-center font-medium text-[10px] cursor-pointer overflow-hidden ring-1 ring-zinc-200/50 hover:ring-zinc-300 focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-zinc-900 transition-all duration-150"
         >
           {user?.avatar ? (
             <img

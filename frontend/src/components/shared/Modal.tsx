@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { X } from 'lucide-react';
 
 interface ModalProps {
@@ -7,44 +7,70 @@ interface ModalProps {
   title: string;
   description?: string;
   children: React.ReactNode;
-  size?: 'sm' | 'md' | 'lg';
+  size?: 'sm' | 'md' | 'lg' | 'xl';
 }
 
 const sizeClasses = {
   sm: 'max-w-sm',
   md: 'max-w-lg',
   lg: 'max-w-2xl',
+  xl: 'max-w-4xl',
 };
 
 export function Modal({ isOpen, onClose, title, description, children, size = 'md' }: ModalProps) {
+  // Close on Escape
+  useEffect(() => {
+    if (!isOpen) return;
+    const handleEsc = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') onClose();
+    };
+    document.addEventListener('keydown', handleEsc);
+    return () => document.removeEventListener('keydown', handleEsc);
+  }, [isOpen, onClose]);
+
+  // Prevent body scroll when modal is open
+  useEffect(() => {
+    if (isOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
+    return () => { document.body.style.overflow = ''; };
+  }, [isOpen]);
+
   if (!isOpen) return null;
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
       {/* Backdrop */}
-      <div 
-        className="fixed inset-0 bg-black/40 backdrop-blur-sm animate-fade-in" 
+      <div
+        className="fixed inset-0 bg-zinc-950/40 backdrop-blur-[2px] animate-fade-in"
         onClick={onClose}
         aria-hidden="true"
       />
       {/* Panel */}
-      <div className={`relative bg-white rounded-2xl shadow-xl w-full ${sizeClasses[size]} max-h-[90vh] flex flex-col overflow-hidden animate-scale-in`}>
+      <div
+        className={`relative bg-white rounded-xl shadow-[var(--shadow-xl)] w-full ${sizeClasses[size]} max-h-[85vh] flex flex-col overflow-hidden animate-scale-in`}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="modal-title"
+      >
         {/* Header */}
-        <div className="flex items-start justify-between px-6 pt-6 pb-4">
+        <div className="flex items-start justify-between px-6 pt-5 pb-4 border-b border-zinc-100">
           <div>
-            <h2 className="text-lg font-semibold text-gray-900">{title}</h2>
-            {description && <p className="text-sm text-gray-500 mt-1">{description}</p>}
+            <h2 id="modal-title" className="text-[15px] font-semibold text-zinc-900">{title}</h2>
+            {description && <p className="text-[13px] text-zinc-500 mt-0.5">{description}</p>}
           </div>
-          <button 
-            onClick={onClose} 
-            className="p-1.5 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-all duration-200 -mt-1 -mr-1"
+          <button
+            onClick={onClose}
+            className="p-1 text-zinc-400 hover:text-zinc-600 hover:bg-zinc-100 rounded-md transition-all duration-150 -mt-0.5 -mr-1"
             aria-label="Fermer"
           >
-            <X className="w-5 h-5" />
+            <X className="w-4 h-4" />
           </button>
         </div>
         {/* Content */}
-        <div className="px-6 pb-6 overflow-y-auto flex-1">
+        <div className="px-6 py-5 overflow-y-auto flex-1">
           {children}
         </div>
       </div>

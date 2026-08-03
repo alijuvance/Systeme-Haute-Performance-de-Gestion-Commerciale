@@ -14,13 +14,13 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(
     return (
       <div className="w-full">
         {label && (
-          <label htmlFor={inputId} className="block text-sm font-medium text-gray-700 mb-1.5">
+          <label htmlFor={inputId} className="block text-[13px] font-medium text-zinc-700 mb-1.5">
             {label}
           </label>
         )}
         <div className="relative">
           {icon && (
-            <div className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none">
+            <div className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-400 pointer-events-none">
               {icon}
             </div>
           )}
@@ -28,20 +28,23 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(
             ref={ref}
             id={inputId}
             className={`
-              w-full px-3 py-2 text-sm text-gray-900 placeholder-gray-400
+              w-full px-3 py-[7px] text-[13px] text-zinc-900 placeholder-zinc-400
               bg-white border rounded-lg
-              transition-all duration-200
-              focus:outline-none focus:ring-2 focus:ring-gray-900/10 focus:border-gray-400
-              disabled:opacity-50 disabled:cursor-not-allowed disabled:bg-gray-50
-              ${icon ? 'pl-10' : ''}
-              ${error ? 'border-red-300 focus:ring-red-500/10 focus:border-red-400' : 'border-gray-200 hover:border-gray-300'}
+              transition-all duration-150 ease-[cubic-bezier(0.25,0.1,0.25,1)]
+              focus:outline-none focus:border-zinc-400 focus:ring-2 focus:ring-zinc-900/8
+              disabled:opacity-50 disabled:cursor-not-allowed disabled:bg-zinc-50
+              ${icon ? 'pl-9' : ''}
+              ${error
+                ? 'border-red-300 focus:ring-red-500/10 focus:border-red-400'
+                : 'border-zinc-200 hover:border-zinc-300'
+              }
               ${className}
             `}
             {...props}
           />
         </div>
-        {error && <p className="mt-1.5 text-xs text-red-600">{error}</p>}
-        {hint && !error && <p className="mt-1.5 text-xs text-gray-400">{hint}</p>}
+        {error && <p className="mt-1 text-xs text-red-600">{error}</p>}
+        {hint && !error && <p className="mt-1 text-xs text-zinc-400">{hint}</p>}
       </div>
     );
   }

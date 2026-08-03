@@ -8,31 +8,31 @@ interface CardProps {
 }
 
 const variantStyles = {
-  default: 'bg-white rounded-xl shadow-sm',
-  elevated: 'bg-white rounded-xl shadow-md',
-  bordered: 'bg-white rounded-xl border border-gray-200',
+  default:  'bg-white rounded-xl shadow-[var(--shadow-card)]',
+  elevated: 'bg-white rounded-xl shadow-[var(--shadow-md)]',
+  bordered: 'bg-white rounded-xl border border-zinc-200/60',
 };
 
 const paddingStyles = {
   none: '',
-  sm: 'p-4',
-  md: 'p-5',
-  lg: 'p-6',
+  sm:   'p-4',
+  md:   'p-5',
+  lg:   'p-6',
 };
 
 export function Card({ children, variant = 'default', padding = 'md', className = '' }: CardProps) {
   return (
-    <div className={`${variantStyles[variant]} ${paddingStyles[padding]} ${className}`}>
+    <div className={`${variantStyles[variant]} ${paddingStyles[padding]} transition-shadow duration-200 ${className}`}>
       {children}
     </div>
   );
 }
 
-/* Card sub-components for structured content */
+/* Sub-components */
 
 export function CardHeader({ children, className = '' }: { children: React.ReactNode; className?: string }) {
   return (
-    <div className={`pb-4 border-b border-gray-100 mb-4 ${className}`}>
+    <div className={`pb-4 mb-4 border-b border-zinc-100 ${className}`}>
       {children}
     </div>
   );
@@ -40,7 +40,7 @@ export function CardHeader({ children, className = '' }: { children: React.React
 
 export function CardTitle({ children, className = '' }: { children: React.ReactNode; className?: string }) {
   return (
-    <h3 className={`text-base font-semibold text-gray-900 ${className}`}>
+    <h3 className={`text-[14px] font-semibold text-zinc-900 ${className}`}>
       {children}
     </h3>
   );
@@ -48,7 +48,7 @@ export function CardTitle({ children, className = '' }: { children: React.ReactN
 
 export function CardDescription({ children, className = '' }: { children: React.ReactNode; className?: string }) {
   return (
-    <p className={`text-sm text-gray-500 mt-1 ${className}`}>
+    <p className={`text-[13px] text-zinc-500 mt-0.5 ${className}`}>
       {children}
     </p>
   );
