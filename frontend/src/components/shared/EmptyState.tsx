@@ -24,16 +24,16 @@ export function EmptyState({
   return (
     <div className={`flex flex-col items-center justify-center py-16 px-6 ${className}`}>
       {/* Icon circle */}
-      <div className="w-14 h-14 rounded-2xl bg-gray-50 border border-gray-100 flex items-center justify-center mb-4">
-        {icon || <Inbox className="w-6 h-6 text-gray-300" />}
+      <div className="w-14 h-14 rounded-2xl bg-zinc-50 border border-zinc-100 flex items-center justify-center mb-4">
+        {icon || <Inbox className="w-6 h-6 text-zinc-300" />}
       </div>
       
       {/* Title */}
-      <h3 className="text-sm font-semibold text-gray-900 mb-1">{title}</h3>
+      <h3 className="text-[14px] font-semibold text-zinc-900 mb-1">{title}</h3>
       
       {/* Description */}
       {description && (
-        <p className="text-sm text-gray-500 text-center max-w-sm mb-5">{description}</p>
+        <p className="text-[13px] text-zinc-500 text-center max-w-sm mb-5">{description}</p>
       )}
       
       {/* CTA */}
