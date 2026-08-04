@@ -21,7 +21,6 @@ const widthClasses: Record<string, string> = {
 };
 
 export default function Drawer({ isOpen, onClose, title, description, children, footer, width = 'xl' }: DrawerProps) {
-  // Escape key handler
   const handleKeyDown = useCallback(
     (e: KeyboardEvent) => {
       if (e.key === 'Escape') onClose();
@@ -46,7 +45,7 @@ export default function Drawer({ isOpen, onClose, title, description, children, 
     <>
       {/* Backdrop */}
       <div
-        className={`fixed inset-0 z-50 bg-black/40 backdrop-blur-sm transition-opacity duration-300 ease-in-out ${
+        className={`fixed inset-0 z-50 bg-zinc-950/40 backdrop-blur-[2px] transition-opacity duration-300 ease-[cubic-bezier(0.25,0.1,0.25,1)] ${
           isOpen ? 'opacity-100' : 'pointer-events-none opacity-0'
         }`}
         onClick={onClose}
@@ -55,7 +54,7 @@ export default function Drawer({ isOpen, onClose, title, description, children, 
 
       {/* Drawer panel */}
       <div
-        className={`fixed inset-y-0 right-0 z-50 flex w-full ${widthClasses[width]} flex-col bg-white shadow-2xl rounded-l-2xl transition-transform duration-300 ease-in-out ${
+        className={`fixed inset-y-0 right-0 z-50 flex w-full ${widthClasses[width]} flex-col bg-white shadow-[var(--shadow-xl)] rounded-l-2xl transition-transform duration-300 ease-[cubic-bezier(0.25,0.1,0.25,1)] ${
           isOpen ? 'translate-x-0' : 'translate-x-full'
         }`}
         role="dialog"
@@ -63,20 +62,20 @@ export default function Drawer({ isOpen, onClose, title, description, children, 
         aria-label={title}
       >
         {/* Header */}
-        <div className="flex items-start justify-between px-6 py-5 border-b border-gray-100">
+        <div className="flex items-start justify-between px-6 py-5 border-b border-zinc-100">
           <div>
-            <h2 className="text-lg font-semibold text-gray-900">{title}</h2>
+            <h2 className="text-[15px] font-semibold text-zinc-900">{title}</h2>
             {description && (
-              <p className="mt-1 text-sm text-gray-500">{description}</p>
+              <p className="mt-0.5 text-[13px] text-zinc-500">{description}</p>
             )}
           </div>
           <button
             type="button"
             onClick={onClose}
-            className="p-1.5 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-all duration-200"
+            className="p-1.5 text-zinc-400 hover:text-zinc-600 hover:bg-zinc-100 rounded-md transition-all duration-150 -mt-1 -mr-1"
             aria-label="Fermer"
           >
-            <X className="h-5 w-5" />
+            <X className="w-4 h-4" />
           </button>
         </div>
 
@@ -87,7 +86,7 @@ export default function Drawer({ isOpen, onClose, title, description, children, 
 
         {/* Sticky footer */}
         {footer && (
-          <div className="border-t border-gray-100 bg-gray-50/50 px-6 py-4">
+          <div className="border-t border-zinc-100 bg-zinc-50/50 px-6 py-4">
             {footer}
           </div>
         )}

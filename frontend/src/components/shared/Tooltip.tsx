@@ -39,10 +39,10 @@ export function Tooltip({ children, content, position = 'top', delay = 300, clas
   };
 
   const arrowClasses: Record<Position, string> = {
-    top: 'top-full left-1/2 -translate-x-1/2 border-t-gray-900 border-l-transparent border-r-transparent border-b-transparent',
-    bottom: 'bottom-full left-1/2 -translate-x-1/2 border-b-gray-900 border-l-transparent border-r-transparent border-t-transparent',
-    left: 'left-full top-1/2 -translate-y-1/2 border-l-gray-900 border-t-transparent border-b-transparent border-r-transparent',
-    right: 'right-full top-1/2 -translate-y-1/2 border-r-gray-900 border-t-transparent border-b-transparent border-l-transparent',
+    top: 'top-full left-1/2 -translate-x-1/2 border-t-zinc-900 border-l-transparent border-r-transparent border-b-transparent',
+    bottom: 'bottom-full left-1/2 -translate-x-1/2 border-b-zinc-900 border-l-transparent border-r-transparent border-t-transparent',
+    left: 'left-full top-1/2 -translate-y-1/2 border-l-zinc-900 border-t-transparent border-b-transparent border-r-transparent',
+    right: 'right-full top-1/2 -translate-y-1/2 border-r-zinc-900 border-t-transparent border-b-transparent border-l-transparent',
   };
 
   return (
@@ -53,7 +53,7 @@ export function Tooltip({ children, content, position = 'top', delay = 300, clas
           className={`absolute z-50 ${positionClasses[position]} pointer-events-none animate-fade-in`}
           role="tooltip"
         >
-          <span className="block px-2.5 py-1.5 text-xs font-medium text-white bg-gray-900 rounded-lg shadow-lg whitespace-nowrap">
+          <span className="block px-2.5 py-1.5 text-[11px] font-medium text-white bg-zinc-900 rounded-md shadow-lg whitespace-nowrap tracking-wide">
             {content}
           </span>
           <span className={`absolute w-0 h-0 border-[4px] ${arrowClasses[position]}`} />

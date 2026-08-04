@@ -1,6 +1,7 @@
 import React from 'react';
 import { Calendar } from 'lucide-react';
 import { Input } from '@/components/shared/Input';
+import { Card } from '@/components/shared/Card';
 
 interface DashboardFiltersProps {
   period: string;
@@ -29,41 +30,43 @@ export const DashboardFilters: React.FC<DashboardFiltersProps> = ({
   ];
 
   return (
-    <div className="bg-white rounded-xl shadow-sm p-4 mb-6 flex flex-col md:flex-row md:items-center justify-between gap-4">
+    <Card padding="sm" className="flex flex-col md:flex-row md:items-center justify-between gap-4">
       <div className="flex flex-wrap items-center gap-2">
-        <Calendar className="w-5 h-5 text-gray-400 mr-2" />
-        {periods.map((p) => (
-          <button
-            key={p.id}
-            onClick={() => setPeriod(p.id)}
-            className={`px-3 py-1.5 text-sm font-medium rounded-lg transition-colors ${
-              period === p.id
-                ? 'bg-indigo-50 text-indigo-700'
-                : 'text-gray-600 hover:bg-gray-50'
-            }`}
-          >
-            {p.label}
-          </button>
-        ))}
+        <Calendar className="w-4 h-4 text-zinc-400 mx-2" />
+        <div className="flex flex-wrap items-center gap-1 bg-zinc-50 p-1 rounded-lg">
+          {periods.map((p) => (
+            <button
+              key={p.id}
+              onClick={() => setPeriod(p.id)}
+              className={`px-3 py-1.5 text-[12px] font-medium rounded-md transition-colors duration-150 ${
+                period === p.id
+                  ? 'bg-white text-zinc-900 shadow-sm ring-1 ring-zinc-200/50'
+                  : 'text-zinc-500 hover:text-zinc-900 hover:bg-zinc-100/50'
+              }`}
+            >
+              {p.label}
+            </button>
+          ))}
+        </div>
       </div>
 
       {period === 'custom' && (
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 px-2">
           <Input
             type="date"
             value={startDate}
             onChange={(e) => setStartDate(e.target.value)}
-            className="w-40"
+            className="w-36 h-8 text-[12px]"
           />
-          <span className="text-gray-400">-</span>
+          <span className="text-zinc-400 text-[12px]">-</span>
           <Input
             type="date"
             value={endDate}
             onChange={(e) => setEndDate(e.target.value)}
-            className="w-40"
+            className="w-36 h-8 text-[12px]"
           />
         </div>
       )}
-    </div>
+    </Card>
   );
 };
