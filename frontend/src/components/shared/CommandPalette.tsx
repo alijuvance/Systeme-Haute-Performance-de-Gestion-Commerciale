@@ -18,7 +18,7 @@ interface CommandItem {
   href?: string;
   action?: () => void;
   group: string;
-  roles?: string[]; // Si vide, accessible à tous
+  roles?: string[];
 }
 
 const defaultItems: CommandItem[] = [
@@ -43,6 +43,7 @@ export function CommandPalette() {
   const [query, setQuery] = useState('');
   const [selectedIndex, setSelectedIndex] = useState(0);
   const inputRef = useRef<HTMLInputElement>(null);
+  const listRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
   const { user } = useAuth();
   const currentRole = user?.role?.name || user?.role || 'MANAGER';
@@ -62,16 +63,20 @@ export function CommandPalette() {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, []);
 
-  // Focus input when opened
+  // Focus input when opened + lock body scroll
   useEffect(() => {
     if (isOpen) {
       setQuery('');
       setSelectedIndex(0);
+      document.body.style.overflow = 'hidden';
       setTimeout(() => inputRef.current?.focus(), 50);
+    } else {
+      document.body.style.overflow = '';
     }
+    return () => { document.body.style.overflow = ''; };
   }, [isOpen]);
 
-  // Filter items by role first
+  // Filter items by role
   const roleAllowedItems = defaultItems.filter(item => 
     !item.roles || item.roles.includes(currentRole as string)
   );
@@ -92,6 +97,13 @@ export function CommandPalette() {
   }, {});
 
   const flatItems = Object.values(groups).flat();
+
+  // Scroll selected item into view
+  useEffect(() => {
+    if (!listRef.current) return;
+    const selected = listRef.current.querySelector(`[data-index="${selectedIndex}"]`);
+    if (selected) selected.scrollIntoView({ block: 'nearest' });
+  }, [selectedIndex]);
 
   // Keyboard navigation
   const handleKeyDown = (e: React.KeyboardEvent) => {
@@ -120,15 +132,15 @@ export function CommandPalette() {
     <div className="fixed inset-0 z-[100] flex items-start justify-center pt-[15vh]">
       {/* Backdrop */}
       <div 
-        className="fixed inset-0 bg-black/50 backdrop-blur-sm animate-fade-in" 
+        className="fixed inset-0 bg-zinc-950/40 backdrop-blur-[2px] animate-fade-in" 
         onClick={() => setIsOpen(false)} 
       />
       
       {/* Panel */}
-      <div className="relative w-full max-w-lg bg-white rounded-2xl shadow-2xl overflow-hidden animate-scale-in border border-gray-200">
+      <div className="relative w-full max-w-lg bg-white rounded-xl shadow-[var(--shadow-xl)] overflow-hidden animate-scale-in border border-zinc-200/60">
         {/* Search input */}
-        <div className="flex items-center gap-3 px-4 py-3 border-b border-gray-100">
-          <Search className="w-5 h-5 text-gray-400 flex-shrink-0" />
+        <div className="flex items-center gap-3 px-4 py-3 border-b border-zinc-100">
+          <Search className="w-4 h-4 text-zinc-400 flex-shrink-0" />
           <input
             ref={inputRef}
             type="text"
@@ -136,24 +148,24 @@ export function CommandPalette() {
             value={query}
             onChange={(e) => { setQuery(e.target.value); setSelectedIndex(0); }}
             onKeyDown={handleKeyDown}
-            className="flex-1 text-sm text-gray-900 placeholder-gray-400 bg-transparent outline-none"
+            className="flex-1 text-[13px] text-zinc-900 placeholder-zinc-400 bg-transparent outline-none"
           />
-          <kbd className="hidden sm:inline-flex items-center gap-1 px-1.5 py-0.5 text-[10px] font-medium text-gray-400 bg-gray-50 border border-gray-200 rounded">
+          <kbd className="hidden sm:inline-flex items-center gap-1 px-1.5 py-0.5 text-[10px] font-medium text-zinc-400 bg-zinc-50 border border-zinc-200 rounded-md">
             ESC
           </kbd>
         </div>
 
         {/* Results */}
-        <div className="max-h-[320px] overflow-y-auto py-2">
+        <div ref={listRef} className="max-h-[320px] overflow-y-auto py-1.5 scrollbar-hide">
           {flatItems.length === 0 && (
-            <div className="px-4 py-8 text-center text-sm text-gray-400">
-              Aucun résultat pour "{query}"
+            <div className="px-4 py-8 text-center text-[13px] text-zinc-400">
+              Aucun résultat pour &quot;{query}&quot;
             </div>
           )}
 
           {Object.entries(groups).map(([groupName, items]) => (
             <div key={groupName}>
-              <div className="px-4 py-1.5 text-[11px] font-semibold text-gray-400 uppercase tracking-wider">
+              <div className="px-4 py-1.5 text-[10px] font-semibold text-zinc-400 uppercase tracking-[0.08em]">
                 {groupName}
               </div>
               {items.map((item) => {
@@ -161,28 +173,29 @@ export function CommandPalette() {
                 return (
                   <button
                     key={item.id}
+                    data-index={globalIdx}
                     onClick={() => executeItem(item)}
                     onMouseEnter={() => setSelectedIndex(globalIdx)}
                     className={`
-                      w-full flex items-center gap-3 px-4 py-2.5 text-left transition-colors duration-100
-                      ${selectedIndex === globalIdx ? 'bg-gray-50' : ''}
+                      w-full flex items-center gap-3 px-4 py-2 text-left transition-colors duration-100
+                      ${selectedIndex === globalIdx ? 'bg-zinc-50' : ''}
                     `}
                   >
                     <span className={`
-                      flex items-center justify-center w-8 h-8 rounded-lg flex-shrink-0
-                      ${selectedIndex === globalIdx ? 'bg-gray-900 text-white' : 'bg-gray-100 text-gray-500'}
+                      flex items-center justify-center w-7 h-7 rounded-md flex-shrink-0
+                      ${selectedIndex === globalIdx ? 'bg-zinc-900 text-white' : 'bg-zinc-100 text-zinc-500'}
                       transition-colors duration-100
                     `}>
                       {item.icon}
                     </span>
                     <div className="flex-1 min-w-0">
-                      <p className="text-sm font-medium text-gray-900 truncate">{item.label}</p>
+                      <p className="text-[13px] font-medium text-zinc-900 truncate">{item.label}</p>
                       {item.description && (
-                        <p className="text-xs text-gray-400 truncate">{item.description}</p>
+                        <p className="text-[11px] text-zinc-400 truncate">{item.description}</p>
                       )}
                     </div>
                     {selectedIndex === globalIdx && (
-                      <ArrowRight className="w-4 h-4 text-gray-400 flex-shrink-0" />
+                      <ArrowRight className="w-3.5 h-3.5 text-zinc-400 flex-shrink-0" />
                     )}
                   </button>
                 );
@@ -192,18 +205,18 @@ export function CommandPalette() {
         </div>
 
         {/* Footer */}
-        <div className="flex items-center justify-between px-4 py-2.5 border-t border-gray-100 bg-gray-50/50">
-          <div className="flex items-center gap-3 text-[11px] text-gray-400">
+        <div className="flex items-center justify-between px-4 py-2 border-t border-zinc-100 bg-zinc-50/50">
+          <div className="flex items-center gap-3 text-[10px] text-zinc-400">
             <span className="inline-flex items-center gap-1">
-              <kbd className="px-1 py-0.5 bg-white border border-gray-200 rounded text-[10px]">↑↓</kbd>
+              <kbd className="px-1 py-0.5 bg-white border border-zinc-200 rounded text-[10px]">↑↓</kbd>
               naviguer
             </span>
             <span className="inline-flex items-center gap-1">
-              <kbd className="px-1 py-0.5 bg-white border border-gray-200 rounded text-[10px]">↵</kbd>
+              <kbd className="px-1 py-0.5 bg-white border border-zinc-200 rounded text-[10px]">↵</kbd>
               ouvrir
             </span>
           </div>
-          <div className="flex items-center gap-1 text-[11px] text-gray-400">
+          <div className="flex items-center gap-1 text-[10px] text-zinc-400">
             <Command className="w-3 h-3" /> K
           </div>
         </div>
